@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:ems="10"
+            android:id="@+id/cityIDfield"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="15dp"
+            android:hint="@string/label_cityid"
+            android:textColor="@android:color/black"
+            android:textCursorDrawable="@null"
+            />
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/label_popular_cities"
+            android:id="@+id/textView"
+            android:layout_below="@+id/cityIDfield"
+            android:layout_marginTop="10dp"
+            android:layout_alignParentBottom="false"
+            android:layout_alignLeft="@+id/cityIDfield"
+            android:textAlignment="center"
+            android:paddingBottom="10dp"
+            android:textColor="@android:color/primary_text_light"/>
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/label_popular_cities_c2"
+            android:id="@+id/textView2"
+            android:layout_alignTop="@+id/textView"
+            android:layout_marginLeft="10dp"
+            android:layout_alignBottom="@+id/textView"
+            android:layout_toRightOf="@+id/textView"
+            android:layout_alignRight="@+id/cityIDfield"
+            android:textColor="@android:color/primary_text_light"
+            android:layout_marginRight="-10dp"/>
+</RelativeLayout>

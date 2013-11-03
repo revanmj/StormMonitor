@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Storm Monitor</string>
+    <string name="title_activity_test_data">Testowe</string>
+    <string name="menu_addcity">Dodaj miasto</string>
+    <string name="menu_about">O programie</string>
+    <string name="menu_delete">Usuń</string>
+    <string name="menu_delete_q">Usunąć miasto?</string>
+    <string name="message_error">Błąd!</string>
+    <string name="message_no_connection">Brak połączenia z serwerem antistorm.eu. Sprawdź czy jesteś połączony z internetem.</string>
+    <string name="message_city_exists">To miasto jest już dodane</string>
+    <string name="message_no_such_city">Błędne ID miasta</string>
+    <string name="label_cityid">Numer ID miasta</string>
+    <string name="label__time">Czas do burzy: </string>
+    <string name="label_storm_prob">Szanse na burzę: </string>
+    <string name="label_popular_cities">390 - Warszawa\n408 - Wrocław\n188 - Łódź\n177 - Lublin\n134 - Kołobrzeg</string>
+    <string name="label_popular_cities_c2">148 - Kraków\n275 - Poznań\n416 - Zakopane\n156 - Krynica\n72   - Gdańsk</string>
+    <string name="button_cancel">Anuluj</string>
+    <string name="button_add">Dodaj</string>
+    <string name="button_ok">OK</string>
+
+</resources>
