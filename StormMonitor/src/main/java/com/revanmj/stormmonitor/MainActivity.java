@@ -123,10 +123,10 @@ public class MainActivity extends ActionBarActivity {
         cityStorm.addAll(result);
         sdAdapter.notifyDataSetChanged();
 
-        if (refreshButton != null && refreshButton.getActionView() != null) {
-            refreshButton.getActionView().clearAnimation();
-            refreshButton.setActionView(null);
-        }
+//        if (refreshButton != null && refreshButton.getActionView() != null) {
+//            refreshButton.getActionView().clearAnimation();
+//            refreshButton.setActionView(null);
+//        }
     }
 
     private class JSONStormTask extends AsyncTask<List<Integer>, Void, List<StormData>> {
@@ -248,9 +248,9 @@ public class MainActivity extends ActionBarActivity {
                 LayoutInflater inflater = (LayoutInflater) getApplication().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 ImageView iv = (ImageView) inflater.inflate(R.layout.refresh_icon, null);
                 Animation rotation = AnimationUtils.loadAnimation(getApplication(), R.anim.refresh);
-                rotation.setRepeatCount(Animation.INFINITE);
-                iv.startAnimation(rotation);
-                refreshButton.setActionView(iv);
+                //rotation.setRepeatCount(Animation.INFINITE);
+                //iv.startAnimation(rotation);
+                //refreshButton.setActionView(iv);
                 RefreshData();
                 sdAdapter.notifyDataSetChanged();
                 return true;
@@ -264,10 +264,10 @@ public class MainActivity extends ActionBarActivity {
             JSONStormTask task = new JSONStormTask();
             task.execute(cities);
         } else {
-            if (refreshButton != null && refreshButton.getActionView() != null) {
-                refreshButton.getActionView().clearAnimation();
-                refreshButton.setActionView(null);
-            }
+//            if (refreshButton != null && refreshButton.getActionView() != null) {
+//                refreshButton.getActionView().clearAnimation();
+//                refreshButton.setActionView(null);
+//            }
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
             builder.setMessage(R.string.message_no_connection);
             builder.setTitle(R.string.message_error);
