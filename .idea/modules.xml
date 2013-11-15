@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/StormMonitor/StormMonitor.iml" filepath="$PROJECT_DIR$/StormMonitor/StormMonitor.iml" />
+      <module fileurl="file://$PROJECT_DIR$/StormMonitor/StormMonitor-StormMonitor.iml" filepath="$PROJECT_DIR$/StormMonitor/StormMonitor-StormMonitor.iml" />
       <module fileurl="file://$PROJECT_DIR$/StormMonitorProject.iml" filepath="$PROJECT_DIR$/StormMonitorProject.iml" />
     </modules>
   </component>
