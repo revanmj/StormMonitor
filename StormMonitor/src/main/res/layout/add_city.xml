@@ -30,7 +30,8 @@
             android:layout_alignLeft="@+id/cityIDfield"
             android:textAlignment="center"
             android:paddingBottom="10dp"
-            android:textColor="@android:color/primary_text_light"/>
+            android:textColor="@android:color/primary_text_light"
+        android:background="@android:color/background_light" />
 
     <TextView
             android:layout_width="wrap_content"
@@ -44,5 +45,6 @@
             android:layout_toRightOf="@+id/textView"
             android:layout_alignRight="@+id/cityIDfield"
             android:textColor="@android:color/primary_text_light"
-            android:layout_marginRight="-10dp"/>
+            android:layout_marginRight="-10dp"
+        android:background="@android:color/background_light" />
 </RelativeLayout>
