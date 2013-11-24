@@ -6,6 +6,7 @@ import java.io.Serializable;
  * Created by Student on 10.07.13.
  */
 public class StormData implements Serializable {
+    private int miasto_id;
     private String miasto;
     private int p_burzy;
     private int t_burzy;
@@ -41,6 +42,14 @@ public class StormData implements Serializable {
 
     public void setError(boolean error) {
         this.error = error;
+    }
+
+    public int getMiasto_id() {
+        return miasto_id;
+    }
+
+    public void setMiasto_id(int miasto_id) {
+        this.miasto_id = miasto_id;
     }
 }
 
