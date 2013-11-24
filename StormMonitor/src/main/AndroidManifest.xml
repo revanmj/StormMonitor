@@ -18,8 +18,8 @@
         android:theme="@style/Theme.AppCompat.Light.DarkActionBar" >
         <activity
             android:name="com.revanmj.stormmonitor.MainActivity"
-            android:label="@string/app_name"
-            android:configChanges="orientation|screenSize|keyboardHidden">
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -29,15 +29,15 @@
         <activity
             android:name="com.revanmj.stormmonitor.testData"
             android:label="@string/title_activity_test_data"
-            android:parentActivityName="com.revanmj.stormmonitor.MainActivity">
+            android:parentActivityName="com.revanmj.stormmonitor.MainActivity" >
         </activity>
         <activity
             android:name="com.revanmj.stormmonitor.About"
             android:label="@string/menu_about"
-            android:parentActivityName="com.revanmj.stormmonitor.MainActivity">
+            android:parentActivityName="com.revanmj.stormmonitor.MainActivity" >
         </activity>
 
-        <receiver android:name=".WidgetProvider" >
+        <receiver android:name="com.revanmj.stormmonitor.WidgetProvider" >
             <intent-filter>
 
                 <!-- This widget provider receives broadcast with following action name or simply onUpdate of AppWidgetProvider is called -->
@@ -50,8 +50,13 @@
         </receiver>
 
         <service
-            android:name=".WidgetService"
+            android:name="com.revanmj.stormmonitor.WidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <activity
+            android:name="com.revanmj.stormmonitor.SettingsActivity"
+            android:label="@string/title_activity_settings" >
+        </activity>
     </application>
 
 </manifest>
