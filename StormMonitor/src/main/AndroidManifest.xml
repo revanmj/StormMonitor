@@ -5,7 +5,7 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="10"
+        android:minSdkVersion="15"
         android:targetSdkVersion="19" />
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -25,11 +25,6 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity
-            android:name="com.revanmj.stormmonitor.testData"
-            android:label="@string/title_activity_test_data"
-            android:parentActivityName="com.revanmj.stormmonitor.MainActivity" >
         </activity>
         <activity
             android:name="com.revanmj.stormmonitor.About"
@@ -56,6 +51,10 @@
         <activity
             android:name="com.revanmj.stormmonitor.SettingsActivity"
             android:label="@string/title_activity_settings" >
+        </activity>
+        <activity
+            android:name=".Map"
+            android:label="@string/title_activity_map" >
         </activity>
     </application>
 

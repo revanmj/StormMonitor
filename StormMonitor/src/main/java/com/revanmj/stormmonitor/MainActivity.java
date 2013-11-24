@@ -1,5 +1,6 @@
 package com.revanmj.stormmonitor;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -7,7 +8,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -30,7 +30,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends Activity {
 
     private List<StormData> cityStorm;
     private List<Integer> cities;
@@ -235,10 +235,6 @@ public class MainActivity extends ActionBarActivity {
                 });
                 imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
                 return true;
-            //case R.id.action_test:
-            //    Intent test = new Intent(MainActivity.this, testData.class);
-            //    MainActivity.this.startActivity(test);
-            //    return true;
             case R.id.action_about:
                 Intent about = new Intent(MainActivity.this, About.class);
                 MainActivity.this.startActivity(about);
