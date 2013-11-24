@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.ContextMenu;
@@ -39,7 +38,6 @@ public class MainActivity extends ActionBarActivity {
     private MenuItem refreshButton;
     private Menu mainMenu;
     private boolean start = true;
-    private boolean err_down = false;
     private ListView lista;
     private File miasta;
 
@@ -125,12 +123,10 @@ public class MainActivity extends ActionBarActivity {
         cityStorm.addAll(result);
         sdAdapter.notifyDataSetChanged();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            if (refreshButton != null && refreshButton.getActionView() != null) {
-              refreshButton.getActionView().clearAnimation();
-              refreshButton.setActionView(null);
-            }
-        }
+//        if (refreshButton != null && refreshButton.getActionView() != null) {
+//            refreshButton.getActionView().clearAnimation();
+//            refreshButton.setActionView(null);
+//        }
     }
 
     private class JSONStormTask extends AsyncTask<List<Integer>, Void, List<StormData>> {
@@ -157,7 +153,10 @@ public class MainActivity extends ActionBarActivity {
                         }
                     }
                     else {
-                        err_down = true;
+                        stormData.setP_burzy(0);
+                        stormData.setT_burzy(500);
+                        stormData.setMiasto("Pobieranie nie powiodło się!");
+                        stormData.setError(true);
                     }
                 }
             }
@@ -236,7 +235,7 @@ public class MainActivity extends ActionBarActivity {
                 });
                 imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
                 return true;
-            //    case R.id.action_test:
+            //case R.id.action_test:
             //    Intent test = new Intent(MainActivity.this, testData.class);
             //    MainActivity.this.startActivity(test);
             //    return true;
@@ -249,12 +248,9 @@ public class MainActivity extends ActionBarActivity {
                 LayoutInflater inflater = (LayoutInflater) getApplication().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 ImageView iv = (ImageView) inflater.inflate(R.layout.refresh_icon, null);
                 Animation rotation = AnimationUtils.loadAnimation(getApplication(), R.anim.refresh);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                    rotation.setRepeatCount(Animation.INFINITE);
-                    iv.startAnimation(rotation);
-                    refreshButton.setActionView(iv);
-                }
-
+                //rotation.setRepeatCount(Animation.INFINITE);
+                //iv.startAnimation(rotation);
+                //refreshButton.setActionView(iv);
                 RefreshData();
                 sdAdapter.notifyDataSetChanged();
                 return true;
@@ -264,15 +260,14 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void RefreshData() {
-        JSONStormTask task = new JSONStormTask();
-        task.execute(cities);
-        if (err_down) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                if (refreshButton != null && refreshButton.getActionView() != null) {
-                    refreshButton.getActionView().clearAnimation();
-                    refreshButton.setActionView(null);
-                }
-            }
+        if (CheckConnection.isHttpsAvalable("http://antistorm.eu/")) {
+            JSONStormTask task = new JSONStormTask();
+            task.execute(cities);
+        } else {
+//            if (refreshButton != null && refreshButton.getActionView() != null) {
+//                refreshButton.getActionView().clearAnimation();
+//                refreshButton.setActionView(null);
+//            }
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
             builder.setMessage(R.string.message_no_connection);
             builder.setTitle(R.string.message_error);
