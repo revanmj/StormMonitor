@@ -1,23 +1,22 @@
 package com.revanmj.stormmonitor;
 
+import android.app.Activity;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
-import android.support.v7.app.ActionBarActivity;
 
-public class About extends ActionBarActivity {
+public class About extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
 
-        getSupportActionBar().setTitle("O aplikacji");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setTitle("O aplikacji");
+        getActionBar().setDisplayHomeAsUpEnabled(true);
 
         TextView wersja = (TextView) findViewById(R.id.textView3);
 
@@ -42,7 +41,7 @@ public class About extends ActionBarActivity {
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
             case android.R.id.home:
-                NavUtils.navigateUpFromSameTask(this);
+                //NavUtils.navigateUpFromSameTask(this);
                 return true;
         }
         return super.onOptionsItemSelected(item);
