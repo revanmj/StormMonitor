@@ -239,6 +239,10 @@ public class MainActivity extends Activity {
                 Intent about = new Intent(MainActivity.this, About.class);
                 MainActivity.this.startActivity(about);
                 return true;
+            case R.id.action_map:
+                Intent map = new Intent(MainActivity.this, MapActivity.class);
+                MainActivity.this.startActivity(map);
+                return true;
             case R.id.action_refresh:
                 refreshButton = item;
                 LayoutInflater inflater = (LayoutInflater) getApplication().getSystemService(Context.LAYOUT_INFLATER_SERVICE);

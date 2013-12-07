@@ -31,6 +31,14 @@
             android:label="@string/menu_about"
             android:parentActivityName="com.revanmj.stormmonitor.MainActivity" >
         </activity>
+        <activity
+            android:name="com.revanmj.stormmonitor.MapActivity"
+            android:label="@string/title_activity_map"
+            android:parentActivityName="MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="MainActivity" />
+        </activity>
     </application>
 
 </manifest>
