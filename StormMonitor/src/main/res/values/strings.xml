@@ -11,6 +11,7 @@
     <string name="message_no_connection">Brak połączenia z serwerem antistorm.eu. Sprawdź czy jesteś połączony z internetem.</string>
     <string name="message_city_exists">To miasto jest już dodane</string>
     <string name="message_no_such_city">Błędne ID miasta</string>
+    <string name="message_map_error">Pobieranie mapy nie powiodło się.</string>
     <string name="label_cityid">Numer ID miasta</string>
     <string name="label__time">Czas do burzy: </string>
     <string name="label_storm_prob">Szanse na burzę: </string>
@@ -19,8 +20,6 @@
     <string name="button_cancel">Anuluj</string>
     <string name="button_add">Dodaj</string>
     <string name="button_ok">OK</string>
-    <string name="title_activity_map">Map</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
+    <string name="title_activity_map">Mapa</string>
 
 </resources>

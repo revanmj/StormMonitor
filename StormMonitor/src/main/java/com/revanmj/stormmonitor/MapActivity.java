@@ -1,35 +1,29 @@
 package com.revanmj.stormmonitor;
 
 import android.app.Activity;
-import android.app.ActionBar;
 import android.app.AlertDialog;
-import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.SurfaceView;
-import android.view.View;
-import android.view.ViewGroup;
-import android.os.Build;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Map;
 
 public class MapActivity extends Activity {
     Bitmap radar, probability, visual, velocity, estofex;
     Canvas image;
+    static TextView timeR;
     boolean error;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +33,7 @@ public class MapActivity extends Activity {
         RefreshMap();
         if (error) {
             AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this);
-            builder.setMessage(R.string.message_no_connection);
+            builder.setMessage(R.string.message_map_error);
             builder.setTitle(R.string.message_error);
             builder.setNeutralButton(R.string.button_ok, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
@@ -48,11 +42,6 @@ public class MapActivity extends Activity {
             });
             AlertDialog komunikat = builder.create();
             komunikat.show();
-        }
-        if (savedInstanceState == null) {
-            getFragmentManager().beginTransaction()
-                    .add(R.id.container, new PlaceholderFragment())
-                    .commit();
         }
     }
 
@@ -71,26 +60,11 @@ public class MapActivity extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_map_refresh) {
+            RefreshMap();
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-
-        public PlaceholderFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_map, container, false);
-            return rootView;
-        }
     }
 
     public Bitmap getBitmapFromURL(String src) {
@@ -114,7 +88,7 @@ public class MapActivity extends Activity {
         adresy[0] = "http://antistorm.eu/radar/radar.png";
         adresy[4] = "http://antistorm.eu/currentImgs/estofex.png";
         Calendar c = Calendar.getInstance();
-        int year = c.get(Calendar.YEAR), month = c.get(Calendar.MONTH), day = c.get(Calendar.DAY_OF_MONTH), hour = c.get(Calendar.HOUR), minutes = c.get(Calendar.MINUTE);
+        int year = c.get(Calendar.YEAR), month = c.get(Calendar.MONTH) + 1, day = c.get(Calendar.DAY_OF_MONTH), hour = c.get(Calendar.HOUR_OF_DAY), minutes = c.get(Calendar.MINUTE);
         if (minutes != 0 && minutes != 15 && minutes != 30 && minutes != 45) {
             if (minutes > 0 && minutes < 15)
                 minutes = 0;
@@ -125,34 +99,19 @@ public class MapActivity extends Activity {
             else if (minutes > 45 && minutes < 59)
                 minutes = 45;
         }
+        String timeS = day + "." + month + "." + year + " " + hour + ":";
+        if (minutes <10)
+            timeS = timeS + "0" + minutes;
+        else
+            timeS = timeS + minutes;
+
+        timeR = (TextView) findViewById(R.id.timeStamp);
+        timeR.setText(timeS);
         adresy[1] = "http://antistorm.eu/archive/" + year + "." + month + "." + day +"/" + hour + "-" + minutes + "-probabilitiesImg.png";
         adresy[2] = "http://antistorm.eu/archive/" + year + "." + month + "." + day +"/" + hour + "-" + minutes + "-velocityMapImg.png";
         adresy[2] = "http://antistorm.eu/archive/" + year + "." + month + "." + day +"/" + hour + "-" + minutes + "-stormVisualImg.png";
         BitmapTask task = new BitmapTask();
         task.execute(adresy);
-
-        if (radar != null && probability != null && visual != null && velocity != null && estofex != null) {
-            Bitmap mapa = BitmapFactory.decodeResource(getResources(), R.drawable.map);
-            image = new Canvas(mapa);
-            image.drawBitmap(radar, 0f, 0f, null);
-            image.drawBitmap(probability, 0f, 0f, null);
-            image.drawBitmap(visual, 0f, 0f, null);
-            image.drawBitmap(velocity, 0f, 0f, null);
-            image.drawBitmap(estofex, 0f, 0f, null);
-            SurfaceView mapView = (SurfaceView) findViewById(R.id.surfaceView);
-            mapView.draw(image);
-        } else {
-            AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this);
-            builder.setMessage(R.string.message_no_connection);
-            builder.setTitle(R.string.message_error);
-            builder.setNeutralButton(R.string.button_ok, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    dialog.cancel();
-                }
-            });
-            AlertDialog komunikat = builder.create();
-            komunikat.show();
-        }
     }
 
     private class BitmapTask extends AsyncTask<String, Void, ArrayList<Bitmap>> {
@@ -169,7 +128,7 @@ public class MapActivity extends Activity {
                 for (int i = 0; i < rozmiar; i++) {
                     tmp = getBitmapFromURL(params[i]);
                     if (tmp == null && i == 2)
-                       tmp = BitmapFactory.decodeResource(getResources(), R.drawable.blankVelocity);
+                       tmp = BitmapFactory.decodeResource(getResources(), R.drawable.blankvelocity);
                     else if (tmp == null)
                        tmp = BitmapFactory.decodeResource(getResources(), R.drawable.blank);
                     lista.add(tmp);
@@ -188,7 +147,19 @@ public class MapActivity extends Activity {
                 velocity = result.get(2);
                 visual = result.get(3);
                 estofex = result.get(4);
-            } else
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inMutable = true;
+                Bitmap mapa = BitmapFactory.decodeResource(getResources(), R.drawable.map, options);
+                image = new Canvas();
+                image.setBitmap(mapa);
+                image.drawBitmap(radar, 0f, 0f, null);
+                image.drawBitmap(probability, 0f, 0f, null);
+                image.drawBitmap(visual, 0f, 0f, null);
+                image.drawBitmap(velocity, 0f, 0f, null);
+                image.drawBitmap(estofex, 0f, 0f, null);
+                ImageView mapView = (ImageView) findViewById(R.id.mapView);
+                mapView.setImageBitmap(mapa);
+            } else if (result == null)
                 error = true;
             if (postep != null)
                 postep.dismiss();
@@ -197,7 +168,7 @@ public class MapActivity extends Activity {
         @Override
         protected void onPreExecute(){
             super.onPreExecute();
-            postep = ProgressDialog.show(MapActivity.this, "Pobieranie", "Trwa pobieranie danych ...", true, false);
+            postep = ProgressDialog.show(MapActivity.this, "Pobieranie", "Trwa pobieranie mapy ...", true, false);
         }
     }
 
