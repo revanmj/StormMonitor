@@ -2,10 +2,10 @@ package com.revanmj.stormmonitor;
 
 import android.content.Context;
 import android.view.LayoutInflater;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -38,7 +38,7 @@ public class StormDataAdapter extends ArrayAdapter<StormData> {
             holder.chance = (TextView) convertView.findViewById(R.id.chanceText);
             holder.time = (TextView) convertView.findViewById(R.id.timeText);
             holder.timeN = (TextView) convertView.findViewById(R.id.textView3);
-            holder.rect = (SurfaceView) convertView.findViewById(R.id.colorRectangle);
+            holder.rect = (ImageView) convertView.findViewById(R.id.colorRectangle);
 
             convertView.setTag(holder);
         } else {
@@ -49,7 +49,7 @@ public class StormDataAdapter extends ArrayAdapter<StormData> {
         TextView chance = holder.chance;
         TextView time = holder.time;
         TextView timeN = holder.timeN;
-        SurfaceView rect = holder.rect;
+        ImageView rect = holder.rect;
 
         city.setText(d.getMiasto());
         chance.setText(d.getP_burzy() + " / 255");
@@ -63,13 +63,13 @@ public class StormDataAdapter extends ArrayAdapter<StormData> {
             timeN.setVisibility(View.INVISIBLE);
         }
         if (t <= 120 && t > 60 && d.getP_burzy() > 30)
-            rect.setBackgroundResource(R.drawable.rectangle_yellow);
+            rect.setImageResource(R.drawable.rectangle_yellow);
         else if (t <= 60 && t > 20)
-            rect.setBackgroundResource(R.drawable.rectangle_orange);
+            rect.setImageResource(R.drawable.rectangle_orange);
         else if (t <= 20)
-            rect.setBackgroundResource(R.drawable.rectangle_red);
+            rect.setImageResource(R.drawable.rectangle_red);
         else
-            rect.setBackgroundResource(R.drawable.rectangle_green);
+            rect.setImageResource(R.drawable.rectangle_green);
 
         return convertView;
     }
@@ -79,7 +79,7 @@ public class StormDataAdapter extends ArrayAdapter<StormData> {
         public TextView chance;
         public TextView time;
         public TextView timeN;
-        public SurfaceView rect;
+        public ImageView rect;
     }
 
 }

@@ -129,11 +129,10 @@ public class MapActivity extends Activity {
     }
 
     private class BitmapTask extends AsyncTask<String, Void, ArrayList<Bitmap>> {
-        ArrayList<Bitmap> lista;
 
         @Override
         protected ArrayList<Bitmap> doInBackground(String... params) {
-            lista = new ArrayList<Bitmap>();
+            ArrayList<Bitmap> lista = new ArrayList<Bitmap>();
             if (params[0] != null) {
                 int rozmiar = params.length;
                 Bitmap tmp;
@@ -154,6 +153,7 @@ public class MapActivity extends Activity {
         @Override
         protected void onPostExecute(ArrayList<Bitmap> result) {
             if (result != null) {
+                mapView.clear();
                 radar = result.get(0);
                 probability = result.get(1);
                 velocity = result.get(2);
@@ -170,6 +170,7 @@ public class MapActivity extends Activity {
                 image.drawBitmap(velocity, 0f, 0f, null);
                 image.drawBitmap(estofex, 0f, 0f, null);
                 mapView.setImageBitmap(mapa);
+                radar = probability = velocity = visual = estofex = null;
             } else if (result == null)
                 error = true;
             if (postep != null)
