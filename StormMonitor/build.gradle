@@ -7,11 +7,9 @@ buildscript {
     }
 }
 apply plugin: 'android'
-
 repositories {
     mavenCentral()
 }
-
 android {
     compileSdkVersion 19
     buildToolsVersion "19.0.0"
@@ -20,4 +18,9 @@ android {
         minSdkVersion 15
         targetSdkVersion 19
     }
+}
+
+dependencies {
+    compile files('libs/ImageViewTouch.jar')
+    compile files('src/main/libs/ImageViewTouch.jar')
 }

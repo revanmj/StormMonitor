@@ -11,7 +11,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -20,15 +19,22 @@ import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import it.sephiroth.android.library.imagezoom.ImageViewTouch;
+
 public class MapActivity extends Activity {
-    Bitmap radar, probability, visual, velocity, estofex;
+    Bitmap radar, probability, visual, velocity, velocity_blank, estofex, blank;
     Canvas image;
     static TextView timeR;
+    ImageViewTouch mapView;
+    ProgressDialog postep;
     boolean error;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+        mapView = (ImageViewTouch) findViewById(R.id.mapView);
+        blank = BitmapFactory.decodeResource(getResources(), R.drawable.blank);
+        velocity_blank = BitmapFactory.decodeResource(getResources(), R.drawable.blankvelocity);
         error = false;
         RefreshMap();
         if (error) {
@@ -43,6 +49,14 @@ public class MapActivity extends Activity {
             AlertDialog komunikat = builder.create();
             komunikat.show();
         }
+    }
+
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+        if(postep != null)
+            postep.dismiss();
     }
 
 
@@ -115,8 +129,6 @@ public class MapActivity extends Activity {
     }
 
     private class BitmapTask extends AsyncTask<String, Void, ArrayList<Bitmap>> {
-
-        protected ProgressDialog postep;
         ArrayList<Bitmap> lista;
 
         @Override
@@ -128,9 +140,9 @@ public class MapActivity extends Activity {
                 for (int i = 0; i < rozmiar; i++) {
                     tmp = getBitmapFromURL(params[i]);
                     if (tmp == null && i == 2)
-                       tmp = BitmapFactory.decodeResource(getResources(), R.drawable.blankvelocity);
+                       tmp = velocity_blank;
                     else if (tmp == null)
-                       tmp = BitmapFactory.decodeResource(getResources(), R.drawable.blank);
+                       tmp = blank;
                     lista.add(tmp);
                 }
                 return lista;
@@ -157,7 +169,6 @@ public class MapActivity extends Activity {
                 image.drawBitmap(visual, 0f, 0f, null);
                 image.drawBitmap(velocity, 0f, 0f, null);
                 image.drawBitmap(estofex, 0f, 0f, null);
-                ImageView mapView = (ImageView) findViewById(R.id.mapView);
                 mapView.setImageBitmap(mapa);
             } else if (result == null)
                 error = true;

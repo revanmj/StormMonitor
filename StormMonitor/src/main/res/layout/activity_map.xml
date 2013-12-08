@@ -9,9 +9,9 @@
     tools:context="com.revanmj.stormmonitor.MapActivity$PlaceholderFragment"
     android:padding="0dp">
 
-    <ImageView
+    <it.sephiroth.android.library.imagezoom.ImageViewTouch
         android:layout_width="384dp"
-        android:layout_height="384dp"
+        android:layout_height="360dp"
         android:layout_alignParentTop="true"
         android:id="@+id/mapView"
         android:layout_margin="0dp" />
