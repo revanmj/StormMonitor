@@ -34,6 +34,8 @@
         <activity
             android:name="com.revanmj.stormmonitor.MapActivity"
             android:label="@string/title_activity_map"
+            android:screenOrientation="portrait"
+            android:configChanges="keyboardHidden|orientation"
             android:parentActivityName="MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
