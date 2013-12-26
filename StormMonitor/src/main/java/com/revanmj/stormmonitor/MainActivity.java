@@ -56,7 +56,6 @@ public class MainActivity extends Activity {
 
         lista = (ListView) findViewById(R.id.listView);
         lista.setAdapter(sdAdapter);
-        start = false;
         registerForContextMenu(lista);
     }
 
@@ -69,6 +68,7 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         RefreshData();
+        start = false;
     }
 
     @Override
