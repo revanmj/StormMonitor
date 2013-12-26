@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="0dip"
+    android:layout_marginLeft="0dip"
+    android:layout_marginRight="0dip"
+    android:layout_marginBottom="0dip"
+    android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dip"
+        android:gravity="center_vertical"
+        android:paddingLeft="8dip"
+        android:paddingRight="8dip"
+        android:orientation="horizontal"
+        android:background="@drawable/header_bg_widget"
+        android:id="@+id/widget_header">
+        <ImageView
+            android:id="@+id/widget_logo"
+            android:layout_width="32dip"
+            android:layout_height="32dip"
+            android:layout_marginRight="8dip"
+            android:src="@drawable/ic_launcher" />
+        <LinearLayout
+            android:id="@+id/widget_header"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/widget_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/app_name"
+                android:textColor="#333333"
+                />
+        </LinearLayout>
+    </LinearLayout>
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:cacheColorHint="#00000000"
+        android:id="@+id/widget_listView"
+        android:background="@drawable/gradient_bg_widget"/>
+</LinearLayout>
