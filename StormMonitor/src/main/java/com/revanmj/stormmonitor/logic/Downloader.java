@@ -1,4 +1,4 @@
-package com.revanmj.stormmonitor;
+package com.revanmj.stormmonitor.logic;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;

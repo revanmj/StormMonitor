@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,45 +23,36 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.revanmj.stormmonitor.logic.CheckConnection;
+import com.revanmj.stormmonitor.logic.Downloader;
+import com.revanmj.stormmonitor.logic.JSONparser;
+import com.revanmj.stormmonitor.model.StormData;
+import com.revanmj.stormmonitor.sql.StormOpenHelper;
+
 import org.json.JSONException;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends Activity {
 
     private List<StormData> cityStorm;
-    private List<Integer> cities;
+    private StormOpenHelper db;
     private StormDataAdapter sdAdapter;
     private MenuItem refreshButton;
     private Menu mainMenu;
     private boolean start = true;
     private ListView lista;
-    private File miasta;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        cityStorm = new ArrayList<StormData>();
+        db = new StormOpenHelper(this);
+
+        cityStorm = db.getAllCities();
         sdAdapter = new StormDataAdapter(cityStorm, this);
-        miasta = new File(getApplicationContext().getFilesDir(), "cities.dat");
-        cities = new ArrayList<Integer>();
-
-        try {
-            cities.addAll(DataFile.ReadFromFile(miasta));
-        } catch (FileNotFoundException e) {}
-        catch (IOException e) {}
-
-        //InitializeCities();
-
-        RefreshData();
-
-        //mainMenu.performIdentifierAction(mainMenu.getItem(0).getItemId(),0);
 
         lista = (ListView) findViewById(R.id.listView);
         lista.setAdapter(sdAdapter);
@@ -70,22 +62,13 @@ public class MainActivity extends Activity {
 
     @Override
     protected  void onDestroy() {
-        try {
-            miasta.delete();
-            DataFile.WriteToFile(cities, miasta);
-        } catch (FileNotFoundException e) {}
-        catch (IOException e) {};
         super.onDestroy();
     }
 
     @Override
-    protected  void onPause() {
-        try {
-            miasta.delete();
-            DataFile.WriteToFile(cities, miasta);
-        } catch (FileNotFoundException e) {}
-        catch (IOException e) {};
-        super.onPause();
+    protected void onResume() {
+        super.onResume();
+        RefreshData();
     }
 
     @Override
@@ -109,9 +92,10 @@ public class MainActivity extends Activity {
         // Here's how you can get the correct item in onContextItemSelected()
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
 
-        //Object listAdapter = lista.getAdapter().getItem(info.position);
-        cities.remove(info.position);
-        cityStorm.remove(info.position);
+        db.deleteCity(cityStorm.get(info.position));
+        cityStorm = db.getAllCities();
+        sdAdapter.clear();
+        sdAdapter.addAll(cityStorm);
         sdAdapter.notifyDataSetChanged();
 
         return true;
@@ -119,8 +103,13 @@ public class MainActivity extends Activity {
 
     private void setData(List<StormData> result)
     {
-        cityStorm.clear();
-        cityStorm.addAll(result);
+        for (int i = 0; i < result.size(); i++) {
+            db.updateCity(result.get(i));
+        }
+
+        cityStorm = db.getAllCities();
+        sdAdapter.clear();
+        sdAdapter.addAll(cityStorm);
         sdAdapter.notifyDataSetChanged();
 
         if (refreshButton != null && refreshButton.getActionView() != null) {
@@ -129,12 +118,12 @@ public class MainActivity extends Activity {
         }
     }
 
-    private class JSONStormTask extends AsyncTask<List<Integer>, Void, List<StormData>> {
+    private class JSONStormTask extends AsyncTask<List<StormData>, Void, List<StormData>> {
 
         protected ProgressDialog postep;
 
         @Override
-        protected List<StormData> doInBackground(List<Integer>... params) {
+        protected List<StormData> doInBackground(List<StormData>... params) {
             List<StormData> lista = new ArrayList<StormData>();
 
             if (params[0] != null) {
@@ -142,11 +131,12 @@ public class MainActivity extends Activity {
 
                 for (int i = 0; i < ile; i++) {
                     StormData stormData = new StormData();
-                    String data = ( (new Downloader()).getStormData(params[0].get(i)));
+                    String data = ( (new Downloader()).getStormData(params[0].get(i).getMiasto_id()));
 
                     if (data != null) {
                         try {
                             stormData = JSONparser.getStormData(data);
+                            stormData.setMiasto_id(params[0].get(i).getMiasto_id());
                             lista.add(stormData);
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -213,15 +203,18 @@ public class MainActivity extends Activity {
                             EditText pole = (EditText) widok.findViewById(R.id.cityIDfield);
                             Integer liczba = Integer.parseInt(pole.getText().toString());
                             boolean blad = false;
-                            if (cities != null)
-                                for (int i = 0; i < cities.size(); i++)
-                                    if (cities.get(i).equals(liczba))
+                            if (cityStorm != null)
+                                for (int i = 0; i < cityStorm.size(); i++)
+                                    if (cityStorm.get(i).getMiasto_id() == liczba)
                                         blad = true;
                             if (!blad) {
                                 if (liczba.intValue() < 439) {
-                                    cities.add(liczba);
+                                    StormData tmp = new StormData();
+                                    tmp.setMiasto_id(liczba);
+                                    db.addCity(tmp);
                                     RefreshData();
                                     sdAdapter.notifyDataSetChanged();
+                                    Log.i("revanmj.Storm", "Added: " + cityStorm.get(cityStorm.size()-1));
                                     imm.toggleSoftInput(InputMethodManager.RESULT_UNCHANGED_HIDDEN, 0);
                                     dodawanie.dismiss();
                                 }
@@ -261,8 +254,9 @@ public class MainActivity extends Activity {
 
     public void RefreshData() {
         if (CheckConnection.isHttpsAvalable("http://antistorm.eu/")) {
+            cityStorm = db.getAllCities();
             JSONStormTask task = new JSONStormTask();
-            task.execute(cities);
+            task.execute(cityStorm);
         } else {
             if (refreshButton != null && refreshButton.getActionView() != null) {
                 refreshButton.getActionView().clearAnimation();

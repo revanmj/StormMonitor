@@ -15,6 +15,8 @@ import android.widget.RemoteViews;
 import android.widget.RemoteViewsService.RemoteViewsFactory;
 import android.widget.TextView;
 
+import com.revanmj.stormmonitor.R;
+
 /**
  * If you are familiar with Adapter of ListView,this is the same as adapter
  * with few changes

@@ -1,8 +1,8 @@
-package com.revanmj.stormmonitor;
+package com.revanmj.stormmonitor.logic;
 
 import org.json.JSONObject;
 import org.json.JSONException;
-import com.revanmj.stormmonitor.StormData;
+import com.revanmj.stormmonitor.model.StormData;
 
 /**
  * Created by Student on 10.07.13.

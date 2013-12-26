@@ -1,4 +1,4 @@
-package com.revanmj.stormmonitor;
+package com.revanmj.stormmonitor.logic;
 
 import android.os.NetworkOnMainThreadException;
 import android.os.StrictMode;

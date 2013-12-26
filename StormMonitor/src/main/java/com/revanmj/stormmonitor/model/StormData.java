@@ -1,4 +1,4 @@
-package com.revanmj.stormmonitor;
+package com.revanmj.stormmonitor.model;
 
 import java.io.Serializable;
 
