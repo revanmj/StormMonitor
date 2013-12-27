@@ -10,16 +10,18 @@
     android:padding="0dp">
 
     <it.sephiroth.android.library.imagezoom.ImageViewTouch
-        android:layout_width="384dp"
-        android:layout_height="360dp"
+        android:layout_width="wrap_content"
+        android:layout_height="100dp"
         android:layout_alignParentTop="true"
         android:id="@+id/mapView"
-        android:layout_margin="0dp" />
+        android:layout_margin="0dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginTop="0dp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Mapa z godziny: "
+        android:text="@string/label_mapdate"
         android:id="@+id/textView"
         android:layout_marginTop="5dp"
         android:layout_marginLeft="2dp"
@@ -28,7 +30,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="01.01.2000 11:30"
+        android:text="@string/label_loading"
         android:layout_alignTop="@+id/textView"
         android:layout_toRightOf="@+id/textView"
         android:id="@+id/timeStamp" />

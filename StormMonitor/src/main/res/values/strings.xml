@@ -2,13 +2,14 @@
 <resources>
 
     <string name="app_name">Storm Monitor</string>
-    <string name="title_activity_test_data">Testowe</string>
+    <string name="title_activity_map">Mapa</string>
     <string name="menu_addcity">Dodaj miasto</string>
+    <string name="menu_addcity_gps">Dodaj miasto przez GPS</string>
     <string name="menu_about">O programie</string>
     <string name="menu_delete">Usuń</string>
     <string name="menu_delete_q">Usunąć miasto?</string>
     <string name="message_error">Błąd!</string>
-    <string name="message_no_connection">Brak połączenia z serwerem antistorm.eu. Sprawdź czy jesteś połączony z internetem.</string>
+    <string name="message_no_connection">Brak połączenia z serwerem antistorm.eu. Sprawdź czy jesteś połączony z internetem. Może to być również awaria samego serwera.</string>
     <string name="message_city_exists">To miasto jest już dodane</string>
     <string name="message_no_such_city">Błędne ID miasta</string>
     <string name="message_map_error">Pobieranie mapy nie powiodło się.</string>
@@ -17,11 +18,11 @@
     <string name="label_storm_prob">Szanse na burzę: </string>
     <string name="label_popular_cities">390 - Warszawa\n408 - Wrocław\n188 - Łódź\n177 - Lublin\n134 - Kołobrzeg</string>
     <string name="label_popular_cities_c2">148 - Kraków\n275 - Poznań\n416 - Zakopane\n156 - Krynica\n72   - Gdańsk</string>
+    <string name="label_loading">Wczytywanie ...</string>
+    <string name="label_mapdate">Mapa z godziny: </string>
+    <string name="text_about">Autor: Michał Jakubowski "revanmj"\n\nAplikacja wykorzystuje dane pochodzące z serwisu antistorm.eu oraz kontrolkę ImageViewTouch autorstwa Alessandro Crugnola (sephiroth) do wyświetlania mapy.</string>
     <string name="button_cancel">Anuluj</string>
     <string name="button_add">Dodaj</string>
     <string name="button_ok">OK</string>
-    <string name="title_activity_map">Mapa</string>
-    <string name="appwidget_text">EXAMPLE</string>
-    <string name="add_widget">Add widget</string>
 
 </resources>

@@ -8,9 +8,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -30,6 +32,7 @@ public class MapActivity extends Activity {
     ImageViewTouch mapView;
     ProgressDialog postep;
     boolean error;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,6 +41,12 @@ public class MapActivity extends Activity {
         blank = BitmapFactory.decodeResource(getResources(), R.drawable.blank);
         velocity_blank = BitmapFactory.decodeResource(getResources(), R.drawable.blankvelocity);
         error = false;
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        mapView.getLayoutParams().height = size.x;
+        mapView.getLayoutParams().width = size.x;
+        mapView.bringToFront();
         RefreshMap();
         if (error) {
             AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this);
