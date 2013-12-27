@@ -6,6 +6,11 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.Address;
+import android.location.Criteria;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -31,8 +36,10 @@ import com.revanmj.stormmonitor.sql.StormOpenHelper;
 
 import org.json.JSONException;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends Activity {
 
@@ -118,6 +125,19 @@ public class MainActivity extends Activity {
         }
     }
 
+    private void addLocationCity(String data) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setMessage("Wykryte miasto: " + data);
+        builder.setTitle("Miasto");
+        builder.setNeutralButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
+        AlertDialog komunikat = builder.create();
+        komunikat.show();
+    }
+
     private class JSONStormTask extends AsyncTask<List<StormData>, Void, List<StormData>> {
 
         protected ProgressDialog postep;
@@ -159,6 +179,7 @@ public class MainActivity extends Activity {
             setData(result);
             if (postep != null)
                 postep.dismiss();
+            super.onPostExecute(result);
         }
 
         @Override
@@ -166,6 +187,54 @@ public class MainActivity extends Activity {
             super.onPreExecute();
             if (start)
                 postep = ProgressDialog.show(MainActivity.this, "Pobieranie", "Trwa pobieranie danych ...", true, false);
+        }
+    }
+
+    public class CityAsyncTask extends AsyncTask<String, String, String> {
+        Activity act;
+        double latitude;
+        double longitude;
+        protected ProgressDialog postep;
+
+        public CityAsyncTask(Activity act) {
+            this.act = act;
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            String result = "";
+            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+            Criteria criteria = new Criteria();
+            String provider = locationManager.getBestProvider(criteria, false);
+            Location location = locationManager.getLastKnownLocation(provider);
+            latitude = location.getLatitude();
+            longitude = location.getLongitude();
+
+            Geocoder geocoder = new Geocoder(act, Locale.getDefault());
+            try {
+                List<Address> addresses = geocoder.getFromLocation(latitude,
+                        longitude, 1);
+                Log.e("Addresses", "-->" + addresses);
+                Address tmp = addresses.get(0);
+                result = tmp.getAddressLine(1);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            postep.dismiss();
+            addLocationCity(result);
+            super.onPostExecute(result);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            postep = ProgressDialog.show(MainActivity.this, "Lokalizowanie", "Trwa ustalanie lokalizacji ...", true, false);
         }
     }
 
@@ -247,6 +316,9 @@ public class MainActivity extends Activity {
                 RefreshData();
                 sdAdapter.notifyDataSetChanged();
                 return true;
+            case R.id.action_add_gps:
+                CityAsyncTask t = new CityAsyncTask(this);
+                t.execute();
             default:
                 return super.onOptionsItemSelected(item);
         }
