@@ -30,15 +30,14 @@
         <activity
             android:name="com.revanmj.stormmonitor.About"
             android:label="@string/menu_about"
-            android:parentActivityName="com.revanmj.stormmonitor.MainActivity" >
+            android:parentActivityName="com.revanmj.stormmonitor.MainActivity">
         </activity>
         <activity
             android:name="com.revanmj.stormmonitor.MapActivity"
             android:label="@string/title_activity_map"
-            android:parentActivityName="com.revanmj.stormmonitor.MainActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="MainActivity" />
+            android:parentActivityName="com.revanmj.stormmonitor.MainActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait">
         </activity>
 
         <receiver android:name="com.revanmj.stormmonitor.CitiesWidget" >
