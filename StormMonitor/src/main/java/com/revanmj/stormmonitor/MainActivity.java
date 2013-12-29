@@ -11,6 +11,7 @@ import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,6 +20,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
@@ -90,23 +92,33 @@ public class MainActivity extends Activity {
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
 
-        menu.setHeaderTitle(R.string.menu_delete_q);
-
         menu.add(R.string.menu_delete);
+        menu.add(R.string.menu_details);
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         // Here's how you can get the correct item in onContextItemSelected()
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        String del = getResources().getString(R.string.menu_delete);
+        switch(item.getItemId()) {
+            case 1:
+                db.deleteCity(cityStorm.get(info.position));
+                cityStorm = db.getAllCities();
+                sdAdapter.clear();
+                sdAdapter.addAll(cityStorm);
+                sdAdapter.notifyDataSetChanged();
 
-        db.deleteCity(cityStorm.get(info.position));
-        cityStorm = db.getAllCities();
-        sdAdapter.clear();
-        sdAdapter.addAll(cityStorm);
-        sdAdapter.notifyDataSetChanged();
-
-        return true;
+                return true;
+            case 0:
+                String url = "http://antistorm.eu/?miasto=";
+                String name = cityStorm.get(info.position).getMiasto().toLowerCase().replace(' ', '-').replace('ą','a').replace('ę','e').replace('ć','c').replace('ł','l').replace('ń','n').replace('ó','o').replace('ś','s').replace('ż','ź').replace('ź','z');
+                url = url + name;
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                startActivity(browserIntent);
+                return true;
+        }
+        return  true;
     }
 
     private void setData(List<StormData> result)

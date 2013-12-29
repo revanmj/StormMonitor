@@ -8,6 +8,7 @@
     <string name="menu_about">O programie</string>
     <string name="menu_delete">Usuń</string>
     <string name="menu_delete_q">Usunąć miasto?</string>
+    <string name="menu_details">Szczegóły</string>
     <string name="message_error">Błąd!</string>
     <string name="message_no_connection">Brak połączenia z antistorm.eu. Sprawdź czy jesteś połączony z internetem. Może to być również awaria serwera usługi.</string>
     <string name="message_city_exists">To miasto jest już dodane</string>
