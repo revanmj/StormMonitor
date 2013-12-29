@@ -25,5 +25,9 @@
     <string name="button_cancel">Anuluj</string>
     <string name="button_add">Dodaj</string>
     <string name="button_ok">OK</string>
+    <string name="search_hint">Podaj nazwę miasta</string>
+    <string name="title_activity_search">Dodaj miasto</string>
+    <string name="button_search">Szukaj</string>
+    <string name="message_no_results">Nie znaleziono miast o podanej nazwie</string>
 
 </resources>

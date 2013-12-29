@@ -1,0 +1,33 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <EditText
+        android:layout_width="260dp"
+        android:layout_height="45dp"
+        android:id="@+id/editText"
+        android:singleLine="true"
+        android:hint="@string/search_hint" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="45dp"
+        android:text="@string/button_search"
+        android:id="@+id/button"
+        android:layout_gravity="right"
+        android:layout_alignTop="@+id/editText"
+        android:layout_toRightOf="@+id/editText"
+        android:onClick="doSearch"
+        android:layout_alignParentRight="true" />
+
+    <ListView
+        android:id="@+id/list_search"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_below="@+id/button"
+        android:divider="@drawable/divider"
+        android:dividerHeight="1dp"
+        android:layout_alignParentLeft="true" />
+</RelativeLayout>

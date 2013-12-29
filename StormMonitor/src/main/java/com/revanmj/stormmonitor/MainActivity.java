@@ -78,7 +78,8 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        RefreshData();
+        if (cityStorm != null)
+            RefreshData();
         start = false;
     }
 
@@ -136,26 +137,6 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void addLocationCity(String data) {
-        CitiesAssetHelper cities_db = new CitiesAssetHelper(this);
-        StormData tmp = cities_db.getCity(data);
-        boolean city_exists = false;
-        if (tmp != null) {
-            for (int i = 0; i < cityStorm.size(); i++)
-                if (cityStorm.get(i).getMiasto_id() == tmp.getMiasto_id())
-                    city_exists = true;
-            if (!city_exists) {
-                    db.addCity(tmp);
-                    RefreshData();
-                    Log.i("revanmj.Storm", "Added: " + cityStorm.get(cityStorm.size()-1));
-            } else {
-                Toast.makeText(this, R.string.message_city_exists, Toast.LENGTH_SHORT).show();
-            }
-        } else {
-            Toast.makeText(this, R.string.message_no_such_city, Toast.LENGTH_SHORT).show();
-        }
-    }
-
     private class JSONStormTask extends AsyncTask<List<StormData>, Void, List<StormData>> {
 
         protected ProgressDialog postep;
@@ -208,110 +189,13 @@ public class MainActivity extends Activity {
         }
     }
 
-    public class CityAsyncTask extends AsyncTask<String, String, String> {
-        Activity act;
-        double latitude;
-        double longitude;
-        protected ProgressDialog postep;
-
-        public CityAsyncTask(Activity act) {
-            this.act = act;
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-            String result = "";
-            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
-            Criteria criteria = new Criteria();
-            String provider = locationManager.getBestProvider(criteria, false);
-            Location location = locationManager.getLastKnownLocation(provider);
-            latitude = location.getLatitude();
-            longitude = location.getLongitude();
-
-            Geocoder geocoder = new Geocoder(act, Locale.getDefault());
-            try {
-                List<Address> addresses = geocoder.getFromLocation(latitude,
-                        longitude, 1);
-                Log.e("Addresses", "-->" + addresses);
-                Address tmp = addresses.get(0);
-                result = tmp.getAddressLine(1);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return result;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            postep.dismiss();
-            addLocationCity(result);
-            super.onPostExecute(result);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            postep = ProgressDialog.show(MainActivity.this, "Lokalizowanie", "Trwa ustalanie lokalizacji ...", true, false);
-        }
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add:
-                AlertDialog.Builder builder_d = new AlertDialog.Builder(MainActivity.this);
-                LayoutInflater infl = (LayoutInflater) getApplication().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                final InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                final View widok = infl.inflate(R.layout.add_city, null);
-                builder_d.setView(widok);
-                builder_d.setCancelable(false);
-                builder_d.setTitle(R.string.menu_addcity);
-                builder_d.setPositiveButton(R.string.button_add, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-
-                    }
-                });
-                builder_d.setNegativeButton(R.string.button_cancel, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        imm.toggleSoftInput(InputMethodManager.RESULT_UNCHANGED_HIDDEN, 0);
-                        dialog.cancel();
-                    }
-                });
-                final AlertDialog dodawanie = builder_d.create();
-                dodawanie.show();
-                dodawanie.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener()
-                {
-                    @Override
-                    public void onClick(View v)
-                    {
-                        if (widok != null) {
-                            EditText pole = (EditText) widok.findViewById(R.id.cityIDfield);
-                            Integer liczba = Integer.parseInt(pole.getText().toString());
-                            boolean blad = false;
-                            if (cityStorm != null)
-                                for (int i = 0; i < cityStorm.size(); i++)
-                                    if (cityStorm.get(i).getMiasto_id() == liczba)
-                                        blad = true;
-                            if (!blad) {
-                                if (liczba.intValue() < 439) {
-                                    StormData tmp = new StormData();
-                                    tmp.setMiasto_id(liczba);
-                                    db.addCity(tmp);
-                                    RefreshData();
-                                    Log.i("revanmj.Storm", "Added: " + cityStorm.get(cityStorm.size()-1));
-                                    imm.toggleSoftInput(InputMethodManager.RESULT_UNCHANGED_HIDDEN, 0);
-                                    dodawanie.dismiss();
-                                }
-                                else
-                                    Toast.makeText(v.getContext(), R.string.message_no_such_city, Toast.LENGTH_SHORT).show();
-                            }
-                            else
-                                Toast.makeText(v.getContext(), R.string.message_city_exists, Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+                Intent search_a = new Intent(MainActivity.this, search.class);
+                MainActivity.this.startActivity(search_a);
+                RefreshData();
                 return true;
             case R.id.action_about:
                 Intent about = new Intent(MainActivity.this, About.class);
@@ -331,9 +215,6 @@ public class MainActivity extends Activity {
                 refreshButton.setActionView(iv);
                 RefreshData();
                 return true;
-            case R.id.action_add_gps:
-                CityAsyncTask t = new CityAsyncTask(this);
-                t.execute();
             default:
                 return super.onOptionsItemSelected(item);
         }
