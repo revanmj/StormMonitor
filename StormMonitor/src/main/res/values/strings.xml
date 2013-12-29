@@ -9,9 +9,9 @@
     <string name="menu_delete">Usuń</string>
     <string name="menu_delete_q">Usunąć miasto?</string>
     <string name="message_error">Błąd!</string>
-    <string name="message_no_connection">Brak połączenia z serwerem antistorm.eu. Sprawdź czy jesteś połączony z internetem. Może to być również awaria samego serwera.</string>
+    <string name="message_no_connection">Brak połączenia z antistorm.eu. Sprawdź czy jesteś połączony z internetem. Może to być również awaria serwera usługi.</string>
     <string name="message_city_exists">To miasto jest już dodane</string>
-    <string name="message_no_such_city">Błędne ID miasta</string>
+    <string name="message_no_such_city">Twojego miasta nie ma w bazie</string>
     <string name="message_map_error">Pobieranie mapy nie powiodło się.</string>
     <string name="label_cityid">Numer ID miasta</string>
     <string name="label__time">Czas do burzy: </string>
@@ -20,7 +20,7 @@
     <string name="label_popular_cities_c2">148 - Kraków\n275 - Poznań\n416 - Zakopane\n156 - Krynica\n72   - Gdańsk</string>
     <string name="label_loading">Wczytywanie ...</string>
     <string name="label_mapdate">Mapa z godziny: </string>
-    <string name="text_about">Autor: Michał Jakubowski "revanmj"\n\nAplikacja wykorzystuje dane pochodzące z serwisu antistorm.eu oraz kontrolkę ImageViewTouch autorstwa Alessandro Crugnola (sephiroth) do wyświetlania mapy.</string>
+    <string name="text_about">Autor: Michał Jakubowski (revanmj)\n\nAplikacja wykorzystuje dane pochodzące z serwisu antistorm.eu\n\nWykorzystywane biblioteki:\n- ImageViewTouch autorstwa Alessandro Crugnola (sephiroth) do wyświetlania mapy\n- SQLiteAssetHelper autorstwa Jeff Gilfelt do wczytywania bazy danych miast</string>
     <string name="button_cancel">Anuluj</string>
     <string name="button_add">Dodaj</string>
     <string name="button_ok">OK</string>
