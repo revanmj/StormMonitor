@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -92,25 +93,22 @@ public class MainActivity extends Activity {
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
 
-        menu.add(R.string.menu_delete);
-        menu.add(R.string.menu_details);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.context, menu);
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        // Here's how you can get the correct item in onContextItemSelected()
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        String del = getResources().getString(R.string.menu_delete);
         switch(item.getItemId()) {
-            case 1:
+            case R.id.context_delete:
                 db.deleteCity(cityStorm.get(info.position));
                 cityStorm = db.getAllCities();
                 sdAdapter.clear();
                 sdAdapter.addAll(cityStorm);
                 sdAdapter.notifyDataSetChanged();
-
                 return true;
-            case 0:
+            case R.id.context_details:
                 String url = "http://antistorm.eu/?miasto=";
                 String name = cityStorm.get(info.position).getMiasto().toLowerCase().replace(' ', '-').replace('ą','a').replace('ę','e').replace('ć','c').replace('ł','l').replace('ń','n').replace('ó','o').replace('ś','s').replace('ż','ź').replace('ź','z');
                 url = url + name;
@@ -260,7 +258,6 @@ public class MainActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
         switch (item.getItemId()) {
             case R.id.action_add:
                 AlertDialog.Builder builder_d = new AlertDialog.Builder(MainActivity.this);
