@@ -32,6 +32,7 @@ import com.revanmj.stormmonitor.logic.CheckConnection;
 import com.revanmj.stormmonitor.logic.Downloader;
 import com.revanmj.stormmonitor.logic.JSONparser;
 import com.revanmj.stormmonitor.model.StormData;
+import com.revanmj.stormmonitor.sql.CitiesAssetHelper;
 import com.revanmj.stormmonitor.sql.StormOpenHelper;
 
 import org.json.JSONException;
@@ -126,16 +127,23 @@ public class MainActivity extends Activity {
     }
 
     private void addLocationCity(String data) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-        builder.setMessage("Wykryte miasto: " + data);
-        builder.setTitle("Miasto");
-        builder.setNeutralButton(R.string.button_ok, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.cancel();
+        CitiesAssetHelper cities_db = new CitiesAssetHelper(this);
+        StormData tmp = cities_db.getCity(data);
+        boolean city_exists = false;
+        if (tmp != null) {
+            for (int i = 0; i < cityStorm.size(); i++)
+                if (cityStorm.get(i).getMiasto_id() == tmp.getMiasto_id())
+                    city_exists = true;
+            if (!city_exists) {
+                    db.addCity(tmp);
+                    RefreshData();
+                    Log.i("revanmj.Storm", "Added: " + cityStorm.get(cityStorm.size()-1));
+            } else {
+                Toast.makeText(this, R.string.message_city_exists, Toast.LENGTH_SHORT).show();
             }
-        });
-        AlertDialog komunikat = builder.create();
-        komunikat.show();
+        } else {
+            Toast.makeText(this, R.string.message_no_such_city, Toast.LENGTH_SHORT).show();
+        }
     }
 
     private class JSONStormTask extends AsyncTask<List<StormData>, Void, List<StormData>> {
@@ -282,7 +290,6 @@ public class MainActivity extends Activity {
                                     tmp.setMiasto_id(liczba);
                                     db.addCity(tmp);
                                     RefreshData();
-                                    sdAdapter.notifyDataSetChanged();
                                     Log.i("revanmj.Storm", "Added: " + cityStorm.get(cityStorm.size()-1));
                                     imm.toggleSoftInput(InputMethodManager.RESULT_UNCHANGED_HIDDEN, 0);
                                     dodawanie.dismiss();
@@ -314,7 +321,6 @@ public class MainActivity extends Activity {
                 iv.startAnimation(rotation);
                 refreshButton.setActionView(iv);
                 RefreshData();
-                sdAdapter.notifyDataSetChanged();
                 return true;
             case R.id.action_add_gps:
                 CityAsyncTask t = new CityAsyncTask(this);
