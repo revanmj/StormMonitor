@@ -8,7 +8,9 @@
         android:layout_height="45dp"
         android:id="@+id/editText"
         android:singleLine="true"
-        android:hint="@string/search_hint" />
+        android:hint="@string/search_hint"
+        android:imeOptions="actionSearch"
+        android:inputType="text"/>
 
     <Button
         android:layout_width="wrap_content"
