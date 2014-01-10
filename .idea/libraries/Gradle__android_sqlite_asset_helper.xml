@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Gradle: android-sqlite-asset-helper">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/StormMonitor/src/main/libs/android-sqlite-asset-helper.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
