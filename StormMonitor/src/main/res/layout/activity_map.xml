@@ -33,7 +33,8 @@
         android:text="@string/label_loading"
         android:layout_alignTop="@+id/textView"
         android:layout_toRightOf="@+id/textView"
-        android:id="@+id/timeStamp" />
+        android:id="@+id/timeStamp"
+        android:layout_marginLeft="4dp" />
 
     <ImageView
         android:layout_width="wrap_content"

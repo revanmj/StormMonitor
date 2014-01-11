@@ -39,7 +39,7 @@ public class MapActivity extends Activity {
         setContentView(R.layout.activity_map);
         mapView = (ImageViewTouch) findViewById(R.id.mapView);
         blank = BitmapFactory.decodeResource(getResources(), R.drawable.blank);
-        velocity_blank = BitmapFactory.decodeResource(getResources(), R.drawable.blankvelocity);
+        velocity_blank = BitmapFactory.decodeResource(getResources(), R.drawable.blank_velocity);
         error = false;
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
@@ -124,7 +124,11 @@ public class MapActivity extends Activity {
             else if (minutes > 45 && minutes < 59)
                 minutes = 45;
         }
-        String timeS = day + "." + month + "." + year + " " + hour + ":";
+        String timeS = "";
+        if (month < 10)
+            timeS = day + ".0" + month + "." + year + " " + hour + ":";
+        else
+            timeS = day + "." + month + "." + year + " " + hour + ":";
         if (minutes <10)
             timeS = timeS + "0" + minutes;
         else
