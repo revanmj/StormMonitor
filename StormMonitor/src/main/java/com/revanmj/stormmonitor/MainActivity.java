@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
@@ -42,6 +43,8 @@ import org.json.JSONException;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 
@@ -54,6 +57,7 @@ public class MainActivity extends Activity {
     private Menu mainMenu;
     private boolean start = true;
     private ListView lista;
+    private SharedPreferences settings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +72,8 @@ public class MainActivity extends Activity {
         lista = (ListView) findViewById(R.id.listView);
         lista.setAdapter(sdAdapter);
         registerForContextMenu(lista);
+
+        settings = getPreferences(MODE_PRIVATE);
     }
 
     @Override
@@ -78,8 +84,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (cityStorm != null)
-            RefreshData();
+        RefreshData();
         start = false;
     }
 
@@ -225,6 +230,12 @@ public class MainActivity extends Activity {
             cityStorm = db.getAllCities();
             JSONStormTask task = new JSONStormTask();
             task.execute(cityStorm);
+            Calendar c = Calendar.getInstance();
+            int year = c.get(Calendar.YEAR), month = c.get(Calendar.MONTH) + 1, day = c.get(Calendar.DAY_OF_MONTH), hour = c.get(Calendar.HOUR_OF_DAY), minutes = c.get(Calendar.MINUTE);
+            String last_d = day + "." + month + "." + year;
+            settings.edit().putInt("lastUpdate_h",hour);
+            settings.edit().putInt("lastUpdate_m",minutes);
+            settings.edit().putString("lastUpdate_date", last_d);
         } else {
             if (refreshButton != null && refreshButton.getActionView() != null) {
                 refreshButton.getActionView().clearAnimation();

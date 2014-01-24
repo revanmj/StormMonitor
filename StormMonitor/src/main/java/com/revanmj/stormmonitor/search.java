@@ -15,6 +15,8 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -40,7 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class search extends Activity {
+public class search extends Activity implements TextWatcher {
 
     private ListView wyniki;
     private EditText pole;
@@ -71,7 +73,9 @@ public class search extends Activity {
                     {
                         case KeyEvent.KEYCODE_DPAD_CENTER:
                         case KeyEvent.KEYCODE_ENTER:
-                            doSearch(v);
+                            doSearch();
+                            final InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                            imm.toggleSoftInput(InputMethodManager.RESULT_UNCHANGED_HIDDEN, 0);
                             return true;
                         default:
                             break;
@@ -80,9 +84,10 @@ public class search extends Activity {
                 return false;
             }
         });
+        pole.addTextChangedListener(this);
     }
 
-    public void doSearch(View view) {
+    public void doSearch() {
 
         String query = pole.getText().toString();
         if (query.toLowerCase().startsWith("ą") || query.toLowerCase().startsWith("ć")  || query.toLowerCase().startsWith("ę") || query.toLowerCase().startsWith("ł") || query.toLowerCase().startsWith("ń") || query.toLowerCase().startsWith("ó") || query.toLowerCase().startsWith("ś") || query.toLowerCase().startsWith("ż") || query.toLowerCase().startsWith("ź"))
@@ -106,9 +111,6 @@ public class search extends Activity {
             sAdapter.clear();
             sAdapter.addAll(results);
             sAdapter.notifyDataSetChanged();
-
-            final InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.toggleSoftInput(InputMethodManager.RESULT_UNCHANGED_HIDDEN, 0);
 
             wyniki.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -168,6 +170,21 @@ public class search extends Activity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+        doSearch();
+    }
+
+    @Override
+    public void afterTextChanged(Editable editable) {
+
     }
 
     public class CityAsyncTask extends AsyncTask<String, String, String> {

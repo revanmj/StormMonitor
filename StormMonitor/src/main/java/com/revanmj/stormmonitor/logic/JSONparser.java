@@ -16,8 +16,8 @@ public class JSONparser {
 
         // We start extracting the info
         d_burze.setMiasto(getString("m",jObj));
-        d_burze.setP_burzy(getInt("p", jObj));
-        d_burze.setT_burzy(getInt("t",jObj));
+        d_burze.setP_burzy(getInt("p_b", jObj));
+        d_burze.setT_burzy(getInt("t_b",jObj));
 
         return d_burze;
     }

@@ -109,9 +109,9 @@ public class MapActivity extends Activity {
     }
 
     public void RefreshMap() {
-        String[] adresy = new String[5];
-        adresy[0] = "http://antistorm.eu/radar/radar.png";
-        adresy[4] = "http://antistorm.eu/currentImgs/estofex.png";
+        String[] adresy = new String[4];
+        //adresy[0] = "http://antistorm.eu/radar/radar.png";
+        adresy[3] = "http://antistorm.eu/currentImgs/estofex.png";
         Calendar c = Calendar.getInstance();
         int year = c.get(Calendar.YEAR), month = c.get(Calendar.MONTH) + 1, day = c.get(Calendar.DAY_OF_MONTH), hour = c.get(Calendar.HOUR_OF_DAY), minutes = c.get(Calendar.MINUTE);
         if (minutes != 0 && minutes != 15 && minutes != 30 && minutes != 45) {
@@ -133,12 +133,16 @@ public class MapActivity extends Activity {
             timeS = timeS + "0" + minutes;
         else
             timeS = timeS + minutes;
+        int minutes2 = minutes + 1;
 
         timeR = (TextView) findViewById(R.id.timeStamp);
         timeR.setText(timeS);
-        adresy[1] = "http://antistorm.eu/archive/" + year + "." + month + "." + day +"/" + hour + "-" + minutes + "-probabilitiesImg.png";
-        adresy[2] = "http://antistorm.eu/archive/" + year + "." + month + "." + day +"/" + hour + "-" + minutes + "-velocityMapImg.png";
-        adresy[2] = "http://antistorm.eu/archive/" + year + "." + month + "." + day +"/" + hour + "-" + minutes + "-stormVisualImg.png";
+        adresy[0] = "http://antistorm.eu/archive/" + year + "." + month + "." + day +"/" + hour + "-" + minutes2 + "-radar-probabilitiesImg.png";
+        adresy[1] = "http://antistorm.eu/archive/" + year + "." + month + "." + day +"/" + hour + "-" + minutes2 + "-radar-velocityMapImg.png";
+        if (month < 10)
+            adresy[2] = "http://antistorm.eu/visualPhenom/" + year + "0" + month  + day +"." + hour + minutes + "-radar-visualPhenomenon.png";
+        else
+            adresy[2] = "http://antistorm.eu/visualPhenom/" + year + month  + day +"." + hour + minutes + "-radar-visualPhenomenon.png";
         BitmapTask task = new BitmapTask();
         task.execute(adresy);
     }
@@ -169,11 +173,11 @@ public class MapActivity extends Activity {
         protected void onPostExecute(ArrayList<Bitmap> result) {
             if (result != null) {
                 mapView.clear();
-                radar = result.get(0);
-                probability = result.get(1);
-                velocity = result.get(2);
-                visual = result.get(3);
-                estofex = result.get(4);
+                //radar = result.get(0);
+                probability = result.get(0);
+                velocity = result.get(1);
+                visual = result.get(2);
+                estofex = result.get(3);
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 options.inMutable = true;
                 Bitmap mapa = BitmapFactory.decodeResource(getResources(), R.drawable.map, options);
@@ -185,8 +189,10 @@ public class MapActivity extends Activity {
                 p.setDither(true);
                 image = new Canvas();
                 image.setBitmap(mapa);
-                image.drawBitmap(radar, null, dest, p);
+                //image.drawBitmap(radar, null, dest, p);
+                p.setAlpha(100);
                 image.drawBitmap(probability, null, dest, p);
+                p.setAlpha(160);
                 image.drawBitmap(visual, null, dest, p);
                 image.drawBitmap(velocity, null, dest, p);
                 image.drawBitmap(estofex, null, dest, p);
