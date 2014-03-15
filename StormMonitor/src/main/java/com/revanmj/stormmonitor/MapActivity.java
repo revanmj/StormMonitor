@@ -173,29 +173,7 @@ public class MapActivity extends Activity {
         protected void onPostExecute(ArrayList<Bitmap> result) {
             if (result != null) {
                 mapView.clear();
-                //radar = result.get(0);
-                probability = result.get(0);
-                velocity = result.get(1);
-                visual = result.get(2);
-                estofex = result.get(3);
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inMutable = true;
-                Bitmap mapa = BitmapFactory.decodeResource(getResources(), R.drawable.map, options);
-                Rect dest = new Rect(0,0,mapa.getWidth(), mapa.getHeight());
-                Paint p = new Paint();
-                p.setAlpha(160);
-                p.setAntiAlias(true);
-                p.setFilterBitmap(true);
-                p.setDither(true);
-                image = new Canvas();
-                image.setBitmap(mapa);
-                //image.drawBitmap(radar, null, dest, p);
-                p.setAlpha(100);
-                image.drawBitmap(probability, null, dest, p);
-                p.setAlpha(160);
-                image.drawBitmap(visual, null, dest, p);
-                image.drawBitmap(velocity, null, dest, p);
-                image.drawBitmap(estofex, null, dest, p);
+                Bitmap mapa = prepareBitmap(result);
                 mapView.setImageBitmap(mapa);
                 radar = probability = velocity = visual = estofex = null;
             } else if (result == null)
@@ -209,6 +187,43 @@ public class MapActivity extends Activity {
             super.onPreExecute();
             postep = ProgressDialog.show(MapActivity.this, "Pobieranie", "Trwa pobieranie mapy ...", true, false);
         }
+    }
+
+    Paint preparePaint(){
+        Paint p = new Paint();
+        p.setAlpha(160);
+        p.setAntiAlias(true);
+        p.setFilterBitmap(true);
+        p.setDither(true);
+        return p;
+    }
+
+    Bitmap prepareBitmap(ArrayList<Bitmap> results){
+        //radar = results.get(0);
+        probability = results.get(0);
+        velocity = results.get(1);
+        visual = results.get(2);
+        estofex = results.get(3);
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inMutable = true;
+
+        Bitmap mapa = BitmapFactory.decodeResource(getResources(), R.drawable.map, options);
+
+        image = new Canvas();
+        image.setBitmap(mapa);
+
+        Paint p = preparePaint();
+        Rect dest = new Rect(0,0,mapa.getWidth(), mapa.getHeight());
+
+        //image.drawBitmap(radar, null, dest, p);
+        p.setAlpha(100);
+        image.drawBitmap(probability, null, dest, p);
+        p.setAlpha(160);
+        image.drawBitmap(visual, null, dest, p);
+        image.drawBitmap(velocity, null, dest, p);
+        image.drawBitmap(estofex, null, dest, p);
+        return mapa;
     }
 
 }

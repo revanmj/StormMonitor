@@ -18,6 +18,8 @@ public class JSONparser {
         d_burze.setMiasto(getString("m",jObj));
         d_burze.setP_burzy(getInt("p_b", jObj));
         d_burze.setT_burzy(getInt("t_b",jObj));
+        d_burze.setP_opadow(getInt("p_o", jObj));
+        d_burze.setT_opadow(getInt("t_o", jObj));
 
         return d_burze;
     }

@@ -10,6 +10,8 @@ public class StormData implements Serializable {
     private String miasto;
     private int p_burzy;
     private int t_burzy;
+    private int p_opadow;
+    private int t_opadow;
     private boolean error;
 
     public String getMiasto() {
@@ -50,6 +52,22 @@ public class StormData implements Serializable {
 
     public void setMiasto_id(int miasto_id) {
         this.miasto_id = miasto_id;
+    }
+
+    public int getT_opadow() {
+        return t_opadow;
+    }
+
+    public void setT_opadow(int t_opadow) {
+        this.t_opadow = t_opadow;
+    }
+
+    public int getP_opadow() {
+        return p_opadow;
+    }
+
+    public void setP_opadow(int p_opadow) {
+        this.p_opadow = p_opadow;
     }
 }
 
