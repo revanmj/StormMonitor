@@ -44,7 +44,7 @@
             android:id="@+id/textView3"
             android:layout_below="@+id/textView2"
             android:layout_toRightOf="@+id/colorRectangle"
-            android:visibility="invisible"
+            android:visibility="visible"
             android:layout_marginTop="-2dp"/>
 
     <TextView
@@ -55,7 +55,7 @@
             android:id="@+id/chanceText"
             android:layout_alignTop="@+id/textView2"
             android:layout_toRightOf="@+id/textView2"
-            android:layout_marginLeft="4dp"/>
+            android:layout_marginLeft="30dp"/>
 
     <TextView
             android:layout_width="wrap_content"
@@ -63,9 +63,51 @@
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:text="0 min"
             android:id="@+id/timeText"
-            android:layout_toRightOf="@+id/textView3"
-            android:layout_alignTop="@+id/textView3"
-            android:layout_marginLeft="4dp"
-            android:visibility="invisible"
-            />/>
+        android:layout_alignTop="@+id/textView3"
+        android:visibility="visible"
+        android:layout_alignLeft="@+id/chanceText" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Sanse na opady:"
+        android:id="@+id/textView"
+        android:layout_below="@+id/textView3"
+        android:layout_alignLeft="@+id/textView3"
+        android:layout_alignStart="@+id/textView3"
+        android:layout_marginTop="-2dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Czas do opadów:"
+        android:id="@+id/textView4"
+        android:layout_below="@+id/textView"
+        android:layout_alignLeft="@+id/textView"
+        android:layout_alignStart="@+id/textView"
+        android:layout_marginTop="-2dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="0 / 255"
+        android:id="@+id/rainChance"
+        android:layout_alignBottom="@+id/textView"
+        android:layout_alignLeft="@+id/chanceText" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="0 min"
+        android:id="@+id/rainTime"
+        android:layout_alignStart="@+id/chanceText"
+        android:layout_alignTop="@+id/textView4"
+        android:layout_alignLeft="@+id/chanceText" /><![CDATA[
+
+    />
+]]>
 </RelativeLayout>

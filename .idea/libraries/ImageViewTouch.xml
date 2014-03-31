@@ -1,7 +1,7 @@
 <component name="libraryTable">
   <library name="ImageViewTouch">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/StormMonitor/src/main/libs/ImageViewTouch.jar!/" />
+      <root url="jar://$PROJECT_DIR$/StormMonitor/libs/ImageViewTouch.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

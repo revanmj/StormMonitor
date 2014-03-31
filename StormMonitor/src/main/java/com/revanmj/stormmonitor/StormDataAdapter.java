@@ -30,6 +30,7 @@ public class StormDataAdapter extends ArrayAdapter<StormData> {
     public View getView(int position, View convertView, ViewGroup parent) {
         StormData d = cityList.get(position);
         int t = d.getT_burzy();
+        int t_r = d.getT_opadow();
         ViewHolder holder;
 
         if (convertView == null) {
@@ -42,6 +43,9 @@ public class StormDataAdapter extends ArrayAdapter<StormData> {
             holder.time = (TextView) convertView.findViewById(R.id.timeText);
             holder.timeN = (TextView) convertView.findViewById(R.id.textView3);
             holder.rect = (ImageView) convertView.findViewById(R.id.colorRectangle);
+            holder.rainChance = (TextView) convertView.findViewById(R.id.rainChance);
+            holder.rainTime = (TextView) convertView.findViewById(R.id.rainTime);
+            holder.rainTimeN = (TextView) convertView.findViewById(R.id.textView4);
 
             convertView.setTag(holder);
         } else {
@@ -51,25 +55,29 @@ public class StormDataAdapter extends ArrayAdapter<StormData> {
         TextView city = holder.city;
         TextView chance = holder.chance;
         TextView time = holder.time;
-        TextView timeN = holder.timeN;
+        TextView rainTime = holder.rainTime;
+        TextView rainChance = holder.rainChance;
         ImageView rect = holder.rect;
 
         city.setText(d.getMiasto());
         chance.setText(d.getP_burzy() + " / 255");
+        rainChance.setText(d.getP_opadow() + " / 255");
 
         if (t < 240) {
-            time.setText("~" + t + " min");
-            time.setVisibility(View.VISIBLE);
-            timeN.setVisibility(View.VISIBLE);
+            time.setText("~ " + t + " min");
         } else {
-            time.setVisibility(View.INVISIBLE);
-            timeN.setVisibility(View.INVISIBLE);
+            time.setText("-");
         }
-        if (t <= 120 && t > 60 && d.getP_burzy() > 30)
+        if (t_r < 240) {
+            rainTime.setText("~ " + t_r + " min");
+        } else {
+            rainTime.setText("-");
+        }
+        if (t <= 120 && t > 60 && d.getP_burzy() > 30 || t_r <= 120 && t_r > 60 && d.getP_opadow() > 30)
             rect.setImageResource(R.drawable.rectangle_yellow);
-        else if (t <= 60 && t > 20)
+        else if (t <= 60 && t > 20 || t_r <= 60 && t_r > 20)
             rect.setImageResource(R.drawable.rectangle_orange);
-        else if (t <= 20)
+        else if (t <= 20 || t_r <= 20)
             rect.setImageResource(R.drawable.rectangle_red);
         else
             rect.setImageResource(R.drawable.rectangle_green);
@@ -82,6 +90,9 @@ public class StormDataAdapter extends ArrayAdapter<StormData> {
         public TextView chance;
         public TextView time;
         public TextView timeN;
+        public TextView rainTime;
+        public TextView rainTimeN;
+        public TextView rainChance;
         public ImageView rect;
     }
 
