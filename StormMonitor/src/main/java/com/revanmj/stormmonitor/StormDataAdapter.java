@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.revanmj.stormmonitor.R;
 import com.revanmj.stormmonitor.model.StormData;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 /**
@@ -60,8 +61,11 @@ public class StormDataAdapter extends ArrayAdapter<StormData> {
         ImageView rect = holder.rect;
 
         city.setText(d.getMiasto());
-        chance.setText(d.getP_burzy() + " / 255");
-        rainChance.setText(d.getP_opadow() + " / 255");
+        float chancePercentage = (d.getP_burzy() * 100.0f) / 255;
+        float rainChancePercentage = (d.getP_opadow() * 100.0f) / 255;
+        DecimalFormat form = new DecimalFormat("##.##");
+        chance.setText(form.format(chancePercentage) + " %");
+        rainChance.setText(form.format(rainChancePercentage) + " %");
 
         if (t < 240) {
             time.setText("~ " + t + " min");
@@ -73,12 +77,12 @@ public class StormDataAdapter extends ArrayAdapter<StormData> {
         } else {
             rainTime.setText("-");
         }
-        if (t <= 120 && t > 60 && d.getP_burzy() > 30 || t_r <= 120 && t_r > 60 && d.getP_opadow() > 30)
+        if (t <= 120 && chancePercentage > 30 && chancePercentage < 50 || t_r <= 120 && rainChancePercentage > 30 && rainChancePercentage < 50)
             rect.setImageResource(R.drawable.rectangle_yellow);
-        else if (t <= 60 && t > 20 || t_r <= 60 && t_r > 20)
-            rect.setImageResource(R.drawable.rectangle_orange);
-        else if (t <= 20 || t_r <= 20)
+        else if (t <= 20 && chancePercentage >= 50 || t_r <= 20 && rainChancePercentage >= 50)
             rect.setImageResource(R.drawable.rectangle_red);
+        else if (t <= 60 && chancePercentage > 30 || t_r <= 60 && rainChancePercentage > 30)
+            rect.setImageResource(R.drawable.rectangle_orange);
         else
             rect.setImageResource(R.drawable.rectangle_green);
 

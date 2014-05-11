@@ -4,7 +4,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_conversation"
     android:layout_width="match_parent"
-    android:layout_height="60dp">
+    android:layout_height="90dp">
     <ImageView
         android:id="@+id/widget_read_background"
         android:layout_width="match_parent"
@@ -57,9 +57,29 @@
             android:id="@+id/widget_textView3"
             android:layout_below="@+id/textView2"
             android:layout_toRightOf="@+id/widget_colorRectangle"
-            android:visibility="invisible"
-            android:layout_marginTop="-2dp"
+            android:visibility="visible"
             android:textColor="#000000"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/label__time"
+            android:id="@+id/textView"
+            android:layout_below="@+id/textView3"
+            android:visibility="visible"
+            android:textColor="#000000"
+            android:layout_alignLeft="@+id/widget_cityText" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/label_storm_prob"
+            android:id="@+id/textView3"
+            android:layout_below="@+id/widget_textView3"
+            android:textColor="#000000"
+            android:layout_alignLeft="@+id/widget_cityText" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -78,10 +98,34 @@
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:text="0 min"
             android:id="@+id/widget_timeText"
-            android:layout_toRightOf="@+id/textView3"
-            android:layout_alignTop="@+id/textView3"
+            android:visibility="visible"
+            android:textColor="#000000"
+            android:layout_toRightOf="@+id/widget_textView3"
             android:layout_marginLeft="4dp"
-            android:visibility="invisible"
-            android:textColor="#000000"/>
+            android:layout_alignTop="@+id/widget_textView3" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="0 / 255"
+            android:id="@+id/widget_rainChance"
+            android:textColor="#000000"
+            android:layout_alignParentTop="false"
+            android:layout_toRightOf="@+id/textView3"
+            android:layout_marginLeft="4dp"
+            android:layout_alignTop="@+id/textView3" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="0 min"
+            android:id="@+id/widget_rainTime"
+            android:visibility="visible"
+            android:textColor="#000000"
+            android:layout_toRightOf="@+id/textView"
+            android:layout_marginLeft="4dp"
+            android:layout_alignTop="@+id/textView" />
     </RelativeLayout>
 </FrameLayout>

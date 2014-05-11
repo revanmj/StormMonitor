@@ -10,6 +10,7 @@ import android.widget.RemoteViewsService;
 import com.revanmj.stormmonitor.model.StormData;
 import com.revanmj.stormmonitor.sql.StormOpenHelper;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 /**
@@ -53,25 +54,35 @@ public class WidgetListProvider implements RemoteViewsService.RemoteViewsFactory
         final RemoteViews remoteView = new RemoteViews(
                 context.getPackageName(), R.layout.cities_widget_row);
         StormData listItem = cities.get(position);
-        Integer p = listItem.getP_burzy();
-        Integer t = listItem.getT_burzy();
+
+        int t = listItem.getT_burzy();
+        int t_r = listItem.getT_opadow();
+        float chancePercentage = (listItem.getP_burzy() * 100.0f) / 255;
+        float rainChancePercentage = (listItem.getP_opadow() * 100.0f) / 255;
+        DecimalFormat form = new DecimalFormat("##.##");
+
         remoteView.setTextViewText(R.id.widget_cityText, listItem.getMiasto());
-        remoteView.setTextViewText(R.id.widget_chanceText, p  + " / 255");
+        remoteView.setTextViewText(R.id.widget_chanceText, form.format(chancePercentage) + " %");
+        remoteView.setTextViewText(R.id.widget_rainChance, form.format(rainChancePercentage) + " %");
 
         if (t < 240) {
             remoteView.setTextViewText(R.id.widget_timeText, "~" + t + " min");
-            remoteView.setViewVisibility(R.id.widget_textView3, View.VISIBLE);
-            remoteView.setViewVisibility(R.id.widget_timeText, View.VISIBLE);
         } else {
-            remoteView.setViewVisibility(R.id.widget_textView3, View.INVISIBLE);
-            remoteView.setViewVisibility(R.id.widget_timeText, View.INVISIBLE);
+            remoteView.setTextViewText(R.id.widget_timeText, "-");
         }
-        if (t <= 120 && t > 60 && listItem.getP_burzy() > 30)
+
+        if (t_r < 240) {
+            remoteView.setTextViewText(R.id.widget_rainTime,"~ " + t_r + " min");
+        } else {
+            remoteView.setTextViewText(R.id.widget_rainTime, "-");
+        }
+
+        if (t <= 120 && chancePercentage > 30 && chancePercentage < 50 || t_r <= 120 && rainChancePercentage > 30 && rainChancePercentage < 50)
             remoteView.setImageViewResource(R.id.widget_colorRectangle, R.drawable.rectangle_yellow);
-        else if (t <= 60 && t > 20)
-            remoteView.setImageViewResource(R.id.widget_colorRectangle, R.drawable.rectangle_orange);
-        else if (t <= 20)
+        else if (t <= 20 && chancePercentage >= 50 || t_r <= 20 && rainChancePercentage >= 50)
             remoteView.setImageViewResource(R.id.widget_colorRectangle, R.drawable.rectangle_red);
+        else if (t <= 60 && chancePercentage > 30 || t_r <= 60 && rainChancePercentage > 30)
+            remoteView.setImageViewResource(R.id.widget_colorRectangle, R.drawable.rectangle_orange);
         else
             remoteView.setImageViewResource(R.id.widget_colorRectangle, R.drawable.rectangle_green);
 
