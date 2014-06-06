@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.9.+'
+        classpath 'com.android.tools.build:gradle:0.11.+'
     }
 }
 apply plugin: 'android'
@@ -12,11 +12,10 @@ repositories {
 }
 android {
     compileSdkVersion 19
-    buildToolsVersion "19.0.0"
+    buildToolsVersion "19.1.0"
 }
 
 dependencies {
-    compile files('libs/ImageViewTouch.jar')
     compile files('src/main/libs/ImageViewTouch.jar')
     compile files('src/main/libs/android-sqlite-asset-helper.jar')
 }
