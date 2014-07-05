@@ -24,7 +24,7 @@
     <string name="button_cancel">Anuluj</string>
     <string name="button_add">Dodaj</string>
     <string name="button_ok">OK</string>
-    <string name="button_map_switch_storm">Przłącz na mapę burzową</string>
+    <string name="button_map_switch_storm">Przełącz na mapę burzową</string>
     <string name="button_map_switch_rain">Przełącz na mapę opadów</string>
     <string name="search_hint">Podaj nazwę miasta</string>
     <string name="title_activity_search">Dodaj miasto</string>
