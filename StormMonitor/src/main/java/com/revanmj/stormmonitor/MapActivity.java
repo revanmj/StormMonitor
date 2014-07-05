@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -16,6 +17,8 @@ import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import org.apache.http.HttpEntity;
@@ -39,26 +42,44 @@ import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 public class MapActivity extends Activity {
     Bitmap radar, probability, visual, velocity, velocity_blank, estofex, blank;
     Canvas image;
-    static TextView timeR;
     ImageViewTouch mapView;
     ProgressDialog postep;
+    Button mapSwitchBtn;
     boolean error;
+    int map_mode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         mapView = (ImageViewTouch) findViewById(R.id.mapView);
+        mapSwitchBtn = (Button) findViewById(R.id.mapSwitchB);
         blank = BitmapFactory.decodeResource(getResources(), R.drawable.blank);
         velocity_blank = BitmapFactory.decodeResource(getResources(), R.drawable.blank_velocity);
         error = false;
+
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
         mapView.getLayoutParams().height = size.x;
         mapView.getLayoutParams().width = size.x;
         mapView.bringToFront();
+
+        SharedPreferences settings = getPreferences(0);
+        map_mode = settings.getInt("map_mode", 0);
+        switch (map_mode) {
+            case 0:
+                mapSwitchBtn.setText(R.string.button_map_switch_rain);
+                setTitle(R.string.title_activity_map);
+                break;
+            case 1:
+                mapSwitchBtn.setText(R.string.button_map_switch_storm);
+                setTitle(R.string.title_map_rain);
+                break;
+        }
+
         RefreshMap();
+
         if (error) {
             AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this);
             builder.setMessage(R.string.message_map_error);
@@ -81,6 +102,31 @@ public class MapActivity extends Activity {
             postep.dismiss();
     }
 
+    public void switchMap(View view){
+        SharedPreferences settings = getPreferences(0);
+        SharedPreferences.Editor editor = settings.edit();
+
+        if (map_mode == 0) {
+            map_mode = 1;
+            mapSwitchBtn.setText(R.string.button_map_switch_storm);
+            setTitle(R.string.title_map_rain);
+        }
+        else if (map_mode == 1) {
+            map_mode = 0;
+            mapSwitchBtn.setText(R.string.button_map_switch_rain);
+            setTitle(R.string.title_activity_map);
+        }
+
+        editor.putInt("map_mode", map_mode);
+        editor.commit();
+
+        RefreshMap();
+    }
+
+    public void RefreshMap() {
+        BitmapTask task = new BitmapTask();
+        task.execute(map_mode);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -183,11 +229,6 @@ public class MapActivity extends Activity {
             Log.d("Added URL: ", tmp.get(i));
 
         return tmp;
-    }
-
-    public void RefreshMap() {
-        BitmapTask task = new BitmapTask();
-        task.execute(1);
     }
 
     private class BitmapTask extends AsyncTask<Integer, Void, ArrayList<Bitmap>> {

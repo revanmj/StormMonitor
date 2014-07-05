@@ -2,7 +2,8 @@
 <resources>
 
     <string name="app_name">Storm Monitor</string>
-    <string name="title_activity_map">Mapa</string>
+    <string name="title_activity_map">Mapa burz</string>
+    <string name="title_map_rain">Mapa opadów</string>
     <string name="menu_addcity">Dodaj miasto</string>
     <string name="menu_addcity_gps">Dodaj miasto przez GPS</string>
     <string name="menu_about">O programie</string>
@@ -23,6 +24,8 @@
     <string name="button_cancel">Anuluj</string>
     <string name="button_add">Dodaj</string>
     <string name="button_ok">OK</string>
+    <string name="button_map_switch_storm">Przłącz na mapę burzową</string>
+    <string name="button_map_switch_rain">Przełącz na mapę opadów</string>
     <string name="search_hint">Podaj nazwę miasta</string>
     <string name="title_activity_search">Dodaj miasto</string>
     <string name="button_search">Szukaj</string>
