@@ -12,16 +12,27 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 
@@ -108,55 +119,87 @@ public class MapActivity extends Activity {
         }
     }
 
-    public void RefreshMap() {
-        String[] adresy = new String[4];
-        //adresy[0] = "http://antistorm.eu/radar/radar.png";
-        adresy[3] = "http://antistorm.eu/currentImgs/estofex.png";
-        Calendar c = Calendar.getInstance();
-        int year = c.get(Calendar.YEAR), month = c.get(Calendar.MONTH) + 1, day = c.get(Calendar.DAY_OF_MONTH), hour = c.get(Calendar.HOUR_OF_DAY), minutes = c.get(Calendar.MINUTE);
-        if (minutes != 0 && minutes != 15 && minutes != 30 && minutes != 45) {
-            if (minutes > 0 && minutes < 15)
-                minutes = 0;
-            else if (minutes > 15 && minutes < 30)
-                minutes = 15;
-            else if (minutes > 30 && minutes < 45)
-                minutes = 30;
-            else if (minutes > 45 && minutes < 59)
-                minutes = 45;
-        }
-        String timeS = "";
-        if (month < 10)
-            timeS = day + ".0" + month + "." + year + " " + hour + ":";
-        else
-            timeS = day + "." + month + "." + year + " " + hour + ":";
-        if (minutes <10)
-            timeS = timeS + "0" + minutes;
-        else
-            timeS = timeS + minutes;
-        int minutes2 = minutes + 1;
+    public String getHTML(int code) {
+        try {
+            HttpClient httpclient = new DefaultHttpClient(); // Create HTTP Client
+            HttpGet httpget;
+            switch (code) {
+                case 0:
+                    httpget = new HttpGet("http://antistorm.eu/?strona=burze");
+                    break;
+                case 1:
+                    httpget = new HttpGet("http://antistorm.eu/?strona=radary");
+                    break;
+                default:
+                    httpget = new HttpGet("http://antistorm.eu/?strona=burze");
+            }
+            HttpResponse response = httpclient.execute(httpget); // Executeit
+            HttpEntity entity = response.getEntity();
+            InputStream is = entity.getContent(); // Create an InputStream with the response
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
+            StringBuilder sb = new StringBuilder();
+            String line = null;
 
-        timeR = (TextView) findViewById(R.id.timeStamp);
-        timeR.setText(timeS);
-        adresy[0] = "http://antistorm.eu/archive/" + year + "." + month + "." + day +"/" + hour + "-" + minutes2 + "-radar-probabilitiesImg.png";
-        adresy[1] = "http://antistorm.eu/archive/" + year + "." + month + "." + day +"/" + hour + "-" + minutes2 + "-radar-velocityMapImg.png";
-        if (month < 10)
-            adresy[2] = "http://antistorm.eu/visualPhenom/" + year + "0" + month  + day +"." + hour + minutes + "-radar-visualPhenomenon.png";
-        else
-            adresy[2] = "http://antistorm.eu/visualPhenom/" + year + month  + day +"." + hour + minutes + "-radar-visualPhenomenon.png";
-        BitmapTask task = new BitmapTask();
-        task.execute(adresy);
+            while ((line = reader.readLine()) != null) // Read line by line
+                sb.append(line + "\n");
+
+            return sb.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
-    private class BitmapTask extends AsyncTask<String, Void, ArrayList<Bitmap>> {
+    public ArrayList<String> getFilesURLs(int code){
+        String websiteHTML = getHTML(code);
+
+        Pattern patternProbabilities = Pattern.compile("<img.*src=[\\\"'](.*probabilitiesImg[\\.]png)[\\\"'].*>", Pattern.CASE_INSENSITIVE);
+        Pattern patternVelocity = Pattern.compile("<img.*src=[\\\"'](.*velocityMapImg[\\.]png)[\\\"'].*>", Pattern.CASE_INSENSITIVE);
+        Pattern patternRadar = Pattern.compile("<img.*src=[\\\"'](.*visualPhenomenon[\\.]png)[\\\"'].*>", Pattern.CASE_INSENSITIVE);
+
+        ArrayList<String> tmp = new ArrayList<String>();
+
+        Matcher m = patternProbabilities.matcher(websiteHTML);
+        if (m.find())
+            tmp.add("http://antistorm.eu/" + m.group(1));
+        else
+            tmp.add(null);
+
+        m = patternVelocity.matcher(websiteHTML);
+        if (m.find())
+            tmp.add("http://antistorm.eu/" + m.group(1));
+        else
+            tmp.add(null);
+
+        m = patternRadar.matcher(websiteHTML);
+        if (m.find())
+            tmp.add("http://antistorm.eu" + m.group(1));
+        else
+            tmp.add(null);
+
+        tmp.add("http://antistorm.eu/currentImgs/estofex.png");
+
+        for (int i = 0; i < 4; i++)
+            Log.d("Added URL: ", tmp.get(i));
+
+        return tmp;
+    }
+
+    public void RefreshMap() {
+        BitmapTask task = new BitmapTask();
+        task.execute(1);
+    }
+
+    private class BitmapTask extends AsyncTask<Integer, Void, ArrayList<Bitmap>> {
 
         @Override
-        protected ArrayList<Bitmap> doInBackground(String... params) {
+        protected ArrayList<Bitmap> doInBackground(Integer... params) {
+            ArrayList<String> nazwy = getFilesURLs(params[0]);
             ArrayList<Bitmap> lista = new ArrayList<Bitmap>();
             if (params[0] != null) {
-                int rozmiar = params.length;
                 Bitmap tmp;
-                for (int i = 0; i < rozmiar; i++) {
-                    tmp = getBitmapFromURL(params[i]);
+                for (int i = 0; i < 4; i++) {
+                    tmp = getBitmapFromURL(nazwy.get(i));
                     if (tmp == null && i == 2)
                        tmp = velocity_blank;
                     else if (tmp == null)
