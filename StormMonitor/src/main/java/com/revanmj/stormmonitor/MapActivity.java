@@ -222,9 +222,6 @@ public class MapActivity extends Activity {
 
         tmp.add("http://antistorm.eu/currentImgs/estofex.png");
 
-        for (int i = 0; i < 4; i++)
-            Log.d("Added URL: ", tmp.get(i));
-
         return tmp;
     }
 
@@ -234,14 +231,17 @@ public class MapActivity extends Activity {
         protected ArrayList<Bitmap> doInBackground(Integer... params) {
             ArrayList<String> nazwy = getFilesURLs(params[0]);
             ArrayList<Bitmap> lista = new ArrayList<Bitmap>();
+
             if (params[0] != null) {
                 Bitmap tmp;
                 for (int i = 0; i < 4; i++) {
                     tmp = getBitmapFromURL(nazwy.get(i));
+
                     if (tmp == null && i == 2)
                        tmp = velocity_blank;
                     else if (tmp == null)
                        tmp = blank;
+
                     lista.add(tmp);
                 }
                 return lista;
