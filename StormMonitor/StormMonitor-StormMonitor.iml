@@ -63,6 +63,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="ImageViewTouch" level="project" />
     <orderEntry type="library" exported="" name="android-sqlite-asset-helper" level="project" />
+    <orderEntry type="library" exported="" name="wversionmanager-1.2" level="project" />
   </component>
 </module>
 

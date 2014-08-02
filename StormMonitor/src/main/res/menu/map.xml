@@ -1,10 +1,19 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.revanmj.stormmonitor.MapActivity" >
+    <item android:id="@+id/action_map_rain"
+        android:icon="@drawable/ic_rain"
+        android:title="@string/button_map_switch_rain"
+        android:showAsAction="ifRoom"
+        android:orderInCategory="2" />
+    <item android:id="@+id/action_map_storm"
+        android:icon="@drawable/ic_storm"
+        android:title="@string/button_map_switch_storm"
+        android:showAsAction="ifRoom"
+        android:orderInCategory="2" />
     <item android:id="@+id/action_map_refresh"
         android:icon="@drawable/ic_menu_refresh"
         android:title="Odśwież"
         android:showAsAction="ifRoom"
-        android:orderInCategory="2"
-        android:actionViewClass="@layout/refresh_icon"/>
+        android:orderInCategory="3" />
 </menu>

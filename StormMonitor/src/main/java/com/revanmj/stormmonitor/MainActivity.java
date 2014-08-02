@@ -38,6 +38,7 @@ import com.revanmj.stormmonitor.logic.JSONparser;
 import com.revanmj.stormmonitor.model.StormData;
 import com.revanmj.stormmonitor.sql.CitiesAssetHelper;
 import com.revanmj.stormmonitor.sql.StormOpenHelper;
+import com.winsontan520.wversionmanager.library.WVersionManager;
 
 import org.json.JSONException;
 
@@ -74,6 +75,16 @@ public class MainActivity extends Activity {
         registerForContextMenu(lista);
 
         settings = getPreferences(MODE_PRIVATE);
+
+        WVersionManager versionManager = new WVersionManager(this);
+        versionManager.setVersionContentUrl("http://revanmj.pl/sm_update.dat"); // your update content url, see the response format below
+        versionManager.setUpdateNowLabel(getString(R.string.dialog_update));
+        versionManager.setRemindMeLaterLabel(getString(R.string.dialog_remind));
+        versionManager.setIgnoreThisVersionLabel(getString(R.string.dialog_ignore));
+        versionManager.setTitle(getString(R.string.label_update));
+        versionManager.setUpdateUrl("https://dl.dropboxusercontent.com/u/1561186/StormMonitor/StormMonitor.apk"); // this is the link will execute when update now clicked. default will go to google play based on your package name.
+        versionManager.setReminderTimer(1440); // this mean checkVersion() will not take effect within 10 minutes 1440
+        versionManager.checkVersion();
     }
 
     @Override

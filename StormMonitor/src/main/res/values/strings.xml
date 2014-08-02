@@ -18,8 +18,9 @@
     <string name="label_cityid">Numer ID miasta</string>
     <string name="label__time">Czas do burzy: </string>
     <string name="label_storm_prob">Szanse na burzę: </string>
-    <string name="label_loading">Wczytywanie ...</string>
+    <string name="label_loading">Wczytywanie …</string>
     <string name="label_mapdate">Ostatnia aktualizacja: </string>
+    <string name="label_update">Aktualizacja:</string>
     <string name="text_about">Autor: Michał Jakubowski (revanmj)\n\nStrona: revanmj.pl/apps\n\nAplikacja wykorzystuje dane pochodzące z serwisu antistorm.eu\n\nWykorzystywane biblioteki:\n- ImageViewTouch autorstwa Alessandro Crugnola (sephiroth) do wyświetlania mapy\n- SQLiteAssetHelper autorstwa Jeff Gilfelt do wczytywania bazy danych miast</string>
     <string name="button_cancel">Anuluj</string>
     <string name="button_add">Dodaj</string>
@@ -30,5 +31,8 @@
     <string name="title_activity_search">Dodaj miasto</string>
     <string name="button_search">Szukaj</string>
     <string name="message_no_results">Nie znaleziono miast o podanej nazwie</string>
+    <string name="dialog_update">Aktualizuj</string>
+    <string name="dialog_ignore">Ignoruj</string>
+    <string name="dialog_remind">Przypomnij później</string>
 
 </resources>

@@ -13,12 +13,9 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -42,7 +39,6 @@ public class MapActivity extends Activity {
     Canvas image;
     ImageViewTouch mapView;
     ProgressDialog postep;
-    Button mapSwitchBtn;
     boolean error;
     int map_mode;
 
@@ -51,7 +47,6 @@ public class MapActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         mapView = (ImageViewTouch) findViewById(R.id.mapView);
-        mapSwitchBtn = (Button) findViewById(R.id.mapSwitchB);
         blank = BitmapFactory.decodeResource(getResources(), R.drawable.blank);
         velocity_blank = BitmapFactory.decodeResource(getResources(), R.drawable.blank_velocity);
         error = false;
@@ -67,11 +62,9 @@ public class MapActivity extends Activity {
         map_mode = settings.getInt("map_mode", 0);
         switch (map_mode) {
             case 0:
-                mapSwitchBtn.setText(R.string.button_map_switch_rain);
                 setTitle(R.string.title_activity_map);
                 break;
             case 1:
-                mapSwitchBtn.setText(R.string.button_map_switch_storm);
                 setTitle(R.string.title_map_rain);
                 break;
         }
@@ -100,37 +93,25 @@ public class MapActivity extends Activity {
             postep.dismiss();
     }
 
-    public void switchMap(View view){
-        SharedPreferences settings = getPreferences(0);
-        SharedPreferences.Editor editor = settings.edit();
-
-        if (map_mode == 0) {
-            map_mode = 1;
-            mapSwitchBtn.setText(R.string.button_map_switch_storm);
-            setTitle(R.string.title_map_rain);
-        }
-        else if (map_mode == 1) {
-            map_mode = 0;
-            mapSwitchBtn.setText(R.string.button_map_switch_rain);
-            setTitle(R.string.title_activity_map);
-        }
-
-        editor.putInt("map_mode", map_mode);
-        editor.apply();
-
-        RefreshMap();
-    }
-
-    public void RefreshMap() {
-        BitmapTask task = new BitmapTask();
-        task.execute(map_mode);
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.map, menu);
+
+        SharedPreferences settings = getPreferences(0);
+        map_mode = settings.getInt("map_mode", 0);
+        MenuItem rain = menu.findItem(R.id.action_map_rain);
+        MenuItem storm = menu.findItem(R.id.action_map_storm);
+
+        if (map_mode == 0) {
+            rain.setVisible(true);
+            storm.setVisible(false);
+        }
+        else if (map_mode == 1) {
+            rain.setVisible(false);
+            storm.setVisible(true);
+        }
+
         return true;
     }
 
@@ -140,11 +121,46 @@ public class MapActivity extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_map_refresh) {
-            RefreshMap();
-            return true;
+
+        switch (id) {
+            case R.id.action_map_refresh:
+                RefreshMap();
+                return true;
+            case R.id.action_map_rain:
+                switchMap();
+                return true;
+            case R.id.action_map_storm:
+                switchMap();
+                return true;
         }
+
         return super.onOptionsItemSelected(item);
+    }
+
+    public void RefreshMap() {
+        BitmapTask task = new BitmapTask();
+        task.execute(map_mode);
+    }
+
+    public void switchMap(){
+        SharedPreferences settings = getPreferences(0);
+        SharedPreferences.Editor editor = settings.edit();
+
+        if (map_mode == 0) {
+            map_mode = 1;
+            setTitle(R.string.title_map_rain);
+        }
+        else if (map_mode == 1) {
+            map_mode = 0;
+            setTitle(R.string.title_activity_map);
+        }
+
+        editor.putInt("map_mode", map_mode);
+        editor.apply();
+
+        invalidateOptionsMenu();
+
+        RefreshMap();
     }
 
     public Bitmap getBitmapFromURL(String src) {

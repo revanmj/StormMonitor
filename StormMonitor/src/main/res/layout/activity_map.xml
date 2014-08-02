@@ -19,22 +19,10 @@
         android:layout_marginLeft="0dp"
         android:layout_marginTop="0dp" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/button_map_switch_storm"
-        android:id="@+id/mapSwitchB"
-        android:layout_below="@+id/mapView"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:onClick="switchMap"
-        android:layout_alignParentRight="true"
-        android:layout_marginBottom="0dp"/>
-
     <ScrollView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_below="@id/mapSwitchB">
+        android:layout_below="@+id/mapView">
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="130dp"
