@@ -16,9 +16,9 @@
         android:id="@+id/listView"
         android:layout_alignParentTop="true"
         android:layout_alignParentBottom="true"
-        android:layout_margin="0dp"
+        android:layout_margin="2dp"
         android:layout_alignParentLeft="true"
-        android:dividerHeight="1dp"
+        android:dividerHeight="5dp"
         android:divider="@drawable/divider"
         android:layout_alignParentRight="true" />
 </RelativeLayout>
