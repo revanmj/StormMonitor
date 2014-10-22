@@ -12,7 +12,9 @@
         android:imeOptions="actionSearch"
         android:inputType="text"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true" />
+        android:layout_alignParentRight="true"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp" />
 
     <ListView
         android:id="@+id/list_search"

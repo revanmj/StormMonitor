@@ -1,6 +1,5 @@
 package com.revanmj.stormmonitor;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -13,6 +12,7 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
 
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 
-public class MapActivity extends Activity {
+public class MapActivity extends ActionBarActivity {
     Bitmap radar, probability, visual, velocity, velocity_blank, estofex, blank;
     Canvas image;
     ImageViewTouch mapView;
@@ -46,6 +46,9 @@ public class MapActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         mapView = (ImageViewTouch) findViewById(R.id.mapView);
         blank = BitmapFactory.decodeResource(getResources(), R.drawable.blank);
         velocity_blank = BitmapFactory.decodeResource(getResources(), R.drawable.blank_velocity);
@@ -62,10 +65,10 @@ public class MapActivity extends Activity {
         map_mode = settings.getInt("map_mode", 0);
         switch (map_mode) {
             case 0:
-                setTitle(R.string.title_activity_map);
+                getSupportActionBar().setTitle(R.string.title_activity_map);
                 break;
             case 1:
-                setTitle(R.string.title_map_rain);
+                getSupportActionBar().setTitle(R.string.title_map_rain);
                 break;
         }
 
@@ -148,11 +151,11 @@ public class MapActivity extends Activity {
 
         if (map_mode == 0) {
             map_mode = 1;
-            setTitle(R.string.title_map_rain);
+            getSupportActionBar().setTitle(R.string.title_map_rain);
         }
         else if (map_mode == 1) {
             map_mode = 0;
-            setTitle(R.string.title_activity_map);
+            getSupportActionBar().setTitle(R.string.title_activity_map);
         }
 
         editor.putInt("map_mode", map_mode);

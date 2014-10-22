@@ -1,71 +1,64 @@
 package com.revanmj.stormmonitor;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.location.Address;
-import android.location.Criteria;
-import android.location.Geocoder;
-import android.location.Location;
-import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.ActionMenuView;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.revanmj.stormmonitor.logic.CheckConnection;
 import com.revanmj.stormmonitor.logic.Downloader;
 import com.revanmj.stormmonitor.logic.JSONparser;
 import com.revanmj.stormmonitor.model.StormData;
-import com.revanmj.stormmonitor.sql.CitiesAssetHelper;
 import com.revanmj.stormmonitor.sql.StormOpenHelper;
 import com.winsontan520.wversionmanager.library.WVersionManager;
 
+import io.fabric.sdk.android.Fabric;
 import org.json.JSONException;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Locale;
 
-public class MainActivity extends Activity {
+public class MainActivity extends ActionBarActivity {
 
     private List<StormData> cityStorm;
     private StormOpenHelper db;
     private StormDataAdapter sdAdapter;
     private MenuItem refreshButton;
-    private Menu mainMenu;
     private boolean start = true;
     private ListView lista;
-    private SharedPreferences settings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Crashlytics.start(this);
+        Fabric.with(this, new Crashlytics());
+
         setContentView(R.layout.activity_main);
+
+        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //if (toolbar != null) {
+        //    setSupportActionBar(toolbar);
+        //}
+        //toolbar.inflateMenu(R.menu.main);
 
         db = new StormOpenHelper(this);
 
@@ -75,8 +68,6 @@ public class MainActivity extends Activity {
         lista = (ListView) findViewById(R.id.listView);
         lista.setAdapter(sdAdapter);
         registerForContextMenu(lista);
-
-        settings = getPreferences(MODE_PRIVATE);
 
         WVersionManager versionManager = new WVersionManager(this);
         versionManager.setVersionContentUrl("http://revanmj.pl/sm_update.dat"); // your update content url, see the response format below
@@ -104,7 +95,6 @@ public class MainActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
-        mainMenu = menu;
         return true;
     }
 

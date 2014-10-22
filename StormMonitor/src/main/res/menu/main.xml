@@ -1,21 +1,22 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/action_add"
           android:title="Dodaj"
           android:icon="@drawable/ic_menu_new"
           android:orderInCategory="1"
-          android:showAsAction="ifRoom" />
+          app:showAsAction="ifRoom" />
     <item android:id="@+id/action_refresh"
         android:icon="@drawable/ic_menu_refresh"
         android:title="Odśwież"
-        android:showAsAction="ifRoom"
+        app:showAsAction="ifRoom"
         android:orderInCategory="200"
         android:actionViewClass="@layout/refresh_icon"/>
     <item android:id="@+id/action_map"
         android:title="Mapa"
         android:orderInCategory="300"
-        android:showAsAction="never" />
+        app:showAsAction="never" />
     <item android:id="@+id/action_about"
           android:title="O aplikacji"
           android:orderInCategory="500"
-          android:showAsAction="never" />
+          app:showAsAction="never" />
 </menu>
