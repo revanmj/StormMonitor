@@ -35,6 +35,8 @@ import java.util.regex.Pattern;
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 
 public class MapActivity extends ActionBarActivity {
+
+    private final String serviceUrl = "http://antistorm.eu/";
     Bitmap radar, probability, visual, velocity, velocity_blank, estofex, blank;
     Canvas image;
     ImageViewTouch mapView;
@@ -98,7 +100,6 @@ public class MapActivity extends ActionBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.map, menu);
 
         SharedPreferences settings = getPreferences(0);
@@ -120,9 +121,6 @@ public class MapActivity extends ActionBarActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         switch (id) {
@@ -187,13 +185,13 @@ public class MapActivity extends ActionBarActivity {
             HttpGet httpget;
             switch (code) {
                 case 0:
-                    httpget = new HttpGet("http://antistorm.eu/?strona=burze");
+                    httpget = new HttpGet(serviceUrl + "?strona=burze");
                     break;
                 case 1:
-                    httpget = new HttpGet("http://antistorm.eu/?strona=radary");
+                    httpget = new HttpGet(serviceUrl + "?strona=radary");
                     break;
                 default:
-                    httpget = new HttpGet("http://antistorm.eu/?strona=burze");
+                    httpget = new HttpGet(serviceUrl + "?strona=radary");
             }
             HttpResponse response = httpclient.execute(httpget); // Executeit
             HttpEntity entity = response.getEntity();
@@ -203,7 +201,7 @@ public class MapActivity extends ActionBarActivity {
             String line = null;
 
             while ((line = reader.readLine()) != null) // Read line by line
-                sb.append(line + "\n");
+                sb.append(line).append("\n");
 
             return sb.toString();
         } catch (IOException e) {
@@ -223,23 +221,23 @@ public class MapActivity extends ActionBarActivity {
 
         Matcher m = patternProbabilities.matcher(websiteHTML);
         if (m.find())
-            tmp.add("http://antistorm.eu/" + m.group(1));
+            tmp.add(serviceUrl + m.group(1));
         else
             tmp.add(null);
 
         m = patternVelocity.matcher(websiteHTML);
         if (m.find())
-            tmp.add("http://antistorm.eu/" + m.group(1));
+            tmp.add(serviceUrl + m.group(1));
         else
             tmp.add(null);
 
         m = patternRadar.matcher(websiteHTML);
         if (m.find())
-            tmp.add("http://antistorm.eu" + m.group(1));
+            tmp.add(serviceUrl + m.group(1));
         else
             tmp.add(null);
 
-        tmp.add("http://antistorm.eu/currentImgs/estofex.png");
+        tmp.add(serviceUrl + "currentImgs/estofex.png");
 
         return tmp;
     }
@@ -276,7 +274,7 @@ public class MapActivity extends ActionBarActivity {
                 Bitmap mapa = prepareBitmap(result);
                 mapView.setImageBitmap(mapa);
                 radar = probability = velocity = visual = estofex = null;
-            } else if (result == null)
+            } else
                 error = true;
             if (postep != null)
                 postep.dismiss();
@@ -285,7 +283,7 @@ public class MapActivity extends ActionBarActivity {
         @Override
         protected void onPreExecute(){
             super.onPreExecute();
-            postep = ProgressDialog.show(MapActivity.this, "Pobieranie", "Trwa pobieranie mapy ...", true, false);
+            postep = ProgressDialog.show(MapActivity.this, null, getResources().getString(R.string.label_downloading), true, false);
         }
     }
 
@@ -299,7 +297,6 @@ public class MapActivity extends ActionBarActivity {
     }
 
     Bitmap prepareBitmap(ArrayList<Bitmap> results){
-        //radar = results.get(0);
         probability = results.get(0);
         velocity = results.get(1);
         visual = results.get(2);
@@ -316,7 +313,6 @@ public class MapActivity extends ActionBarActivity {
         Paint p = preparePaint();
         Rect dest = new Rect(0,0,mapa.getWidth(), mapa.getHeight());
 
-        //image.drawBitmap(radar, null, dest, p);
         p.setAlpha(100);
         image.drawBitmap(probability, null, dest, p);
         p.setAlpha(160);

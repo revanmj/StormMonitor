@@ -4,3 +4,8 @@
 .DS_Store
 gradlew
 *.bat
+
+# Crashlytics
+com_crashlytics_export_strings.xml
+crashlytics-build.properties
+crashlytics.properties

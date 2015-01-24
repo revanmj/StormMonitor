@@ -8,7 +8,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.revanmj.stormmonitor.R;
 import com.revanmj.stormmonitor.model.StormData;
 
 import java.text.DecimalFormat;
@@ -17,12 +16,12 @@ import java.util.List;
 /**
  * Created by revan_000 on 14.07.13.
  */
-public class StormDataAdapter extends ArrayAdapter<StormData> {
+public class MainViewAdapter extends ArrayAdapter<StormData> {
 
     private List<StormData> cityList;
     private Context context;
 
-    public StormDataAdapter(List<StormData> cityList, Context ctx) {
+    public MainViewAdapter(List<StormData> cityList, Context ctx) {
         super(ctx, R.layout.row_listview, cityList);
         this.cityList = cityList;
         this.context = ctx;

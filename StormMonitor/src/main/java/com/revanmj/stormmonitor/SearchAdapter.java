@@ -14,12 +14,12 @@ import java.util.List;
 /**
  * Created by revanmj on 29.12.2013.
  */
-public class SearchProvider extends ArrayAdapter<StormData> {
+public class SearchAdapter extends ArrayAdapter<StormData> {
 
     private List<StormData> cityList;
     private Context context;
 
-    public SearchProvider(List<StormData> cityList, Context ctx) {
+    public SearchAdapter(List<StormData> cityList, Context ctx) {
         super(ctx, R.layout.row_search, cityList);
         this.cityList = cityList;
         this.context = ctx;

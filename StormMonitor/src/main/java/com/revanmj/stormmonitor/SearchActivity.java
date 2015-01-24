@@ -34,11 +34,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class search extends ActionBarActivity implements TextWatcher {
+public class SearchActivity extends ActionBarActivity implements TextWatcher {
 
     private ListView wyniki;
     private EditText pole;
-    private SearchProvider sAdapter;
+    private SearchAdapter sAdapter;
     List<StormData> cities;
     List<StormData> res;
     StormOpenHelper db;
@@ -51,10 +51,10 @@ public class search extends ActionBarActivity implements TextWatcher {
         getSupportActionBar().setTitle(R.string.title_activity_search);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        db = new StormOpenHelper(search.this);
+        db = new StormOpenHelper(SearchActivity.this);
         cities = db.getAllCities();
         res = new ArrayList<StormData>();
-        sAdapter = new SearchProvider(res, this);
+        sAdapter = new SearchAdapter(res, this);
 
         wyniki = (ListView)findViewById(R.id.list_search);
         wyniki.setAdapter(sAdapter);
@@ -103,7 +103,7 @@ public class search extends ActionBarActivity implements TextWatcher {
         }
 
         if (results.size() == 0) {
-            Toast.makeText(search.this, R.string.message_no_results, Toast.LENGTH_SHORT).show();
+            Toast.makeText(SearchActivity.this, R.string.message_no_results, Toast.LENGTH_SHORT).show();
         } else {
             sAdapter.clear();
             sAdapter.addAll(results);
@@ -123,10 +123,10 @@ public class search extends ActionBarActivity implements TextWatcher {
                             db.addCity(tmp);
                             finish();
                         } else {
-                            Toast.makeText(search.this, R.string.message_city_exists, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SearchActivity.this, R.string.message_city_exists, Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        Toast.makeText(search.this, R.string.message_no_such_city, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(SearchActivity.this, R.string.message_no_such_city, Toast.LENGTH_SHORT).show();
                     }
                 }
             });
@@ -228,7 +228,7 @@ public class search extends ActionBarActivity implements TextWatcher {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            postep = ProgressDialog.show(search.this, "Lokalizowanie", "Trwa ustalanie lokalizacji ...", true, false);
+            postep = ProgressDialog.show(SearchActivity.this, "Lokalizowanie", "Trwa ustalanie lokalizacji ...", true, false);
         }
     }
 

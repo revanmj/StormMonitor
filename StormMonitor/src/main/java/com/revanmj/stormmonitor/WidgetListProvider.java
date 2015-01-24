@@ -44,11 +44,6 @@ public class WidgetListProvider implements RemoteViewsService.RemoteViewsFactory
         return position;
     }
 
-    /*
-    *Similar to getView of Adapter where instead of View
-    *we return RemoteViews
-    *
-    */
     @Override
     public RemoteViews getViewAt(int position) {
         final RemoteViews remoteView = new RemoteViews(

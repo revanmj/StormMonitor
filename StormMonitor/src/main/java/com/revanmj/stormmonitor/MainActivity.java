@@ -9,8 +9,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.Toolbar;
-import android.support.v7.widget.ActionMenuView;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -40,12 +38,15 @@ import java.util.List;
 
 public class MainActivity extends ActionBarActivity {
 
+    private final String updateApkUrl = "";
+    private final String updateChangelogUrl = "";
+    private final String serviceUrl = "http://antistorm.eu/";
+    private final String cityDataUrl = "http://antistorm.eu/?miasto=";
     private List<StormData> cityStorm;
     private StormOpenHelper db;
-    private StormDataAdapter sdAdapter;
+    private MainViewAdapter sdAdapter;
     private MenuItem refreshButton;
     private boolean start = true;
-    private ListView lista;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,29 +55,23 @@ public class MainActivity extends ActionBarActivity {
 
         setContentView(R.layout.activity_main);
 
-        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        //if (toolbar != null) {
-        //    setSupportActionBar(toolbar);
-        //}
-        //toolbar.inflateMenu(R.menu.main);
-
         db = new StormOpenHelper(this);
 
         cityStorm = db.getAllCities();
-        sdAdapter = new StormDataAdapter(cityStorm, this);
+        sdAdapter = new MainViewAdapter(cityStorm, this);
 
-        lista = (ListView) findViewById(R.id.listView);
+        ListView lista = (ListView) findViewById(R.id.listView);
         lista.setAdapter(sdAdapter);
         registerForContextMenu(lista);
 
         WVersionManager versionManager = new WVersionManager(this);
-        versionManager.setVersionContentUrl("http://revanmj.pl/sm_update.dat"); // your update content url, see the response format below
+        versionManager.setVersionContentUrl(updateChangelogUrl);
         versionManager.setUpdateNowLabel(getString(R.string.dialog_update));
         versionManager.setRemindMeLaterLabel(getString(R.string.dialog_remind));
         versionManager.setIgnoreThisVersionLabel(getString(R.string.dialog_ignore));
         versionManager.setTitle(getString(R.string.label_update));
-        versionManager.setUpdateUrl("https://dl.dropboxusercontent.com/u/1561186/StormMonitor/StormMonitor.apk"); // this is the link will execute when update now clicked. default will go to google play based on your package name.
-        versionManager.setReminderTimer(1440); // this mean checkVersion() will not take effect within 10 minutes 1440
+        versionManager.setUpdateUrl(updateApkUrl);
+        versionManager.setReminderTimer(1440); // this mean checkVersion() will not take effect within 10 minutes
         versionManager.checkVersion();
     }
 
@@ -118,10 +113,8 @@ public class MainActivity extends ActionBarActivity {
                 sdAdapter.notifyDataSetChanged();
                 return true;
             case R.id.context_details:
-                String url = "http://antistorm.eu/?miasto=";
                 String name = cityStorm.get(info.position).getMiasto().toLowerCase().replace(' ', '-').replace('ą','a').replace('ę','e').replace('ć','c').replace('ł','l').replace('ń','n').replace('ó','o').replace('ś','s').replace('ż','ź').replace('ź','z');
-                url = url + name;
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(cityDataUrl + name));
                 startActivity(browserIntent);
                 return true;
         }
@@ -172,7 +165,7 @@ public class MainActivity extends ActionBarActivity {
                     else {
                         stormData.setP_burzy(0);
                         stormData.setT_burzy(500);
-                        stormData.setMiasto("Pobieranie nie powiodło się!");
+                        stormData.setMiasto(getResources().getString(R.string.message_download_error));
                         stormData.setError(true);
                     }
                 }
@@ -193,7 +186,7 @@ public class MainActivity extends ActionBarActivity {
         protected void onPreExecute(){
             super.onPreExecute();
             if (start)
-                postep = ProgressDialog.show(MainActivity.this, "Pobieranie", "Trwa pobieranie danych ...", true, false);
+                postep = ProgressDialog.show(MainActivity.this, null, getResources().getString(R.string.label_downloading), true, false);
         }
     }
 
@@ -201,7 +194,7 @@ public class MainActivity extends ActionBarActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add:
-                Intent search_a = new Intent(MainActivity.this, search.class);
+                Intent search_a = new Intent(MainActivity.this, SearchActivity.class);
                 MainActivity.this.startActivity(search_a);
                 RefreshData();
                 return true;
@@ -229,7 +222,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void RefreshData() {
-        if (CheckConnection.isHttpsAvalable("http://antistorm.eu/")) {
+        if (CheckConnection.isHttpsAvalable(serviceUrl)) {
             cityStorm = db.getAllCities();
             JSONStormTask task = new JSONStormTask();
             task.execute(cityStorm);
