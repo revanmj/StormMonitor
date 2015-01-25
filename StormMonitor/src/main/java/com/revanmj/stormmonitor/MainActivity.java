@@ -5,7 +5,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -22,6 +21,9 @@ import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.crashlytics.android.Crashlytics;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+import com.revanmj.StormMonitor;
 import com.revanmj.stormmonitor.logic.CheckConnection;
 import com.revanmj.stormmonitor.logic.Downloader;
 import com.revanmj.stormmonitor.logic.JSONparser;
@@ -55,6 +57,11 @@ public class MainActivity extends ActionBarActivity {
 
         setContentView(R.layout.activity_main);
 
+        // Get tracker.
+        Tracker t = ((StormMonitor) MainActivity.this.getApplication()).getTracker(StormMonitor.TrackerName.GLOBAL_TRACKER);
+        // Send a screen view.
+        t.send(new HitBuilders.AppViewBuilder().build());
+
         db = new StormOpenHelper(this);
 
         cityStorm = db.getAllCities();
@@ -76,11 +83,6 @@ public class MainActivity extends ActionBarActivity {
     }
 
     @Override
-    protected  void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
         RefreshData();
@@ -97,8 +99,10 @@ public class MainActivity extends ActionBarActivity {
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
 
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.context, menu);
+        if (v.getId() == R.id.listView) {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.context, menu);
+        }
     }
 
     @Override
@@ -200,7 +204,7 @@ public class MainActivity extends ActionBarActivity {
                 RefreshData();
                 return true;
             case R.id.action_about:
-                Intent about = new Intent(MainActivity.this, About.class);
+                Intent about = new Intent(MainActivity.this, AboutActivity.class);
                 MainActivity.this.startActivity(about);
                 return true;
             case R.id.action_map:

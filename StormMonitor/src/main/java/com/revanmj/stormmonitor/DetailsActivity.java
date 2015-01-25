@@ -8,6 +8,11 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+import com.revanmj.StormMonitor;
+
 
 public class DetailsActivity extends ActionBarActivity {
 
@@ -18,11 +23,19 @@ public class DetailsActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
 
+        // Get tracker.
+        Tracker t = ((StormMonitor) DetailsActivity.this.getApplication()).getTracker(StormMonitor.TrackerName.GLOBAL_TRACKER);
+        // Send a screen view.
+        t.send(new HitBuilders.AppViewBuilder().build());
+
         String url = getIntent().getStringExtra("url");
 
         wv = (WebView) findViewById(R.id.webView);
         wv.getSettings().setJavaScriptEnabled(true);
-        wv.getSettings().setSupportZoom(true);
+        wv.getSettings().setLoadWithOverviewMode(true);
+        wv.getSettings().setUseWideViewPort(true);
+        wv.getSettings().setBuiltInZoomControls(true);
+        wv.getSettings().setDisplayZoomControls(false);
         wv.setWebChromeClient(new WebChromeClient(){
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
@@ -34,7 +47,6 @@ public class DetailsActivity extends ActionBarActivity {
         if (url != null && !url.equals(""))
             wv.loadUrl(url);
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

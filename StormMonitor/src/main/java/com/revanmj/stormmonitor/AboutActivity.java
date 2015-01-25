@@ -8,7 +8,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-public class About extends ActionBarActivity {
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+import com.revanmj.StormMonitor;
+
+public class AboutActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,6 +21,11 @@ public class About extends ActionBarActivity {
 
         getSupportActionBar().setTitle("O aplikacji");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        // Get tracker.
+        Tracker t = ((StormMonitor) AboutActivity.this.getApplication()).getTracker(StormMonitor.TrackerName.GLOBAL_TRACKER);
+        // Send a screen view.
+        t.send(new HitBuilders.AppViewBuilder().build());
 
         TextView wersja = (TextView) findViewById(R.id.textView3);
 
@@ -29,7 +38,6 @@ public class About extends ActionBarActivity {
             e.printStackTrace();
         }
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

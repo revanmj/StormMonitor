@@ -17,6 +17,11 @@ import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+import com.revanmj.StormMonitor;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -37,6 +42,7 @@ import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 public class MapActivity extends ActionBarActivity {
 
     private final String serviceUrl = "http://antistorm.eu/";
+    private Tracker t;
     Bitmap radar, probability, visual, velocity, velocity_blank, estofex, blank;
     Canvas image;
     ImageViewTouch mapView;
@@ -50,6 +56,11 @@ public class MapActivity extends ActionBarActivity {
         setContentView(R.layout.activity_map);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        // Get tracker.
+        t = ((StormMonitor) MapActivity.this.getApplication()).getTracker(StormMonitor.TrackerName.GLOBAL_TRACKER);
+        // Send a screen view.
+        t.send(new HitBuilders.AppViewBuilder().build());
 
         mapView = (ImageViewTouch) findViewById(R.id.mapView);
         blank = BitmapFactory.decodeResource(getResources(), R.drawable.blank);
@@ -103,7 +114,7 @@ public class MapActivity extends ActionBarActivity {
         getMenuInflater().inflate(R.menu.map, menu);
 
         SharedPreferences settings = getPreferences(0);
-        map_mode = settings.getInt("map_mode", 0);
+        map_mode = settings.getInt("map_mode", 1);
         MenuItem rain = menu.findItem(R.id.action_map_rain);
         MenuItem storm = menu.findItem(R.id.action_map_storm);
 
@@ -129,13 +140,23 @@ public class MapActivity extends ActionBarActivity {
                 return true;
             case R.id.action_map_rain:
                 switchMap();
+                sendMapChangedEvent();
                 return true;
             case R.id.action_map_storm:
                 switchMap();
+                sendMapChangedEvent();
                 return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void sendMapChangedEvent() {
+        t.send(new HitBuilders.EventBuilder()
+                .setCategory("Function")
+                .setAction("Changed map view")
+                .setValue(1)
+                .build());
     }
 
     public void RefreshMap() {

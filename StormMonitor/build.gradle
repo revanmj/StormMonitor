@@ -22,6 +22,13 @@ android {
     defaultConfig {
         targetSdkVersion 21
     }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFile 'proguard-rules.txt'
+        }
+    }
 }
 
 dependencies {
@@ -30,6 +37,7 @@ dependencies {
     compile files('src/main/libs/wversionmanager-1.2.jar')
     compile 'com.android.support:support-v4:21.0.+'
     compile 'com.android.support:appcompat-v7:21.0.+'
+    compile 'com.google.android.gms:play-services-base:6.5.+'
     compile('com.crashlytics.sdk.android:crashlytics:2.2.0@aar') {
         transitive = true;
     }

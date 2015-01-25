@@ -1,24 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.revanmj.stormmonitor"
-    android:versionCode="26"
-    android:versionName="1.4.2" >
+    android:versionCode="27"
+    android:versionName="1.4.3" >
 
     <uses-sdk android:minSdkVersion="15" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-
-    <android:uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="18" />
-    <android:uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <android:uses-permission
-        android:name="android.permission.READ_EXTERNAL_STORAGE"
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="18" />
 
-    <application
+    <application android:name="com.revanmj.StormMonitor"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
@@ -34,7 +31,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".About"
+            android:name=".AboutActivity"
             android:label="@string/menu_about"
             android:parentActivityName=".MainActivity" >
         </activity>
@@ -72,6 +69,7 @@
         <meta-data
             android:name="com.crashlytics.ApiKey"
             android:value="a13f1a8d8359fda1ea856cb5907b8aa64fde7d9b" />
+
 
         <activity
             android:name=".DetailsActivity"

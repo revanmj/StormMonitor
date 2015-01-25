@@ -25,6 +25,10 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+import com.revanmj.StormMonitor;
 import com.revanmj.stormmonitor.model.StormData;
 import com.revanmj.stormmonitor.sql.CitiesAssetHelper;
 import com.revanmj.stormmonitor.sql.StormOpenHelper;
@@ -39,6 +43,7 @@ public class SearchActivity extends ActionBarActivity implements TextWatcher {
     private ListView wyniki;
     private EditText pole;
     private SearchAdapter sAdapter;
+    private Tracker t;
     List<StormData> cities;
     List<StormData> res;
     StormOpenHelper db;
@@ -50,6 +55,11 @@ public class SearchActivity extends ActionBarActivity implements TextWatcher {
 
         getSupportActionBar().setTitle(R.string.title_activity_search);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        // Get tracker.
+        t = ((StormMonitor) SearchActivity.this.getApplication()).getTracker(StormMonitor.TrackerName.GLOBAL_TRACKER);
+        // Send a screen view.
+        t.send(new HitBuilders.AppViewBuilder().build());
 
         db = new StormOpenHelper(SearchActivity.this);
         cities = db.getAllCities();
@@ -114,12 +124,8 @@ public class SearchActivity extends ActionBarActivity implements TextWatcher {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     StormData tmp = cities_db.getCity(results.get(position).getMiasto());
-                    boolean city_exists = false;
                     if (tmp != null) {
-                        for (int i = 0; i < cities.size(); i++)
-                            if (cities.get(i).getMiasto_id() == tmp.getMiasto_id())
-                                city_exists = true;
-                        if (!city_exists) {
+                        if (cityExists(tmp.getMiasto_id())) {
                             db.addCity(tmp);
                             finish();
                         } else {
@@ -136,12 +142,8 @@ public class SearchActivity extends ActionBarActivity implements TextWatcher {
     private void addLocationCity(String data) {
         CitiesAssetHelper cities_db = new CitiesAssetHelper(this);
         StormData tmp = cities_db.getCity(data);
-        boolean city_exists = false;
         if (tmp != null) {
-            for (int i = 0; i < cities.size(); i++)
-                if (cities.get(i).getMiasto_id() == tmp.getMiasto_id())
-                    city_exists = true;
-            if (!city_exists) {
+            if (cityExists(tmp.getMiasto_id())) {
                 db.addCity(tmp);
                 finish();
             } else {
@@ -150,6 +152,13 @@ public class SearchActivity extends ActionBarActivity implements TextWatcher {
         } else {
             Toast.makeText(this, R.string.message_no_such_city, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private boolean cityExists(int cityId) {
+        for (int i = 0; i < cities.size(); i++)
+            if (cities.get(i).getMiasto_id() == cityId)
+                return true;
+        return false;
     }
 
     @Override
@@ -184,6 +193,14 @@ public class SearchActivity extends ActionBarActivity implements TextWatcher {
 
     }
 
+    public void sendGpsUsedEvent() {
+        t.send(new HitBuilders.EventBuilder()
+                .setCategory("Function")
+                .setAction("Used adding by GPS")
+                .setValue(1)
+                .build());
+    }
+
     public class CityAsyncTask extends AsyncTask<String, String, String> {
         Activity act;
         double latitude;
@@ -211,7 +228,7 @@ public class SearchActivity extends ActionBarActivity implements TextWatcher {
                         longitude, 1);
                 Log.e("Addresses", "-->" + addresses);
                 Address tmp = addresses.get(0);
-                result = tmp.getAddressLine(1);
+                result = tmp.getLocality();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -222,13 +239,14 @@ public class SearchActivity extends ActionBarActivity implements TextWatcher {
         protected void onPostExecute(String result) {
             postep.dismiss();
             addLocationCity(result);
+            sendGpsUsedEvent();
             super.onPostExecute(result);
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            postep = ProgressDialog.show(SearchActivity.this, "Lokalizowanie", "Trwa ustalanie lokalizacji ...", true, false);
+            postep = ProgressDialog.show(SearchActivity.this, null, "Trwa ustalanie lokalizacji ...", true, false);
         }
     }
 
