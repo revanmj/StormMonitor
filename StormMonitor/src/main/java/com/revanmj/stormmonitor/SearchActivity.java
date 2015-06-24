@@ -125,7 +125,7 @@ public class SearchActivity extends ActionBarActivity implements TextWatcher {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     StormData tmp = cities_db.getCity(results.get(position).getMiasto());
                     if (tmp != null) {
-                        if (cityExists(tmp.getMiasto_id())) {
+                        if (!cityExists(tmp.getMiasto_id())) {
                             db.addCity(tmp);
                             finish();
                         } else {
@@ -143,7 +143,7 @@ public class SearchActivity extends ActionBarActivity implements TextWatcher {
         CitiesAssetHelper cities_db = new CitiesAssetHelper(this);
         StormData tmp = cities_db.getCity(data);
         if (tmp != null) {
-            if (cityExists(tmp.getMiasto_id())) {
+            if (!cityExists(tmp.getMiasto_id())) {
                 db.addCity(tmp);
                 finish();
             } else {

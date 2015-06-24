@@ -1,9 +1,14 @@
 package com.revanmj.stormmonitor;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Window;
+import android.webkit.GeolocationPermissions;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -13,14 +18,18 @@ import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.revanmj.StormMonitor;
 
+import im.delight.android.webview.AdvancedWebView;
+
 
 public class DetailsActivity extends ActionBarActivity {
 
-    private WebView wv;
+    AdvancedWebView webview;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.onCreate(savedInstanceState);
+        setSupportProgressBarIndeterminateVisibility(true);
         setContentView(R.layout.activity_details);
 
         // Get tracker.
@@ -29,23 +38,54 @@ public class DetailsActivity extends ActionBarActivity {
         t.send(new HitBuilders.AppViewBuilder().build());
 
         String url = getIntent().getStringExtra("url");
+        String title = getIntent().getStringExtra("title");
+        if (title.equals("map")) {
+            getSupportActionBar().setTitle(R.string.title_activity_maps);
+        }
+        else if (title.equals("details"))
+            getSupportActionBar().setTitle(R.string.title_activity_details);
 
-        wv = (WebView) findViewById(R.id.webView);
-        wv.getSettings().setJavaScriptEnabled(true);
-        wv.getSettings().setLoadWithOverviewMode(true);
-        wv.getSettings().setUseWideViewPort(true);
-        wv.getSettings().setBuiltInZoomControls(true);
-        wv.getSettings().setDisplayZoomControls(false);
-        wv.setWebChromeClient(new WebChromeClient(){
+        webview = (AdvancedWebView) findViewById(R.id.webView);
+        webview.getSettings().setAppCacheEnabled(true);
+        webview.setGeolocationEnabled(true);
+        webview.addPermittedHostname("antistorm.eu");
+        webview.addPermittedHostname("m.antistorm.eu");
+        webview.addPermittedHostname("www.antistorm.eu");
+
+        webview.setListener(this, new AdvancedWebView.Listener() {
+
             @Override
-            public void onProgressChanged(WebView view, int newProgress) {
-                DetailsActivity.this.setProgress(newProgress);
-                super.onProgressChanged(view, newProgress);
+            public void onPageFinished(String url) {
+                // a new page finished loading
             }
+
+            @Override
+            public void onPageStarted(String url, Bitmap favicon) {
+                // a new page started loading
+            }
+
+            @Override
+            public void onPageError(int errorCode, String description, String failingUrl) {
+                // the new page failed to load
+            }
+
+            @Override
+            public void onExternalPageRequest(String url) {
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(url));
+                startActivity(i);
+            }
+
+            @Override
+            public void onDownloadRequested(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
+                // some file is available for download
+            }
+
         });
 
+
         if (url != null && !url.equals(""))
-            wv.loadUrl(url);
+            webview.loadUrl(url);
     }
 
     @Override
@@ -64,7 +104,7 @@ public class DetailsActivity extends ActionBarActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_refresh) {
-            wv.reload();
+            webview.reload();
             return true;
         }
 

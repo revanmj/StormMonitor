@@ -7,7 +7,7 @@
     tools:context="com.revanmj.stormmonitor.DetailsActivity"
     android:padding="0dp">
 
-    <WebView
+    <im.delight.android.webview.AdvancedWebView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/webView"

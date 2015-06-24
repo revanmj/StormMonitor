@@ -22,7 +22,7 @@
     <string name="label_mapdate">Ostatnia aktualizacja: </string>
     <string name="label_update">Aktualizacja:</string>
     <string name="label_downloading">Trwa pobieranie …</string>
-    <string name="text_about">Autor: Michał Jakubowski (revanmj)\n\nStrona: revanmj.pl/apps\n\nAplikacja wykorzystuje dane pochodzące z serwisu antistorm.eu\n\nWykorzystywane biblioteki:\n- ImageViewTouch autorstwa Alessandro Crugnola (sephiroth) do wyświetlania mapy\n- SQLiteAssetHelper autorstwa Jeff Gilfelt do wczytywania bazy danych miast\n\nAplikacja wykorzystuje usługę Crashlytics do anonimowego przesyłania raportów błędów oraz Google Analytics dogromadzenia anonimowych statystyk.</string>
+    <string name="text_about">Autor: Michał Jakubowski (revanmj)\n\nStrona: revanmj.pl/apps\n\nAplikacja wykorzystuje dane pochodzące z serwisu antistorm.eu\n\nWykorzystywane biblioteki:\n- ImageViewTouch autorstwa Alessandro Crugnola (sephiroth) do wyświetlania mapy\n- SQLiteAssetHelper autorstwa Jeff Gilfelt do wczytywania bazy danych miast\n\nAplikacja wykorzystuje usługę Crashlytics do anonimowego przesyłania raportów błędów oraz Google Analytics do gromadzenia anonimowych statystyk.</string>
     <string name="button_cancel">Anuluj</string>
     <string name="button_add">Dodaj</string>
     <string name="button_ok">OK</string>
@@ -36,5 +36,6 @@
     <string name="dialog_ignore">Ignoruj</string>
     <string name="dialog_remind">Przypomnij później</string>
     <string name="title_activity_details">Szczegóły</string>
+    <string name="title_activity_maps">Mapy</string>
 
 </resources>

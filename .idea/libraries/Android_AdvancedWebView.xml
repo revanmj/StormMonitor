@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Android-AdvancedWebView">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/StormMonitor/src/main/libs/Android-AdvancedWebView.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

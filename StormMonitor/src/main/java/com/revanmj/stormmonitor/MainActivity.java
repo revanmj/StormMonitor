@@ -40,8 +40,8 @@ import java.util.List;
 
 public class MainActivity extends ActionBarActivity {
 
-    private final String updateApkUrl = "";
-    private final String updateChangelogUrl = "";
+    private final String updateApkUrl = "https://dl.dropboxusercontent.com/u/1561186/StormMonitorPb/StormMonitor.apk";
+    private final String updateChangelogUrl = "http://revanmj.pl/sm_changes.dat";
     private final String serviceUrl = "http://antistorm.eu/";
     private final String cityDataUrl = "http://antistorm.eu/?miasto=";
     private List<StormData> cityStorm;
@@ -120,6 +120,7 @@ public class MainActivity extends ActionBarActivity {
                 String name = cityStorm.get(info.position).getMiasto().toLowerCase().replace(' ', '-').replace('ą','a').replace('ę','e').replace('ć','c').replace('ł','l').replace('ń','n').replace('ó','o').replace('ś','s').replace('ż','ź').replace('ź','z');
                 Intent browserIntent = new Intent(MainActivity.this, DetailsActivity.class);
                 browserIntent.putExtra("url", cityDataUrl + name);
+                browserIntent.putExtra("title", "details");
                 startActivity(browserIntent);
                 return true;
         }
@@ -208,8 +209,10 @@ public class MainActivity extends ActionBarActivity {
                 MainActivity.this.startActivity(about);
                 return true;
             case R.id.action_map:
-                Intent map = new Intent(MainActivity.this, MapActivity.class);
-                MainActivity.this.startActivity(map);
+                Intent browserIntent = new Intent(MainActivity.this, DetailsActivity.class);
+                browserIntent.putExtra("url", serviceUrl + "/m/");
+                browserIntent.putExtra("title", "map");
+                startActivity(browserIntent);
                 return true;
             case R.id.action_refresh:
                 refreshButton = item;

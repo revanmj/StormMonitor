@@ -206,13 +206,13 @@ public class MapActivity extends ActionBarActivity {
             HttpGet httpget;
             switch (code) {
                 case 0:
-                    httpget = new HttpGet(serviceUrl + "?strona=burze");
+                    httpget = new HttpGet(serviceUrl + "#storm");
                     break;
                 case 1:
-                    httpget = new HttpGet(serviceUrl + "?strona=radary");
+                    httpget = new HttpGet(serviceUrl + "#radar");
                     break;
                 default:
-                    httpget = new HttpGet(serviceUrl + "?strona=radary");
+                    httpget = new HttpGet(serviceUrl + "#radar");
             }
             HttpResponse response = httpclient.execute(httpget); // Executeit
             HttpEntity entity = response.getEntity();
