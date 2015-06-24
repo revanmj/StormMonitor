@@ -40,8 +40,8 @@ import java.util.List;
 
 public class MainActivity extends ActionBarActivity {
 
-    private final String updateApkUrl = "https://dl.dropboxusercontent.com/u/1561186/StormMonitorPb/StormMonitor.apk";
-    private final String updateChangelogUrl = "http://revanmj.pl/sm_changes.dat";
+    private final String updateApkUrl = "https://github.com/revanmj/StormMonitor/raw/master/StormMonitor.apk";
+    private final String updateChangelogUrl = "https://github.com/revanmj/StormMonitor/raw/master/updates.json";
     private final String serviceUrl = "http://antistorm.eu/";
     private final String cityDataUrl = "http://antistorm.eu/?miasto=";
     private List<StormData> cityStorm;
