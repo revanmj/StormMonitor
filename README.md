@@ -7,4 +7,4 @@ Do pobierania obrazków składowych mapy wykorzystywane są wyrażenia regularne
 
 Screeny:
 
-![MyImage](https://dl.dropboxusercontent.com/u/1561186/StormMonitor/storm1.png) ![MyImage](https://dl.dropboxusercontent.com/u/1561186/StormMonitor/storm2.png)
+![MyImage](https://github.com/revanmj/StormMonitor/raw/master/screen1.png) ![MyImage](https://github.com/revanmj/StormMonitor/raw/master/screen2.png)
