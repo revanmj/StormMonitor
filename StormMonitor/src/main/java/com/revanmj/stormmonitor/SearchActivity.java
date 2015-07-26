@@ -25,6 +25,8 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.ContentViewEvent;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -61,9 +63,14 @@ public class SearchActivity extends ActionBarActivity implements TextWatcher {
         // Send a screen view.
         t.send(new HitBuilders.AppViewBuilder().build());
 
+        Answers.getInstance().logContentView(new ContentViewEvent()
+                .putContentName("Search")
+                .putContentType("Screens")
+                .putContentId("screen-3"));
+
         db = new StormOpenHelper(SearchActivity.this);
         cities = db.getAllCities();
-        res = new ArrayList<StormData>();
+        res = new ArrayList<>();
         sAdapter = new SearchAdapter(res, this);
 
         wyniki = (ListView)findViewById(R.id.list_search);
@@ -100,7 +107,7 @@ public class SearchActivity extends ActionBarActivity implements TextWatcher {
         if (query.toLowerCase().startsWith("ą") || query.toLowerCase().startsWith("ć")  || query.toLowerCase().startsWith("ę") || query.toLowerCase().startsWith("ł") || query.toLowerCase().startsWith("ń") || query.toLowerCase().startsWith("ó") || query.toLowerCase().startsWith("ś") || query.toLowerCase().startsWith("ż") || query.toLowerCase().startsWith("ź"))
             query = query.substring(1);
         final CitiesAssetHelper cities_db = new CitiesAssetHelper(this);
-        final List<StormData> results = new ArrayList<StormData>();
+        final List<StormData> results = new ArrayList<>();
         Cursor cursor = cities_db.searchCity(query);
         if (cursor.moveToFirst()) {
             do {
@@ -127,6 +134,10 @@ public class SearchActivity extends ActionBarActivity implements TextWatcher {
                     if (tmp != null) {
                         if (!cityExists(tmp.getMiasto_id())) {
                             db.addCity(tmp);
+                            Answers.getInstance().logContentView(new ContentViewEvent()
+                                    .putContentName("Added city from list")
+                                    .putContentType("Events")
+                                    .putContentId("event-1"));
                             finish();
                         } else {
                             Toast.makeText(SearchActivity.this, R.string.message_city_exists, Toast.LENGTH_SHORT).show();
@@ -145,12 +156,20 @@ public class SearchActivity extends ActionBarActivity implements TextWatcher {
         if (tmp != null) {
             if (!cityExists(tmp.getMiasto_id())) {
                 db.addCity(tmp);
+                Answers.getInstance().logContentView(new ContentViewEvent()
+                        .putContentName("Added city via GPS")
+                        .putContentType("Events")
+                        .putContentId("event-2"));
                 finish();
             } else {
                 Toast.makeText(this, R.string.message_city_exists, Toast.LENGTH_SHORT).show();
             }
         } else {
             Toast.makeText(this, R.string.message_no_such_city, Toast.LENGTH_SHORT).show();
+            Answers.getInstance().logContentView(new ContentViewEvent()
+                    .putContentName("Adding via GPS - City not found")
+                    .putContentType("Events")
+                    .putContentId("event-3"));
         }
     }
 

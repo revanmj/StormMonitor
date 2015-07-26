@@ -17,6 +17,8 @@ import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.ContentViewEvent;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -61,6 +63,11 @@ public class MapActivity extends ActionBarActivity {
         t = ((StormMonitor) MapActivity.this.getApplication()).getTracker(StormMonitor.TrackerName.GLOBAL_TRACKER);
         // Send a screen view.
         t.send(new HitBuilders.AppViewBuilder().build());
+
+        Answers.getInstance().logContentView(new ContentViewEvent()
+                .putContentName("Map (native)")
+                .putContentType("Screens")
+                .putContentId("screen-6"));
 
         mapView = (ImageViewTouch) findViewById(R.id.mapView);
         blank = BitmapFactory.decodeResource(getResources(), R.drawable.blank);
@@ -181,6 +188,11 @@ public class MapActivity extends ActionBarActivity {
         editor.apply();
 
         invalidateOptionsMenu();
+
+        Answers.getInstance().logContentView(new ContentViewEvent()
+                .putContentName("Switched native map mode")
+                .putContentType("Events")
+                .putContentId("event-4"));
 
         RefreshMap();
     }

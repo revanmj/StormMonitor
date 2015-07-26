@@ -13,6 +13,8 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.ContentViewEvent;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -41,9 +43,18 @@ public class DetailsActivity extends ActionBarActivity {
         String title = getIntent().getStringExtra("title");
         if (title.equals("map")) {
             getSupportActionBar().setTitle(R.string.title_activity_maps);
+            Answers.getInstance().logContentView(new ContentViewEvent()
+                    .putContentName("Map (webView)")
+                    .putContentType("Screens")
+                    .putContentId("screen-2"));
         }
-        else if (title.equals("details"))
+        else if (title.equals("details")) {
             getSupportActionBar().setTitle(R.string.title_activity_details);
+            Answers.getInstance().logContentView(new ContentViewEvent()
+                    .putContentName("Details (webView screen)")
+                    .putContentType("Screens")
+                    .putContentId("screen-4"));
+        }
 
         webview = (AdvancedWebView) findViewById(R.id.webView);
         webview.getSettings().setAppCacheEnabled(true);

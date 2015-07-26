@@ -8,6 +8,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.ContentViewEvent;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.revanmj.StormMonitor;
@@ -26,6 +28,11 @@ public class AboutActivity extends ActionBarActivity {
         Tracker t = ((StormMonitor) AboutActivity.this.getApplication()).getTracker(StormMonitor.TrackerName.GLOBAL_TRACKER);
         // Send a screen view.
         t.send(new HitBuilders.AppViewBuilder().build());
+
+        Answers.getInstance().logContentView(new ContentViewEvent()
+                .putContentName("About")
+                .putContentType("Screens")
+                .putContentId("screen-5"));
 
         TextView wersja = (TextView) findViewById(R.id.textView3);
 
