@@ -33,15 +33,33 @@
         </activity>
         <activity
             android:name=".AboutActivity"
-            android:label="@string/menu_about"
-            android:parentActivityName=".MainActivity" >
+            android:label="@string/menu_about">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
         </activity>
         <activity
             android:name=".MapActivity"
             android:configChanges="orientation"
             android:label="@string/title_activity_map"
-            android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+        <activity
+            android:name=".SearchActivity"
+            android:label="@string/title_activity_search">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+        <activity
+            android:name=".DetailsActivity"
+            android:label="@string/title_activity_details">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
         </activity>
 
         <receiver android:name=".CitiesWidget" >
@@ -58,28 +76,10 @@
             android:name=".WidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
 
-        <activity
-            android:name=".SearchActivity"
-            android:label="@string/title_activity_search"
-            android:parentActivityName=".MainActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="MainActivity" />
-        </activity>
-
         <meta-data
             android:name="com.crashlytics.ApiKey"
             android:value="a13f1a8d8359fda1ea856cb5907b8aa64fde7d9b" />
 
-
-        <activity
-            android:name=".DetailsActivity"
-            android:label="@string/title_activity_details"
-            android:parentActivityName=".MainActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.revanmj.stormmonitor.MainActivity" />
-        </activity>
     </application>
 
 </manifest>
