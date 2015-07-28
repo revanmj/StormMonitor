@@ -1,4 +1,4 @@
-package com.revanmj.stormmonitor.logic;
+package pl.revanmj.stormmonitor.logic;
 
 import android.os.NetworkOnMainThreadException;
 import android.os.StrictMode;
@@ -31,12 +31,12 @@ public class CheckConnection {
             client.execute(requestTest);
             responded = true;
         } catch (ClientProtocolException e) {
-            Log.e("com.revanmj.StormMonitor", "Unable to connect to " + url + " " + e.toString());
+            Log.e("pl.revanmj.StormMonitor", "Unable to connect to " + url + " " + e.toString());
         } catch (IOException e) {
-            Log.e("com.revanmj.StormMonitor", "Unable to connect to " + url + " " + e.toString());
+            Log.e("pl.revanmj.StormMonitor", "Unable to connect to " + url + " " + e.toString());
             e.printStackTrace();
         } catch (NetworkOnMainThreadException e) {
-            Log.e("com.revanmj.StormMonitor", "Unable to connect to " + url + " " + e.toString());
+            Log.e("pl.revanmj.StormMonitor", "Unable to connect to " + url + " " + e.toString());
         }
         return responded;
     }

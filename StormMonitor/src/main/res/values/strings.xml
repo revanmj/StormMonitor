@@ -34,7 +34,7 @@
     <string name="message_no_results">Nie znaleziono miast o podanej nazwie</string>
     <string name="dialog_update">Aktualizuj</string>
     <string name="dialog_ignore">Ignoruj</string>
-    <string name="dialog_remind">Przypomnij później</string>
+    <string name="dialog_remind">Później</string>
     <string name="title_activity_details">Szczegóły</string>
     <string name="title_activity_maps">Mapy</string>
 

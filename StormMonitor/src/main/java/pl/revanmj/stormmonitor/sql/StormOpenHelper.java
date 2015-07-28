@@ -1,4 +1,4 @@
-package com.revanmj.stormmonitor.sql;
+package pl.revanmj.stormmonitor.sql;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.revanmj.stormmonitor.model.StormData;
+import pl.revanmj.stormmonitor.model.StormData;
 
 import java.util.LinkedList;
 import java.util.List;

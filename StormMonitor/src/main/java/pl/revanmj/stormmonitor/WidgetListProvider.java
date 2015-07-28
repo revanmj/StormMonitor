@@ -1,14 +1,13 @@
-package com.revanmj.stormmonitor;
+package pl.revanmj.stormmonitor;
 
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
-import android.view.View;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
-import com.revanmj.stormmonitor.model.StormData;
-import com.revanmj.stormmonitor.sql.StormOpenHelper;
+import pl.revanmj.stormmonitor.model.StormData;
+import pl.revanmj.stormmonitor.sql.StormOpenHelper;
 
 import java.text.DecimalFormat;
 import java.util.List;

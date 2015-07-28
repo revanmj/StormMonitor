@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.revanmj.stormmonitor.MapActivity" >
+    tools:context="pl.revanmj.stormmonitor.MapActivity" >
     <item android:id="@+id/action_map_rain"
         android:icon="@drawable/ic_rain"
         android:title="@string/button_map_switch_rain"

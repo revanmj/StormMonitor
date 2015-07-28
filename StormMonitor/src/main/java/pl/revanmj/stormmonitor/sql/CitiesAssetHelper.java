@@ -1,4 +1,4 @@
-package com.revanmj.stormmonitor.sql;
+package pl.revanmj.stormmonitor.sql;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
-import com.revanmj.stormmonitor.model.StormData;
+import pl.revanmj.stormmonitor.model.StormData;
 
 /**
  * Created by revanmj on 29.12.2013.
@@ -14,6 +14,9 @@ import com.revanmj.stormmonitor.model.StormData;
 public class CitiesAssetHelper extends SQLiteAssetHelper {
     private static final String DATABASE_NAME = "cities";
     private static final int DATABASE_VERSION = 2;
+    public static final String CITY_ID = "city_id";
+    public static final String CITY_NAME = "name";
+    public static final String CITIES_TABLE = "cities";
 
     public CitiesAssetHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -24,11 +27,10 @@ public class CitiesAssetHelper extends SQLiteAssetHelper {
         SQLiteDatabase db = getReadableDatabase();
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
 
-        String [] sqlSelect = {"city_id", "name"};
-        String sqlTables = "cities";
-        String select = "name = '" + city_name +"'";
+        String [] sqlSelect = {CITY_ID, CITY_NAME};
+        String select = CITY_NAME + " = '" + city_name +"'";
 
-        qb.setTables(sqlTables);
+        qb.setTables(CITIES_TABLE);
         Cursor c = qb.query(db, sqlSelect, select, null,
                 null, null, null);
 
@@ -47,11 +49,10 @@ public class CitiesAssetHelper extends SQLiteAssetHelper {
         SQLiteDatabase db = getReadableDatabase();
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
 
-        String [] sqlSelect = {"city_id", "name"};
-        String sqlTables = "cities";
-        String select = "name LIKE '%" + city_name +"%'";
+        String [] sqlSelect = {CITY_ID, CITY_NAME};
+        String select = CITY_NAME + " LIKE '%" + city_name +"%'";
 
-        qb.setTables(sqlTables);
+        qb.setTables(CITIES_TABLE);
         Cursor c = qb.query(db, sqlSelect, select, null,
                 null, null, null);
         return c;

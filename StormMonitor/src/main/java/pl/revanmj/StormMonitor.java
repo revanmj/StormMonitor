@@ -1,13 +1,14 @@
-package com.revanmj;
+package pl.revanmj;
 
 import android.app.Application;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Logger;
 import com.google.android.gms.analytics.Tracker;
-import com.revanmj.stormmonitor.R;
 
 import java.util.HashMap;
+
+import pl.revanmj.stormmonitor.R;
 
 
 /**

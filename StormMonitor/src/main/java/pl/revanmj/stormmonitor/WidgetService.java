@@ -1,4 +1,4 @@
-package com.revanmj.stormmonitor;
+package pl.revanmj.stormmonitor;
 
 /**
  * Created by revanmj on 26.12.2013.

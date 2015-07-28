@@ -1,13 +1,16 @@
-package com.revanmj.stormmonitor;
+package pl.revanmj.stormmonitor;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -23,12 +26,14 @@ import android.widget.ListView;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
-import com.revanmj.StormMonitor;
-import com.revanmj.stormmonitor.logic.CheckConnection;
-import com.revanmj.stormmonitor.logic.Downloader;
-import com.revanmj.stormmonitor.logic.JSONparser;
-import com.revanmj.stormmonitor.model.StormData;
-import com.revanmj.stormmonitor.sql.StormOpenHelper;
+import pl.revanmj.StormMonitor;
+
+import pl.revanmj.stormmonitor.adapters.MainViewAdapter;
+import pl.revanmj.stormmonitor.logic.CheckConnection;
+import pl.revanmj.stormmonitor.logic.Downloader;
+import pl.revanmj.stormmonitor.logic.JSONparser;
+import pl.revanmj.stormmonitor.model.StormData;
+import pl.revanmj.stormmonitor.sql.StormOpenHelper;
 import com.winsontan520.wversionmanager.library.WVersionManager;
 
 import io.fabric.sdk.android.Fabric;
@@ -92,6 +97,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
+
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        MenuItem searchItem = menu.findItem(R.id.menu_search);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setIconifiedByDefault(true); // Do not iconify the widget; expand it by default
+
         return true;
     }
 

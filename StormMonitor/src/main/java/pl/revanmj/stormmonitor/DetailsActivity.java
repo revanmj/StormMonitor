@@ -1,4 +1,4 @@
-package com.revanmj.stormmonitor;
+package pl.revanmj.stormmonitor;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -13,7 +13,7 @@ import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.ContentViewEvent;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
-import com.revanmj.StormMonitor;
+import pl.revanmj.StormMonitor;
 
 import im.delight.android.webview.AdvancedWebView;
 

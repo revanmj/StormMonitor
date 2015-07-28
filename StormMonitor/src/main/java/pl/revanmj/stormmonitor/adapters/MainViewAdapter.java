@@ -1,4 +1,4 @@
-package com.revanmj.stormmonitor;
+package pl.revanmj.stormmonitor.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -8,7 +8,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.revanmj.stormmonitor.model.StormData;
+import pl.revanmj.stormmonitor.R;
+import pl.revanmj.stormmonitor.model.StormData;
 
 import java.text.DecimalFormat;
 import java.util.List;

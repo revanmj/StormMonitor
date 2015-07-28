@@ -1,4 +1,4 @@
-package com.revanmj.stormmonitor;
+package pl.revanmj.stormmonitor;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -29,10 +29,12 @@ import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.ContentViewEvent;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
-import com.revanmj.StormMonitor;
-import com.revanmj.stormmonitor.model.StormData;
-import com.revanmj.stormmonitor.sql.CitiesAssetHelper;
-import com.revanmj.stormmonitor.sql.StormOpenHelper;
+import pl.revanmj.StormMonitor;
+
+import pl.revanmj.stormmonitor.adapters.SearchAdapter;
+import pl.revanmj.stormmonitor.model.StormData;
+import pl.revanmj.stormmonitor.sql.CitiesAssetHelper;
+import pl.revanmj.stormmonitor.sql.StormOpenHelper;
 
 import java.io.IOException;
 import java.util.ArrayList;

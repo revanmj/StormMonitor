@@ -1,4 +1,4 @@
-package com.revanmj.stormmonitor;
+package pl.revanmj.stormmonitor;
 
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -8,11 +8,11 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.widget.RemoteViews;
 
-import com.revanmj.stormmonitor.logic.CheckConnection;
-import com.revanmj.stormmonitor.logic.Downloader;
-import com.revanmj.stormmonitor.logic.JSONparser;
-import com.revanmj.stormmonitor.model.StormData;
-import com.revanmj.stormmonitor.sql.StormOpenHelper;
+import pl.revanmj.stormmonitor.logic.CheckConnection;
+import pl.revanmj.stormmonitor.logic.Downloader;
+import pl.revanmj.stormmonitor.logic.JSONparser;
+import pl.revanmj.stormmonitor.model.StormData;
+import pl.revanmj.stormmonitor.sql.StormOpenHelper;
 
 import org.json.JSONException;
 

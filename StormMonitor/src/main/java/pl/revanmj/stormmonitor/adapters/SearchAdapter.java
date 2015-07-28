@@ -1,4 +1,4 @@
-package com.revanmj.stormmonitor;
+package pl.revanmj.stormmonitor.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -7,7 +7,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.revanmj.stormmonitor.model.StormData;
+import pl.revanmj.stormmonitor.R;
+import pl.revanmj.stormmonitor.model.StormData;
 
 import java.util.List;
 
