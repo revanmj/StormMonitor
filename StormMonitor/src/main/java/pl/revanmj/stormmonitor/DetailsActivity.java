@@ -1,13 +1,18 @@
 package pl.revanmj.stormmonitor;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
+import android.widget.ProgressBar;
 
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.ContentViewEvent;
@@ -20,7 +25,8 @@ import im.delight.android.webview.AdvancedWebView;
 
 public class DetailsActivity extends AppCompatActivity {
 
-    AdvancedWebView webview;
+    private AdvancedWebView webview;
+    private ProgressBar loadingAnim;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,9 +56,10 @@ public class DetailsActivity extends AppCompatActivity {
                     .putContentId("screen-4"));
         }
 
+        loadingAnim = (ProgressBar) findViewById(R.id.progressBar);
         webview = (AdvancedWebView) findViewById(R.id.webView);
         webview.getSettings().setAppCacheEnabled(true);
-        webview.setGeolocationEnabled(true);
+        checkForPermission();
         webview.addPermittedHostname("antistorm.eu");
         webview.addPermittedHostname("m.antistorm.eu");
         webview.addPermittedHostname("www.antistorm.eu");
@@ -61,17 +68,23 @@ public class DetailsActivity extends AppCompatActivity {
 
             @Override
             public void onPageFinished(String url) {
-                // a new page finished loading
+                webview.setVisibility(View.VISIBLE);
+                loadingAnim.setProgress(100);
+                loadingAnim.setVisibility(View.GONE);
             }
 
             @Override
             public void onPageStarted(String url, Bitmap favicon) {
-                // a new page started loading
+                webview.setVisibility(View.GONE);
+                loadingAnim.setVisibility(View.VISIBLE);
+                loadingAnim.setProgress(0);
             }
 
             @Override
             public void onPageError(int errorCode, String description, String failingUrl) {
-                // the new page failed to load
+                loadingAnim.setProgress(100);
+                loadingAnim.setVisibility(View.GONE);
+
             }
 
             @Override
@@ -91,6 +104,31 @@ public class DetailsActivity extends AppCompatActivity {
 
         if (url != null && !url.equals(""))
             webview.loadUrl(url);
+    }
+
+    private void checkForPermission() {
+        int permission = ContextCompat.checkSelfPermission(this, "android.permission.ACCESS_FINE_LOCATION");
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{"android.permission.ACCESS_FINE_LOCATION"},
+                    1);
+            return;
+        }
+
+        webview.setGeolocationEnabled(true);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case 1:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    webview.setGeolocationEnabled(true);
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 
     @Override

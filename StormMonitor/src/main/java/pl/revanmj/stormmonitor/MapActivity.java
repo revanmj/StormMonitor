@@ -23,17 +23,13 @@ import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import pl.revanmj.StormMonitor;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -213,24 +209,26 @@ public class MapActivity extends AppCompatActivity {
 
     public String getHTML(int code) {
         try {
-            HttpClient httpclient = new DefaultHttpClient(); // Create HTTP Client
-            HttpGet httpget;
+            URL url = null;
+
             switch (code) {
                 case 0:
-                    httpget = new HttpGet(serviceUrl + "#storm");
+                    url = new URL(serviceUrl + "#storm");
                     break;
                 case 1:
-                    httpget = new HttpGet(serviceUrl + "#radar");
+                    url = new URL(serviceUrl + "#radar");
                     break;
                 default:
-                    httpget = new HttpGet(serviceUrl + "#radar");
+                    url = new URL(serviceUrl + "#radar");
             }
-            HttpResponse response = httpclient.execute(httpget); // Executeit
-            HttpEntity entity = response.getEntity();
-            InputStream is = entity.getContent(); // Create an InputStream with the response
-            BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
+
+            URLConnection conn = url.openConnection();
+            conn.setReadTimeout(10000);
+            conn.setConnectTimeout(10000);
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             StringBuilder sb = new StringBuilder();
-            String line = null;
+            String line;
 
             while ((line = reader.readLine()) != null) // Read line by line
                 sb.append(line).append("\n");

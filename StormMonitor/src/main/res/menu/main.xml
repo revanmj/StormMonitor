@@ -5,11 +5,6 @@
         android:icon="@drawable/ic_menu_new"
         android:orderInCategory="1"
         app:showAsAction="ifRoom" />
-    <item
-        android:id="@+id/menu_search"
-        android:title="Szukaj"
-        app:showAsAction="always"
-        app:actionViewClass="android.support.v7.widget.SearchView"/>
     <item android:id="@+id/action_refresh"
         android:icon="@drawable/ic_menu_refresh"
         android:title="Odśwież"

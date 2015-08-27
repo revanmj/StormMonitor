@@ -3,6 +3,7 @@ package pl.revanmj.stormmonitor;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.location.Address;
 import android.location.Criteria;
@@ -11,6 +12,8 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -40,6 +43,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.jar.Manifest;
 
 public class SearchActivity extends AppCompatActivity implements TextWatcher {
 
@@ -103,10 +107,11 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
     }
 
     public void doSearch() {
-
         String query = pole.getText().toString();
-        if (query.toLowerCase().startsWith("ą") || query.toLowerCase().startsWith("ć")  || query.toLowerCase().startsWith("ę") || query.toLowerCase().startsWith("ł") || query.toLowerCase().startsWith("ń") || query.toLowerCase().startsWith("ó") || query.toLowerCase().startsWith("ś") || query.toLowerCase().startsWith("ż") || query.toLowerCase().startsWith("ź"))
+
+        if (query.toLowerCase().startsWith("ą") || query.toLowerCase().startsWith("ć")  || query.toLowerCase().startsWith("ę") || query.toLowerCase().startsWith("ł") || query.toLowerCase().startsWith("ń") || query.toLowerCase().startsWith("ó") || query.toLowerCase().startsWith("ś") || query.toLowerCase().startsWith("ż") || query.toLowerCase().startsWith("ź")) {
             query = query.substring(1);
+        }
         final CitiesAssetHelper cities_db = new CitiesAssetHelper(this);
         final List<StormData> results = new ArrayList<>();
         Cursor cursor = cities_db.searchCity(query);
@@ -151,6 +156,26 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
         }
     }
 
+    private void checkForPermission() {
+        int permission = ContextCompat.checkSelfPermission(this, "android.permission.ACCESS_FINE_LOCATION");
+
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, "android.permission.ACCESS_FINE_LOCATION"))
+            Toast.makeText(this, R.string.error_location_denied, Toast.LENGTH_SHORT)
+                    .show();
+        else if (permission != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{"android.permission.ACCESS_FINE_LOCATION"},
+                        1);
+                return;
+        }
+
+        addCityByLocation();
+    }
+
+    private void addCityByLocation() {
+        CityAsyncTask t = new CityAsyncTask(this);
+        t.execute();
+    }
+
     private void addLocationCity(String data) {
         CitiesAssetHelper cities_db = new CitiesAssetHelper(this);
         StormData tmp = cities_db.getCity(data);
@@ -181,6 +206,30 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
         return false;
     }
 
+    public void sendGpsUsedEvent() {
+        t.send(new HitBuilders.EventBuilder()
+                .setCategory("Function")
+                .setAction("Used adding by GPS")
+                .setValue(1)
+                .build());
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case 1:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    addCityByLocation();
+                } else {
+                    Toast.makeText(this, R.string.error_location_denied, Toast.LENGTH_SHORT)
+                            .show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.search, menu);
@@ -191,17 +240,14 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add_gps:
-                CityAsyncTask t = new CityAsyncTask(this);
-                t.execute();
+                checkForPermission();
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
     @Override
-    public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-
-    }
+    public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {}
 
     @Override
     public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
@@ -209,17 +255,7 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
     }
 
     @Override
-    public void afterTextChanged(Editable editable) {
-
-    }
-
-    public void sendGpsUsedEvent() {
-        t.send(new HitBuilders.EventBuilder()
-                .setCategory("Function")
-                .setAction("Used adding by GPS")
-                .setValue(1)
-                .build());
-    }
+    public void afterTextChanged(Editable editable) {}
 
     public class CityAsyncTask extends AsyncTask<String, String, String> {
         Activity act;

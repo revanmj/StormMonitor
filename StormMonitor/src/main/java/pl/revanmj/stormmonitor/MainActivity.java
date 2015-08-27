@@ -2,15 +2,12 @@ package pl.revanmj.stormmonitor;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -50,7 +47,6 @@ public class MainActivity extends AppCompatActivity {
     private final String serviceUrl = "http://antistorm.eu/";
     private final String cityDataUrl = "http://antistorm.eu/?miasto=";
     private List<StormData> cityStorm;
-    private StormOpenHelper db;
     private MainViewAdapter sdAdapter;
     private MenuItem refreshButton;
     private boolean start = true;
@@ -67,9 +63,10 @@ public class MainActivity extends AppCompatActivity {
         // Send a screen view.
         t.send(new HitBuilders.AppViewBuilder().build());
 
-        db = new StormOpenHelper(this);
-
+        StormOpenHelper db = new StormOpenHelper(this);
         cityStorm = db.getAllCities();
+        db.close();
+
         sdAdapter = new MainViewAdapter(cityStorm, this);
 
         ListView lista = (ListView) findViewById(R.id.listView);
@@ -98,12 +95,6 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
 
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        MenuItem searchItem = menu.findItem(R.id.menu_search);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        searchView.setIconifiedByDefault(true); // Do not iconify the widget; expand it by default
-
         return true;
     }
 
@@ -117,35 +108,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        switch(item.getItemId()) {
-            case R.id.context_delete:
-                db.deleteCity(cityStorm.get(info.position));
-                cityStorm = db.getAllCities();
-                sdAdapter.clear();
-                sdAdapter.addAll(cityStorm);
-                sdAdapter.notifyDataSetChanged();
-                return true;
-            case R.id.context_details:
-                String name = cityStorm.get(info.position).getMiasto().toLowerCase().replace(' ', '-').replace('ą','a').replace('ę','e').replace('ć','c').replace('ł','l').replace('ń','n').replace('ó','o').replace('ś','s').replace('ż','ź').replace('ź','z');
-                Intent browserIntent = new Intent(MainActivity.this, DetailsActivity.class);
-                browserIntent.putExtra("url", cityDataUrl + name);
-                browserIntent.putExtra("title", "details");
-                startActivity(browserIntent);
-                return true;
-        }
-        return  true;
-    }
-
     private void setData(List<StormData> result)
     {
+        StormOpenHelper db = new StormOpenHelper(this);
+
         for (int i = 0; i < result.size(); i++) {
             db.updateCity(result.get(i));
         }
 
         cityStorm = db.getAllCities();
+        db.close();
+
         sdAdapter.clear();
         sdAdapter.addAll(cityStorm);
         sdAdapter.notifyDataSetChanged();
@@ -209,6 +182,31 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        switch(item.getItemId()) {
+            case R.id.context_delete:
+                StormOpenHelper db = new StormOpenHelper(this);
+                db.deleteCity(cityStorm.get(info.position));
+                cityStorm = db.getAllCities();
+                db.close();
+
+                sdAdapter.clear();
+                sdAdapter.addAll(cityStorm);
+                sdAdapter.notifyDataSetChanged();
+                return true;
+            case R.id.context_details:
+                String name = cityStorm.get(info.position).getMiasto().toLowerCase().replace(' ', '-').replace('ą','a').replace('ę','e').replace('ć','c').replace('ł','l').replace('ń','n').replace('ó','o').replace('ś','s').replace('ż','ź').replace('ź','z');
+                Intent browserIntent = new Intent(MainActivity.this, DetailsActivity.class);
+                browserIntent.putExtra("url", cityDataUrl + name);
+                browserIntent.putExtra("title", "details");
+                startActivity(browserIntent);
+                return true;
+        }
+        return  true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add:
@@ -243,17 +241,23 @@ public class MainActivity extends AppCompatActivity {
 
     public void RefreshData() {
         if (CheckConnection.isHttpsAvalable(serviceUrl)) {
+            StormOpenHelper db = new StormOpenHelper(this);
             cityStorm = db.getAllCities();
+            db.close();
+
             JSONStormTask task = new JSONStormTask();
             task.execute(cityStorm);
+
             Calendar c = Calendar.getInstance();
             int year = c.get(Calendar.YEAR), month = c.get(Calendar.MONTH) + 1, day = c.get(Calendar.DAY_OF_MONTH), hour = c.get(Calendar.HOUR_OF_DAY), minutes = c.get(Calendar.MINUTE);
+
             String last_d = day + "." + month + "." + year;
         } else {
             if (refreshButton != null && refreshButton.getActionView() != null) {
                 refreshButton.getActionView().clearAnimation();
                 refreshButton.setActionView(null);
             }
+
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
             builder.setMessage(R.string.message_no_connection);
             builder.setTitle(R.string.message_error);

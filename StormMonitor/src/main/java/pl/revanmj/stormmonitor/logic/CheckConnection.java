@@ -4,14 +4,10 @@ import android.os.NetworkOnMainThreadException;
 import android.os.StrictMode;
 import android.util.Log;
 
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
-
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 
 /**
  * Created by revanmj on 28.07.2013.
@@ -21,16 +17,17 @@ public class CheckConnection {
     static public boolean isHttpsAvalable(String url){
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
+
         boolean responded = false;
-        HttpGet requestTest = new HttpGet(url);
-        HttpParams params = new BasicHttpParams();
-        HttpConnectionParams.setConnectionTimeout(params, 3000);
-        HttpConnectionParams.setSoTimeout(params, 5000);
-        DefaultHttpClient client = new DefaultHttpClient(params);
+
         try {
-            client.execute(requestTest);
+            URL address = new URL(url);
+            URLConnection conn = address.openConnection();
+            conn.setReadTimeout(5000);
+            conn.setConnectTimeout(5000);
+
             responded = true;
-        } catch (ClientProtocolException e) {
+        } catch (MalformedURLException e) {
             Log.e("pl.revanmj.StormMonitor", "Unable to connect to " + url + " " + e.toString());
         } catch (IOException e) {
             Log.e("pl.revanmj.StormMonitor", "Unable to connect to " + url + " " + e.toString());
