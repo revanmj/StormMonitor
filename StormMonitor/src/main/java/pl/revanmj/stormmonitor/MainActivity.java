@@ -195,13 +195,6 @@ public class MainActivity extends AppCompatActivity {
                 sdAdapter.addAll(cityStorm);
                 sdAdapter.notifyDataSetChanged();
                 return true;
-            case R.id.context_details:
-                String name = cityStorm.get(info.position).getMiasto().toLowerCase().replace(' ', '-').replace('ą','a').replace('ę','e').replace('ć','c').replace('ł','l').replace('ń','n').replace('ó','o').replace('ś','s').replace('ż','ź').replace('ź','z');
-                Intent browserIntent = new Intent(MainActivity.this, DetailsActivity.class);
-                browserIntent.putExtra("url", cityDataUrl + name);
-                browserIntent.putExtra("title", "details");
-                startActivity(browserIntent);
-                return true;
         }
         return  true;
     }

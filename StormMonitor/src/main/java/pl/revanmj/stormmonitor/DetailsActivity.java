@@ -84,7 +84,6 @@ public class DetailsActivity extends AppCompatActivity {
             public void onPageError(int errorCode, String description, String failingUrl) {
                 loadingAnim.setProgress(100);
                 loadingAnim.setVisibility(View.GONE);
-
             }
 
             @Override
