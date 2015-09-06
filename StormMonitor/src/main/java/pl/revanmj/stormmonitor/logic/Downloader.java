@@ -1,10 +1,16 @@
 package pl.revanmj.stormmonitor.logic;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
+import android.util.JsonReader;
+
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
+
+import pl.revanmj.stormmonitor.model.DownloadResult;
+import pl.revanmj.stormmonitor.model.StormData;
 
 /**
  * Created by Student on 10.07.13.
@@ -13,39 +19,73 @@ public class Downloader {
     private static String BASE_URL = "http://antistorm.eu/webservice.php?id=";
 
 
-    public String getStormData(Integer id) {
-        HttpURLConnection con = null ;
-        InputStream is = null;
+    static public DownloadResult getStormData(List<StormData> list) {
+        int resultCode = 1;
+        int responseCode = -1;
+        HttpURLConnection con = null;
+        List<StormData> resultList = new ArrayList<>();
 
-        try {
-            con = (HttpURLConnection) ( new URL(BASE_URL + id)).openConnection();
-            con.setRequestMethod("GET");
-            con.setDoInput(true);
-            con.setDoOutput(true);
-            con.setConnectTimeout(3000);
-            con.connect();
+        for (StormData city : list) {
+            try {
+                con = (HttpURLConnection) (new URL(BASE_URL + city.getMiasto_id())).openConnection();
+                con.setRequestMethod("GET");
+                con.setConnectTimeout(3000);
+                con.connect();
+                responseCode = con.getResponseCode();
 
-            // Let's read the response
-            StringBuffer buffer = new StringBuffer();
-            is = con.getInputStream();
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
-            String line = null;
-            while (  (line = br.readLine()) != null )
-                buffer.append(line + "\r\n");
+                JsonReader reader = new JsonReader(new InputStreamReader(con.getInputStream(), "UTF-8"));
 
-            is.close();
-            con.disconnect();
-            return buffer.toString();
+                // Setting city database id
+                StormData data = new StormData();
+                data.setMiasto_id(city.getMiasto_id());
+
+                // Parsing received data into StormData obejct
+                reader.beginObject();
+                while (reader.hasNext()) {
+                    String name = reader.nextName();
+                    if (name.equals("m"))
+                        data.setMiasto(reader.nextString());
+                    else if (name.equals("p_b"))
+                        data.setP_burzy(reader.nextInt());
+                    else if (name.equals("t_b"))
+                        data.setT_burzy(reader.nextInt());
+                    else if (name.equals("p_o"))
+                        data.setP_opadow(reader.nextInt());
+                    else if (name.equals("t_o"))
+                        data.setT_opadow(reader.nextInt());
+                    else {
+                        reader.skipValue();
+                    }
+                }
+                reader.endObject();
+
+                // Adding result to a list
+                resultList.add(data);
+
+            } catch (UnknownHostException e) {
+                // Couldn't connect to a host, so assume we have no internet connection (or host is down)
+                resultCode = 2;
+            } catch (Exception e) {
+                // Unknown exception. If HTTP status code is available, pass it
+                if (responseCode > 99 && responseCode < 600)
+                    resultCode = responseCode;
+                else {
+                    resultCode = -1;
+                    e.printStackTrace();
+                }
+            } finally {
+                try {
+                    con.disconnect();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }
-        catch(Throwable t) {
-            t.printStackTrace();
-        }
-        finally {
-            try { is.close(); } catch(Throwable t) {}
-            try { con.disconnect(); } catch(Throwable t) {}
-        }
 
-        return null;
-
+        // Create object with final list or just an error code
+        if (resultCode == 1)
+            return new DownloadResult(resultList);
+        else
+            return new DownloadResult(resultCode);
     }
 }

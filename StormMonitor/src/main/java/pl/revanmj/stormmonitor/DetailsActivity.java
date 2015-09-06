@@ -16,9 +16,6 @@ import android.widget.ProgressBar;
 
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.ContentViewEvent;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
-import pl.revanmj.StormMonitor;
 
 import im.delight.android.webview.AdvancedWebView;
 
@@ -34,28 +31,25 @@ public class DetailsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
 
-        // Get tracker.
-        Tracker t = ((StormMonitor) DetailsActivity.this.getApplication()).getTracker(StormMonitor.TrackerName.GLOBAL_TRACKER);
-        // Send a screen view.
-        t.send(new HitBuilders.AppViewBuilder().build());
-
+        // Getting parameters
         String url = getIntent().getStringExtra("url");
         String title = getIntent().getStringExtra("title");
         if (title.equals("map")) {
             getSupportActionBar().setTitle(R.string.title_activity_maps);
             Answers.getInstance().logContentView(new ContentViewEvent()
                     .putContentName("Map (webView)")
-                    .putContentType("Screens")
-                    .putContentId("screen-2"));
+                    .putContentType("Views")
+                    .putContentId("mapWebView"));
         }
         else if (title.equals("details")) {
             getSupportActionBar().setTitle(R.string.title_activity_details);
             Answers.getInstance().logContentView(new ContentViewEvent()
                     .putContentName("Details (webView screen)")
-                    .putContentType("Screens")
-                    .putContentId("screen-4"));
+                    .putContentType("Views")
+                    .putContentId("detailsWebView"));
         }
 
+        // Setting up loading animation and WebView
         loadingAnim = (ProgressBar) findViewById(R.id.progressBar);
         webview = (AdvancedWebView) findViewById(R.id.webView);
         webview.getSettings().setAppCacheEnabled(true);
@@ -63,7 +57,6 @@ public class DetailsActivity extends AppCompatActivity {
         webview.addPermittedHostname("antistorm.eu");
         webview.addPermittedHostname("m.antistorm.eu");
         webview.addPermittedHostname("www.antistorm.eu");
-
         webview.setListener(this, new AdvancedWebView.Listener() {
 
             @Override

@@ -11,7 +11,6 @@
     <string name="menu_delete_q">Usunąć miasto?</string>
     <string name="menu_details">Szczegóły</string>
     <string name="message_error">Błąd!</string>
-    <string name="message_no_connection">Brak połączenia z antistorm.eu. Sprawdź czy jesteś połączony z internetem. Może to być również awaria serwera usługi.</string>
     <string name="message_city_exists">To miasto jest już dodane</string>
     <string name="message_no_such_city">Twojego miasta nie ma w bazie</string>
     <string name="message_map_error">Pobieranie mapy nie powiodło się.</string>
@@ -38,5 +37,6 @@
     <string name="title_activity_details">Szczegóły</string>
     <string name="title_activity_maps">Mapy</string>
     <string name="error_location_denied">Nie przyznano dostępu do danych lokalizacji!</string>
-
+    <string name="error_no_connection">Nie masz połączenia z internetem lub usługa jest teraz niedostępna.</string>
+    <string name="error_unknown">Nieznany bład\nKod: </string>
 </resources>

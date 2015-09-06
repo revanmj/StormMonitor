@@ -19,9 +19,6 @@ import android.view.MenuItem;
 
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.ContentViewEvent;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
-import pl.revanmj.StormMonitor;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -39,7 +36,6 @@ import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 public class MapActivity extends AppCompatActivity {
 
     private final String serviceUrl = "http://antistorm.eu/";
-    private Tracker t;
     Bitmap radar, probability, visual, velocity, velocity_blank, estofex, blank;
     Canvas image;
     ImageViewTouch mapView;
@@ -54,15 +50,10 @@ public class MapActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        // Get tracker.
-        t = ((StormMonitor) MapActivity.this.getApplication()).getTracker(StormMonitor.TrackerName.GLOBAL_TRACKER);
-        // Send a screen view.
-        t.send(new HitBuilders.AppViewBuilder().build());
-
         Answers.getInstance().logContentView(new ContentViewEvent()
                 .putContentName("Map (native)")
-                .putContentType("Screens")
-                .putContentId("screen-6"));
+                .putContentType("View")
+                .putContentId("mapNative"));
 
         mapView = (ImageViewTouch) findViewById(R.id.mapView);
         blank = BitmapFactory.decodeResource(getResources(), R.drawable.blank);
@@ -142,23 +133,13 @@ public class MapActivity extends AppCompatActivity {
                 return true;
             case R.id.action_map_rain:
                 switchMap();
-                sendMapChangedEvent();
                 return true;
             case R.id.action_map_storm:
                 switchMap();
-                sendMapChangedEvent();
                 return true;
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private void sendMapChangedEvent() {
-        t.send(new HitBuilders.EventBuilder()
-                .setCategory("Function")
-                .setAction("Changed map view")
-                .setValue(1)
-                .build());
     }
 
     public void RefreshMap() {
@@ -185,9 +166,9 @@ public class MapActivity extends AppCompatActivity {
         invalidateOptionsMenu();
 
         Answers.getInstance().logContentView(new ContentViewEvent()
-                .putContentName("Switched native map mode")
-                .putContentType("Events")
-                .putContentId("event-4"));
+                .putContentName("Map (native)")
+                .putContentType("Actions")
+                .putContentId("mapTypeChanged"));
 
         RefreshMap();
     }

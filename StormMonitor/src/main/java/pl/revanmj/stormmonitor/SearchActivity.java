@@ -30,9 +30,6 @@ import android.widget.Toast;
 
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.ContentViewEvent;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
-import pl.revanmj.StormMonitor;
 
 import pl.revanmj.stormmonitor.adapters.SearchAdapter;
 import pl.revanmj.stormmonitor.model.StormData;
@@ -50,7 +47,6 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
     private ListView wyniki;
     private EditText pole;
     private SearchAdapter sAdapter;
-    private Tracker t;
     List<StormData> cities;
     List<StormData> res;
     StormOpenHelper db;
@@ -63,25 +59,24 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
         getSupportActionBar().setTitle(R.string.title_activity_search);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        // Get tracker.
-        t = ((StormMonitor) SearchActivity.this.getApplication()).getTracker(StormMonitor.TrackerName.GLOBAL_TRACKER);
-        // Send a screen view.
-        t.send(new HitBuilders.AppViewBuilder().build());
-
         Answers.getInstance().logContentView(new ContentViewEvent()
                 .putContentName("Search")
                 .putContentType("Screens")
                 .putContentId("screen-3"));
 
+        // Get list of all cities
         db = new StormOpenHelper(SearchActivity.this);
         cities = db.getAllCities();
+        db.close();
+
+        // Prepare ListView
         res = new ArrayList<>();
         sAdapter = new SearchAdapter(res, this);
-
         wyniki = (ListView)findViewById(R.id.list_search);
         wyniki.setAdapter(sAdapter);
         pole = (EditText)findViewById(R.id.editText);
 
+        // Add listener for Search key presses on virtual keyboard
         pole.setOnKeyListener(new View.OnKeyListener()
         {
             public boolean onKey(View v, int keyCode, KeyEvent event)
@@ -106,14 +101,22 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
         pole.addTextChangedListener(this);
     }
 
+    /**
+     * Main method for searching the database
+     */
     public void doSearch() {
         String query = pole.getText().toString();
 
+        // Remove polish letters
         if (query.toLowerCase().startsWith("ą") || query.toLowerCase().startsWith("ć")  || query.toLowerCase().startsWith("ę") || query.toLowerCase().startsWith("ł") || query.toLowerCase().startsWith("ń") || query.toLowerCase().startsWith("ó") || query.toLowerCase().startsWith("ś") || query.toLowerCase().startsWith("ż") || query.toLowerCase().startsWith("ź")) {
             query = query.substring(1);
         }
+
+        // Prepare database
         final CitiesAssetHelper cities_db = new CitiesAssetHelper(this);
         final List<StormData> results = new ArrayList<>();
+
+        // Get the results
         Cursor cursor = cities_db.searchCity(query);
         if (cursor.moveToFirst()) {
             do {
@@ -126,16 +129,18 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
         }
 
         if (results.size() == 0) {
+            // No city fits the query
             Toast.makeText(SearchActivity.this, R.string.message_no_results, Toast.LENGTH_SHORT).show();
         } else {
+            // Clear the ListView and add results to it
             sAdapter.clear();
             sAdapter.addAll(results);
             sAdapter.notifyDataSetChanged();
 
             wyniki.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    // Add clicked city to the database
                     StormData tmp = cities_db.getCity(results.get(position).getMiasto());
                     if (tmp != null) {
                         if (!cityExists(tmp.getMiasto_id())) {
@@ -156,6 +161,9 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
         }
     }
 
+    /**
+     * Methods for cheking location permission in Android 6.0 and newer
+     */
     private void checkForPermission() {
         int permission = ContextCompat.checkSelfPermission(this, "android.permission.ACCESS_FINE_LOCATION");
 
@@ -171,11 +179,35 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
         addCityByLocation();
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case 1:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    addCityByLocation();
+                } else {
+                    Toast.makeText(this, R.string.error_location_denied, Toast.LENGTH_SHORT)
+                            .show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+
+    /**
+     * Method for adding city via GPS without declaring AsyncTask objects all over the place
+     */
     private void addCityByLocation() {
         CityAsyncTask t = new CityAsyncTask(this);
         t.execute();
     }
 
+    /**
+     * Method for adding a city from GPS data
+     * @param data string that contains city name returned by Google Play services API
+     */
     private void addLocationCity(String data) {
         CitiesAssetHelper cities_db = new CitiesAssetHelper(this);
         StormData tmp = cities_db.getCity(data);
@@ -207,27 +239,10 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
     }
 
     public void sendGpsUsedEvent() {
-        t.send(new HitBuilders.EventBuilder()
-                .setCategory("Function")
-                .setAction("Used adding by GPS")
-                .setValue(1)
-                .build());
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        switch (requestCode) {
-            case 1:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    addCityByLocation();
-                } else {
-                    Toast.makeText(this, R.string.error_location_denied, Toast.LENGTH_SHORT)
-                            .show();
-                }
-                break;
-            default:
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
+        Answers.getInstance().logContentView(new ContentViewEvent()
+                .putContentName("Added by GPS")
+                .putContentType("events")
+                .putContentId("addByGPS"));
     }
 
     @Override
@@ -251,12 +266,17 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
 
     @Override
     public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+        // Initialize search on every keypress so results list is constantly updated
         doSearch();
     }
 
     @Override
     public void afterTextChanged(Editable editable) {}
 
+    /**
+     * Class for getting location data that's used for automatically adding city you're in now.
+     * It returns a String with city's name returned by Google Play services API
+     */
     public class CityAsyncTask extends AsyncTask<String, String, String> {
         Activity act;
         double latitude;

@@ -8,15 +8,11 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.widget.RemoteViews;
 
-import pl.revanmj.stormmonitor.logic.CheckConnection;
 import pl.revanmj.stormmonitor.logic.Downloader;
-import pl.revanmj.stormmonitor.logic.JSONparser;
+import pl.revanmj.stormmonitor.model.DownloadResult;
 import pl.revanmj.stormmonitor.model.StormData;
 import pl.revanmj.stormmonitor.sql.StormOpenHelper;
 
-import org.json.JSONException;
-
-import java.util.ArrayList;
 import java.util.List;
 
 public class CitiesWidget extends AppWidgetProvider {
@@ -45,50 +41,32 @@ public class CitiesWidget extends AppWidgetProvider {
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 
-    private void setData(List<StormData> result)
+    private void setData(DownloadResult result)
     {
-        for (int i = 0; i < result.size(); i++) {
-            db.updateCity(result.get(i));
-        }
+        if (result.getResultCode() == 1)
+            for (StormData city : result.getCitiesData()) {
+                db.updateCity(city);
+            }
     }
 
-    private class JSONStormTask extends AsyncTask<List<StormData>, Void, List<StormData>> {
+    private class JSONStormTask extends AsyncTask<List<StormData>, Void, DownloadResult> {
 
         @Override
-        protected List<StormData> doInBackground(List<StormData>... params) {
-            List<StormData> lista = new ArrayList<StormData>();
+        protected DownloadResult doInBackground(List<StormData>... params) {
+            DownloadResult result = null;
 
             if (params[0] != null) {
-                int ile = params[0].size();
-
-                for (int i = 0; i < ile; i++) {
-                    StormData stormData = new StormData();
-                    String data = ( (new Downloader()).getStormData(params[0].get(i).getMiasto_id()));
-
-                    if (data != null) {
-                        try {
-                            stormData = JSONparser.getStormData(data);
-                            stormData.setMiasto_id(params[0].get(i).getMiasto_id());
-                            lista.add(stormData);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    else {
-                        stormData.setP_burzy(0);
-                        stormData.setT_burzy(500);
-                        stormData.setMiasto("Pobieranie nie powiodło się!");
-                        stormData.setError(true);
-                    }
-                }
+                // We list of the cities so download process can be started
+                result = Downloader.getStormData(params[0]);
             }
 
-            return lista;
+            return result;
         }
 
         @Override
-        protected void onPostExecute(List<StormData> result) {
+        protected void onPostExecute(DownloadResult result) {
             setData(result);
+            super.onPostExecute(result);
         }
 
         @Override
@@ -99,10 +77,8 @@ public class CitiesWidget extends AppWidgetProvider {
 
     public void RefreshData() {
         List<StormData> cities = db.getAllCities();
-        if (CheckConnection.isHttpsAvalable("http://antistorm.eu/")) {
-            JSONStormTask task = new JSONStormTask();
-            task.execute(cities);
-        }
+        JSONStormTask task = new JSONStormTask();
+        task.execute(cities);
     }
 }
 

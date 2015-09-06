@@ -10,9 +10,6 @@ import android.widget.TextView;
 
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.ContentViewEvent;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
-import pl.revanmj.StormMonitor;
 
 public class AboutActivity extends AppCompatActivity {
 
@@ -24,15 +21,10 @@ public class AboutActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("O aplikacji");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        // Get tracker.
-        Tracker t = ((StormMonitor) AboutActivity.this.getApplication()).getTracker(StormMonitor.TrackerName.GLOBAL_TRACKER);
-        // Send a screen view.
-        t.send(new HitBuilders.AppViewBuilder().build());
-
         Answers.getInstance().logContentView(new ContentViewEvent()
                 .putContentName("About")
-                .putContentType("Screens")
-                .putContentId("screen-5"));
+                .putContentType("Views")
+                .putContentId("aboutScreen"));
 
         TextView wersja = (TextView) findViewById(R.id.textView3);
 
