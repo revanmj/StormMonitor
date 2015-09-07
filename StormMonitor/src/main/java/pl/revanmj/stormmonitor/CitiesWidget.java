@@ -8,6 +8,9 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.widget.RemoteViews;
 
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.ContentViewEvent;
+
 import pl.revanmj.stormmonitor.logic.Downloader;
 import pl.revanmj.stormmonitor.model.DownloadResult;
 import pl.revanmj.stormmonitor.model.StormData;
@@ -58,6 +61,10 @@ public class CitiesWidget extends AppWidgetProvider {
             if (params[0] != null) {
                 // We list of the cities so download process can be started
                 result = Downloader.getStormData(params[0]);
+                Answers.getInstance().logContentView(new ContentViewEvent()
+                        .putContentName("Widget")
+                        .putContentType("Action")
+                        .putContentId("widgetUpdated"));
             }
 
             return result;

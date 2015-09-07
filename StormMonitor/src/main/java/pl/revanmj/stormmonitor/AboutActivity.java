@@ -22,7 +22,7 @@ public class AboutActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Answers.getInstance().logContentView(new ContentViewEvent()
-                .putContentName("About")
+                .putContentName("AboutView")
                 .putContentType("Views")
                 .putContentId("aboutScreen"));
 

@@ -27,6 +27,9 @@ import pl.revanmj.stormmonitor.logic.Downloader;
 import pl.revanmj.stormmonitor.model.DownloadResult;
 import pl.revanmj.stormmonitor.model.StormData;
 import pl.revanmj.stormmonitor.sql.StormOpenHelper;
+
+import com.crashlytics.android.answers.Answers;
+import com.crashlytics.android.answers.ContentViewEvent;
 import com.winsontan520.wversionmanager.library.WVersionManager;
 
 import io.fabric.sdk.android.Fabric;
@@ -124,6 +127,12 @@ public class MainActivity extends AppCompatActivity {
             alertDialogBuilder.setTitle(R.string.message_error);
 
             String error = getResources().getString(R.string.error_unknown) + result.getResultCode();
+
+            Answers.getInstance().logContentView(new ContentViewEvent()
+                    .putContentName("Error code: " + result.getResultCode())
+                    .putContentType("Error")
+                    .putContentId("downloadError"));
+
             if (result.getResultCode() == 2)
                 error = getResources().getString(R.string.error_no_connection);
 
@@ -196,6 +205,12 @@ public class MainActivity extends AppCompatActivity {
                 sdAdapter.clear();
                 sdAdapter.addAll(cityStorm);
                 sdAdapter.notifyDataSetChanged();
+
+                Answers.getInstance().logContentView(new ContentViewEvent()
+                        .putContentName("MainView")
+                        .putContentType("Action")
+                        .putContentId("deletedCity"));
+
                 return true;
         }
         return  true;

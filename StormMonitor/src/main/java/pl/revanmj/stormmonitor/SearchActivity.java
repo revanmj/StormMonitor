@@ -60,9 +60,9 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Answers.getInstance().logContentView(new ContentViewEvent()
-                .putContentName("Search")
-                .putContentType("Screens")
-                .putContentId("screen-3"));
+                .putContentName("AddView")
+                .putContentType("Views")
+                .putContentId("addView"));
 
         // Get list of all cities
         db = new StormOpenHelper(SearchActivity.this);
@@ -146,9 +146,9 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
                         if (!cityExists(tmp.getMiasto_id())) {
                             db.addCity(tmp);
                             Answers.getInstance().logContentView(new ContentViewEvent()
-                                    .putContentName("Added city from list")
-                                    .putContentType("Events")
-                                    .putContentId("event-1"));
+                                    .putContentName("AddView")
+                                    .putContentType("Actions")
+                                    .putContentId("addedCityFromList"));
                             finish();
                         } else {
                             Toast.makeText(SearchActivity.this, R.string.message_city_exists, Toast.LENGTH_SHORT).show();
@@ -215,9 +215,9 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
             if (!cityExists(tmp.getMiasto_id())) {
                 db.addCity(tmp);
                 Answers.getInstance().logContentView(new ContentViewEvent()
-                        .putContentName("Added city via GPS")
-                        .putContentType("Events")
-                        .putContentId("event-2"));
+                        .putContentName("AddView")
+                        .putContentType("Actions")
+                        .putContentId("addedCityViaGPS"));
                 finish();
             } else {
                 Toast.makeText(this, R.string.message_city_exists, Toast.LENGTH_SHORT).show();
@@ -225,9 +225,9 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
         } else {
             Toast.makeText(this, R.string.message_no_such_city, Toast.LENGTH_SHORT).show();
             Answers.getInstance().logContentView(new ContentViewEvent()
-                    .putContentName("Adding via GPS - City not found")
-                    .putContentType("Events")
-                    .putContentId("event-3"));
+                    .putContentName("City not found: " + data)
+                    .putContentType("Errors")
+                    .putContentId("noSuchCity"));
         }
     }
 
@@ -238,12 +238,7 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
         return false;
     }
 
-    public void sendGpsUsedEvent() {
-        Answers.getInstance().logContentView(new ContentViewEvent()
-                .putContentName("Added by GPS")
-                .putContentType("events")
-                .putContentId("addByGPS"));
-    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -315,7 +310,6 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
         protected void onPostExecute(String result) {
             postep.dismiss();
             addLocationCity(result);
-            sendGpsUsedEvent();
             super.onPostExecute(result);
         }
 
