@@ -19,11 +19,11 @@ import pl.revanmj.stormmonitor.sql.StormOpenHelper;
 import java.util.List;
 
 public class CitiesWidget extends AppWidgetProvider {
-    private StormOpenHelper db;
+    private Context ctx;
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        db = new StormOpenHelper(context);
+        ctx = context;
         RefreshData();
         final int N = appWidgetIds.length;
         for (int i=0; i<N; i++) {
@@ -39,17 +39,21 @@ public class CitiesWidget extends AppWidgetProvider {
         Intent svcIntent = new Intent(context, WidgetService.class);
         svcIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         svcIntent.setData(Uri.parse(svcIntent.toUri(Intent.URI_INTENT_SCHEME)));
-        views.setRemoteAdapter(appWidgetId, R.id.widget_listView, svcIntent);
+        views.setRemoteAdapter(R.id.widget_listView, svcIntent);
+        //views.setRemoteAdapter(appWidgetId, R.id.widget_listView, svcIntent);
 
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 
     private void setData(DownloadResult result)
     {
-        if (result.getResultCode() == 1)
+        if (result.getResultCode() == 1) {
+            StormOpenHelper db = new StormOpenHelper(ctx);
             for (StormData city : result.getCitiesData()) {
                 db.updateCity(city);
             }
+            db.close();
+        }
     }
 
     private class JSONStormTask extends AsyncTask<List<StormData>, Void, DownloadResult> {
@@ -83,7 +87,10 @@ public class CitiesWidget extends AppWidgetProvider {
     }
 
     public void RefreshData() {
+        StormOpenHelper db = new StormOpenHelper(ctx);
         List<StormData> cities = db.getAllCities();
+        db.close();
+
         JSONStormTask task = new JSONStormTask();
         task.execute(cities);
     }

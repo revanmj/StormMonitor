@@ -17,7 +17,6 @@ import java.util.List;
  */
 public class WidgetListProvider implements RemoteViewsService.RemoteViewsFactory {
     private List<StormData> cities;
-    private StormOpenHelper db;
     private Context context = null;
     private int appWidgetId;
 
@@ -25,12 +24,13 @@ public class WidgetListProvider implements RemoteViewsService.RemoteViewsFactory
         this.context = context;
         appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
                 AppWidgetManager.INVALID_APPWIDGET_ID);
-        db = new StormOpenHelper(context);
         populateListItem();
     }
 
     private void populateListItem() {
+        StormOpenHelper db = new StormOpenHelper(context);
         cities = db.getAllCities();
+        db.close();
     }
 
     @Override

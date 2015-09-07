@@ -47,9 +47,8 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
     private ListView wyniki;
     private EditText pole;
     private SearchAdapter sAdapter;
-    List<StormData> cities;
-    List<StormData> res;
-    StormOpenHelper db;
+    private List<StormData> cities;
+    private List<StormData> res;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +64,7 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
                 .putContentId("addView"));
 
         // Get list of all cities
-        db = new StormOpenHelper(SearchActivity.this);
+        StormOpenHelper db = new StormOpenHelper(SearchActivity.this);
         cities = db.getAllCities();
         db.close();
 
@@ -144,11 +143,15 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
                     StormData tmp = cities_db.getCity(results.get(position).getMiasto());
                     if (tmp != null) {
                         if (!cityExists(tmp.getMiasto_id())) {
+                            StormOpenHelper db = new StormOpenHelper(SearchActivity.this);
                             db.addCity(tmp);
+                            db.close();
+
                             Answers.getInstance().logContentView(new ContentViewEvent()
                                     .putContentName("AddView")
                                     .putContentType("Actions")
                                     .putContentId("addedCityFromList"));
+
                             finish();
                         } else {
                             Toast.makeText(SearchActivity.this, R.string.message_city_exists, Toast.LENGTH_SHORT).show();
@@ -213,11 +216,15 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
         StormData tmp = cities_db.getCity(data);
         if (tmp != null) {
             if (!cityExists(tmp.getMiasto_id())) {
+                StormOpenHelper db = new StormOpenHelper(this);
                 db.addCity(tmp);
+                db.close();
+
                 Answers.getInstance().logContentView(new ContentViewEvent()
                         .putContentName("AddView")
                         .putContentType("Actions")
                         .putContentId("addedCityViaGPS"));
+
                 finish();
             } else {
                 Toast.makeText(this, R.string.message_city_exists, Toast.LENGTH_SHORT).show();
