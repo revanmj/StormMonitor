@@ -57,6 +57,7 @@ public class DetailsActivity extends AppCompatActivity {
         webview.addPermittedHostname("antistorm.eu");
         webview.addPermittedHostname("m.antistorm.eu");
         webview.addPermittedHostname("www.antistorm.eu");
+        webview.addPermittedHostname("www.antistorm.eu/m");
         webview.setListener(this, new AdvancedWebView.Listener() {
 
             @Override
