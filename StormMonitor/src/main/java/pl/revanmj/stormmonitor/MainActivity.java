@@ -1,23 +1,18 @@
 package pl.revanmj.stormmonitor;
 
-import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.ContextMenu;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
-import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.crashlytics.android.Crashlytics;
@@ -46,8 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
     private List<StormData> cityStorm;
     private MainViewAdapter sdAdapter;
-    private MenuItem refreshButton;
-    private boolean start = true;
+    private SwipeRefreshLayout mySwipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +53,20 @@ public class MainActivity extends AppCompatActivity {
         StormOpenHelper db = new StormOpenHelper(this);
         cityStorm = db.getAllCities();
         db.close();
+
+        mySwipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swiperefresh);
+
+        mySwipeRefreshLayout.setOnRefreshListener(
+                new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        // This method performs the actual data-refresh operation.
+                        // The method calls setRefreshing(false) when it's finished.
+                        RefreshData(true);
+                    }
+                }
+        );
+        mySwipeRefreshLayout.setColorSchemeResources(R.color.md_blue_500);
 
         // Setting up the ListView
         sdAdapter = new MainViewAdapter(cityStorm, this);
@@ -81,8 +89,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        RefreshData();
-        start = false;
+        RefreshData(false);
     }
 
     @Override
@@ -148,18 +155,13 @@ public class MainActivity extends AppCompatActivity {
             alertDialogBuilder.create().show();
         }
 
-        if (refreshButton != null && refreshButton.getActionView() != null) {
-            refreshButton.getActionView().clearAnimation();
-            refreshButton.setActionView(null);
-        }
+        mySwipeRefreshLayout.setRefreshing(false);
     }
 
     /**
      * AsyncTask responsible for downloading data and showing ProgressDialog while doing that
      */
     private class JSONStormTask extends AsyncTask<List<StormData>, Void, DownloadResult> {
-
-        protected ProgressDialog postep;
 
         @Override
         protected DownloadResult doInBackground(List<StormData>... params) {
@@ -176,16 +178,12 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(DownloadResult result) {
             setData(result);
-            if (postep != null)
-                postep.dismiss();
             super.onPostExecute(result);
         }
 
         @Override
         protected void onPreExecute(){
             super.onPreExecute();
-            if (start)
-                postep = ProgressDialog.show(MainActivity.this, null, getResources().getString(R.string.label_downloading), true, false);
         }
     }
 
@@ -225,7 +223,7 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_add:
                 Intent search_a = new Intent(MainActivity.this, SearchActivity.class);
                 MainActivity.this.startActivity(search_a);
-                RefreshData();
+                RefreshData(false);
                 return true;
             case R.id.action_about:
                 Intent about = new Intent(MainActivity.this, AboutActivity.class);
@@ -238,14 +236,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(browserIntent);
                 return true;
             case R.id.action_refresh:
-                refreshButton = item;
-                LayoutInflater inflater = (LayoutInflater) getApplication().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                ImageView iv = (ImageView) inflater.inflate(R.layout.refresh_icon, null);
-                Animation rotation = AnimationUtils.loadAnimation(getApplication(), R.anim.refresh);
-                rotation.setRepeatCount(Animation.INFINITE);
-                iv.startAnimation(rotation);
-                refreshButton.setActionView(iv);
-                RefreshData();
+                RefreshData(false);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -255,7 +246,10 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Method for initating process of downloading data
      */
-    public void RefreshData() {
+    public void RefreshData(Boolean byGesture) {
+        if (!byGesture)
+            mySwipeRefreshLayout.setRefreshing(true);
+
         StormOpenHelper db = new StormOpenHelper(this);
         cityStorm = db.getAllCities();
         db.close();
