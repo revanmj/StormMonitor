@@ -1,11 +1,10 @@
 package pl.revanmj.stormmonitor;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -130,9 +129,6 @@ public class MainActivity extends AppCompatActivity {
             sdAdapter.addAll(cityStorm);
             sdAdapter.notifyDataSetChanged();
         } else {
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
-            alertDialogBuilder.setTitle(R.string.message_error);
-
             String error = getResources().getString(R.string.error_unknown) + result.getResultCode();
 
             Answers.getInstance().logContentView(new ContentViewEvent()
@@ -143,16 +139,7 @@ public class MainActivity extends AppCompatActivity {
             if (result.getResultCode() == 2)
                 error = getResources().getString(R.string.error_no_connection);
 
-            alertDialogBuilder
-                    .setMessage(error)
-                    .setCancelable(false)
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            // do nothing
-                        }
-                    });
-
-            alertDialogBuilder.create().show();
+            Snackbar.make(mySwipeRefreshLayout, error, Snackbar.LENGTH_LONG).show();
         }
 
         mySwipeRefreshLayout.setRefreshing(false);
