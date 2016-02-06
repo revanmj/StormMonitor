@@ -6,8 +6,8 @@ import android.content.Intent;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
+import pl.revanmj.stormmonitor.logic.Utils;
 import pl.revanmj.stormmonitor.model.StormData;
-import pl.revanmj.stormmonitor.sql.StormOpenHelper;
 
 import java.text.DecimalFormat;
 import java.util.List;
@@ -15,6 +15,7 @@ import java.util.List;
 /**
  * Created by revanmj on 26.12.2013.
  */
+
 public class WidgetListProvider implements RemoteViewsService.RemoteViewsFactory {
     private List<StormData> cities;
     private Context context = null;
@@ -28,9 +29,7 @@ public class WidgetListProvider implements RemoteViewsService.RemoteViewsFactory
     }
 
     private void populateListItem() {
-        StormOpenHelper db = new StormOpenHelper(context);
-        cities = db.getAllCities();
-        db.close();
+        cities = Utils.getAllData(context);
     }
 
     @Override
@@ -49,13 +48,13 @@ public class WidgetListProvider implements RemoteViewsService.RemoteViewsFactory
                 context.getPackageName(), R.layout.cities_widget_row);
         StormData listItem = cities.get(position);
 
-        int t = listItem.getT_burzy();
-        int t_r = listItem.getT_opadow();
-        float chancePercentage = (listItem.getP_burzy() * 100.0f) / 255;
-        float rainChancePercentage = (listItem.getP_opadow() * 100.0f) / 255;
+        int t = listItem.getStormTime();
+        int t_r = listItem.getRainTime();
+        float chancePercentage = (listItem.getStormChance() * 100.0f) / 255;
+        float rainChancePercentage = (listItem.getRainChance() * 100.0f) / 255;
         DecimalFormat form = new DecimalFormat("##.##");
 
-        remoteView.setTextViewText(R.id.widget_cityText, listItem.getMiasto());
+        remoteView.setTextViewText(R.id.widget_cityText, listItem.getCityName());
         remoteView.setTextViewText(R.id.widget_chanceText, form.format(chancePercentage) + " %");
         remoteView.setTextViewText(R.id.widget_rainChance, form.format(rainChancePercentage) + " %");
 

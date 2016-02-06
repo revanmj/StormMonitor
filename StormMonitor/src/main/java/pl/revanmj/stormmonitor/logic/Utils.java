@@ -1,5 +1,7 @@
 package pl.revanmj.stormmonitor.logic;
 
+import android.content.Context;
+import android.database.Cursor;
 import android.util.JsonReader;
 
 import java.io.InputStreamReader;
@@ -9,15 +11,38 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
+import pl.revanmj.stormmonitor.data.StormDataProvider;
 import pl.revanmj.stormmonitor.model.DownloadResult;
 import pl.revanmj.stormmonitor.model.StormData;
 
 /**
- * Created by Student on 10.07.13.
+ * Created by revanmj on 10.07.2013.
  */
-public class Downloader {
+
+public class Utils {
     private static String BASE_URL = "http://antistorm.eu/webservice.php?id=";
 
+    static public List<StormData> getAllData(Context context){
+        String[] projection = {StormDataProvider.KEY_ID, StormDataProvider.KEY_CITYNAME, StormDataProvider.KEY_STORMCHANCE, StormDataProvider.KEY_STORMTIME, StormDataProvider.KEY_RAINCHANCE, StormDataProvider.KEY_RAINTIME};
+        Cursor c = context.getContentResolver().query(StormDataProvider.CONTENT_URI, projection, null, null, null);
+
+        if (c != null) {
+            List<StormData> cities = new ArrayList<>();
+            while (c.moveToNext()) {
+                StormData tmp = new StormData();
+                tmp.setCityId(c.getInt(StormDataProvider.CITYID));
+                tmp.setCityName(c.getString(StormDataProvider.CITYNAME));
+                tmp.setStormChance(c.getInt(StormDataProvider.STORMCHANCE));
+                tmp.setStormTime(c.getInt(StormDataProvider.STORMTIME));
+                tmp.setRainChance(c.getInt(StormDataProvider.RAINCHANCE));
+                tmp.setRainTime(c.getInt(StormDataProvider.RAINTIME));
+                cities.add(tmp);
+            }
+            return cities;
+        }
+
+        return new ArrayList<>();
+    }
 
     static public DownloadResult getStormData(List<StormData> list) {
         int resultCode = 1;
@@ -27,7 +52,7 @@ public class Downloader {
 
         for (StormData city : list) {
             try {
-                con = (HttpURLConnection) (new URL(BASE_URL + city.getMiasto_id())).openConnection();
+                con = (HttpURLConnection) (new URL(BASE_URL + city.getCityId())).openConnection();
                 con.setRequestMethod("GET");
                 con.setConnectTimeout(3000);
                 con.connect();
@@ -37,22 +62,22 @@ public class Downloader {
 
                 // Setting city database id
                 StormData data = new StormData();
-                data.setMiasto_id(city.getMiasto_id());
+                data.setCityId(city.getCityId());
 
                 // Parsing received data into StormData obejct
                 reader.beginObject();
                 while (reader.hasNext()) {
                     String name = reader.nextName();
                     if (name.equals("m"))
-                        data.setMiasto(reader.nextString());
+                        data.setCityName(reader.nextString());
                     else if (name.equals("p_b"))
-                        data.setP_burzy(reader.nextInt());
+                        data.setStormChance(reader.nextInt());
                     else if (name.equals("t_b"))
-                        data.setT_burzy(reader.nextInt());
+                        data.setStormTime(reader.nextInt());
                     else if (name.equals("p_o"))
-                        data.setP_opadow(reader.nextInt());
+                        data.setRainChance(reader.nextInt());
                     else if (name.equals("t_o"))
-                        data.setT_opadow(reader.nextInt());
+                        data.setRainTime(reader.nextInt());
                     else {
                         reader.skipValue();
                     }

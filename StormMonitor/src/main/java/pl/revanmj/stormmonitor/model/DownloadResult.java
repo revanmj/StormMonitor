@@ -5,6 +5,7 @@ import java.util.List;
 /**
  * Created by revanmj on 06.09.2015.
  */
+
 public class DownloadResult {
     List<StormData> cities = null;
     int resultCode = -1;

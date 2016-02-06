@@ -1,26 +1,33 @@
 package pl.revanmj.stormmonitor;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.view.ContextMenu;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
 
 import com.crashlytics.android.Crashlytics;
 
-import pl.revanmj.stormmonitor.adapters.MainViewAdapter;
-import pl.revanmj.stormmonitor.logic.Downloader;
+import pl.revanmj.stormmonitor.adapters.MainRecyclerViewAdapter;
+import pl.revanmj.stormmonitor.data.StormDataProvider;
+import pl.revanmj.stormmonitor.logic.Utils;
+import pl.revanmj.stormmonitor.logic.SwipeToDelTouchCallback;
 import pl.revanmj.stormmonitor.model.DownloadResult;
 import pl.revanmj.stormmonitor.model.StormData;
-import pl.revanmj.stormmonitor.sql.StormOpenHelper;
 
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.ContentViewEvent;
@@ -30,7 +37,11 @@ import io.fabric.sdk.android.Fabric;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+/**
+ * Created by revanmj on 14.07.2013.
+ */
+
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     // Data for updater from WVersionManager library
     private final String updateApkUrl = "https://github.com/revanmj/StormMonitor/raw/master/StormMonitor.apk";
     private final String updateChangelogUrl = "https://github.com/revanmj/StormMonitor/raw/master/updates.json";
@@ -38,8 +49,8 @@ public class MainActivity extends AppCompatActivity {
     // URL for opening a map in WebView
     private final String serviceUrl = "http://antistorm.eu/";
 
-    private List<StormData> cityStorm;
-    private MainViewAdapter sdAdapter;
+    private MainRecyclerViewAdapter rcAdapter;
+    private RecyclerView recyclerView;
     private SwipeRefreshLayout mySwipeRefreshLayout;
 
     @Override
@@ -48,11 +59,7 @@ public class MainActivity extends AppCompatActivity {
         Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_main);
 
-        // Getting all cities from the database
-        StormOpenHelper db = new StormOpenHelper(this);
-        cityStorm = db.getAllCities();
-        db.close();
-
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         mySwipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swiperefresh);
 
         mySwipeRefreshLayout.setOnRefreshListener(
@@ -67,11 +74,32 @@ public class MainActivity extends AppCompatActivity {
         );
         mySwipeRefreshLayout.setColorSchemeResources(R.color.md_blue_500);
 
-        // Setting up the ListView
-        sdAdapter = new MainViewAdapter(cityStorm, this);
-        ListView lista = (ListView) findViewById(R.id.listView);
-        lista.setAdapter(sdAdapter);
-        registerForContextMenu(lista);
+        // Setting up FAB
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_map);
+        fab.show();
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent browserIntent = new Intent(MainActivity.this, DetailsActivity.class);
+                browserIntent.putExtra("url", serviceUrl + "/m/");
+                browserIntent.putExtra("title", "map");
+                startActivity(browserIntent);
+            }
+        });
+
+        // Setting up RecyclerView
+        rcAdapter = new MainRecyclerViewAdapter(this);
+        recyclerView.setAdapter(rcAdapter);
+        recyclerView.setHasFixedSize(true);
+        LinearLayoutManager llm = new LinearLayoutManager(this);
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(llm);
+
+        SwipeToDelTouchCallback stdcallback = new SwipeToDelTouchCallback(this);
+        ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(stdcallback);
+        mItemTouchHelper.attachToRecyclerView(recyclerView);
+
+        getSupportLoaderManager().initLoader(1, null, this);
 
         // Setting up updater form WVersionManager library
         WVersionManager versionManager = new WVersionManager(this);
@@ -99,13 +127,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(this, StormDataProvider.CONTENT_URI, null, null, null, null);
+    }
 
-        if (v.getId() == R.id.listView) {
-            MenuInflater inflater = getMenuInflater();
-            inflater.inflate(R.menu.context, menu);
-        }
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        rcAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        rcAdapter.swapCursor(null);
     }
 
     /**
@@ -116,18 +149,18 @@ public class MainActivity extends AppCompatActivity {
     private void setData(DownloadResult result)
     {
         if (result.getResultCode() == 1) {
-            StormOpenHelper db = new StormOpenHelper(this);
 
             for (StormData city : result.getCitiesData()) {
-                db.updateCity(city);
+                ContentValues cv = new ContentValues();
+                cv.put(StormDataProvider.KEY_STORMCHANCE, city.getStormChance());
+                cv.put(StormDataProvider.KEY_STORMTIME, city.getStormTime());
+                cv.put(StormDataProvider.KEY_RAINCHANCE, city.getRainChance());
+                cv.put(StormDataProvider.KEY_RAINTIME, city.getRainTime());
+                String selection = StormDataProvider.KEY_ID + " = ?";
+                String[] selArgs = {Integer.toString(city.getCityId())};
+                getContentResolver().update(StormDataProvider.CONTENT_URI, cv, selection, selArgs);
             }
 
-            cityStorm = db.getAllCities();
-            db.close();
-
-            sdAdapter.clear();
-            sdAdapter.addAll(cityStorm);
-            sdAdapter.notifyDataSetChanged();
         } else {
             String error = getResources().getString(R.string.error_unknown) + result.getResultCode();
 
@@ -156,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
 
             if (params[0] != null) {
                 // We list of the cities so download process can be started
-                result = Downloader.getStormData(params[0]);
+                result = Utils.getStormData(params[0]);
             }
 
             return result;
@@ -175,33 +208,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Method supporting context menu of the ListView
-     */
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        switch(item.getItemId()) {
-            case R.id.context_delete:
-                StormOpenHelper db = new StormOpenHelper(this);
-                db.deleteCity(cityStorm.get(info.position));
-                cityStorm = db.getAllCities();
-                db.close();
-
-                sdAdapter.clear();
-                sdAdapter.addAll(cityStorm);
-                sdAdapter.notifyDataSetChanged();
-
-                Answers.getInstance().logContentView(new ContentViewEvent()
-                        .putContentName("MainView")
-                        .putContentType("Action")
-                        .putContentId("deletedCity"));
-
-                return true;
-        }
-        return  true;
-    }
-
-    /**
      * Method supporting ActionBar's menu
      */
     @Override
@@ -215,12 +221,6 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_about:
                 Intent about = new Intent(MainActivity.this, AboutActivity.class);
                 MainActivity.this.startActivity(about);
-                return true;
-            case R.id.action_map:
-                Intent browserIntent = new Intent(MainActivity.this, DetailsActivity.class);
-                browserIntent.putExtra("url", serviceUrl + "/m/");
-                browserIntent.putExtra("title", "map");
-                startActivity(browserIntent);
                 return true;
             case R.id.action_refresh:
                 RefreshData(false);
@@ -237,11 +237,10 @@ public class MainActivity extends AppCompatActivity {
         if (!byGesture)
             mySwipeRefreshLayout.setRefreshing(true);
 
-        StormOpenHelper db = new StormOpenHelper(this);
-        cityStorm = db.getAllCities();
-        db.close();
+        List<StormData> cities = Utils.getAllData(this);
 
+        Log.d("StormMonitor", "Initating data downloading, city ids: " + cities);
         JSONStormTask task = new JSONStormTask();
-        task.execute(cityStorm);
+        task.execute(cities);
     }
 }

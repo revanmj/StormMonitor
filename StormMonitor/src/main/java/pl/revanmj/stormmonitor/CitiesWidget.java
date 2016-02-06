@@ -2,6 +2,7 @@ package pl.revanmj.stormmonitor;
 
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -11,19 +12,23 @@ import android.widget.RemoteViews;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.ContentViewEvent;
 
-import pl.revanmj.stormmonitor.logic.Downloader;
+import pl.revanmj.stormmonitor.data.StormDataProvider;
+import pl.revanmj.stormmonitor.logic.Utils;
 import pl.revanmj.stormmonitor.model.DownloadResult;
 import pl.revanmj.stormmonitor.model.StormData;
-import pl.revanmj.stormmonitor.sql.StormOpenHelper;
 
 import java.util.List;
 
+/**
+ * Created by revanmj on 26.12.2013.
+ */
+
 public class CitiesWidget extends AppWidgetProvider {
-    private Context ctx;
+    private Context context;
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        ctx = context;
+        this.context = context;
         RefreshData();
         final int N = appWidgetIds.length;
         for (int i=0; i<N; i++) {
@@ -48,11 +53,16 @@ public class CitiesWidget extends AppWidgetProvider {
     private void setData(DownloadResult result)
     {
         if (result.getResultCode() == 1) {
-            StormOpenHelper db = new StormOpenHelper(ctx);
             for (StormData city : result.getCitiesData()) {
-                db.updateCity(city);
+                ContentValues cv = new ContentValues();
+                cv.put(StormDataProvider.KEY_STORMCHANCE, city.getStormChance());
+                cv.put(StormDataProvider.KEY_STORMTIME, city.getStormTime());
+                cv.put(StormDataProvider.KEY_RAINCHANCE, city.getRainChance());
+                cv.put(StormDataProvider.KEY_RAINTIME, city.getRainTime());
+                String selection = StormDataProvider.KEY_ID + " = ?";
+                String[] selArgs = {Integer.toString(city.getCityId())};
+                context.getContentResolver().update(StormDataProvider.CONTENT_URI, cv, selection, selArgs);
             }
-            db.close();
         }
     }
 
@@ -64,7 +74,7 @@ public class CitiesWidget extends AppWidgetProvider {
 
             if (params[0] != null) {
                 // We list of the cities so download process can be started
-                result = Downloader.getStormData(params[0]);
+                result = Utils.getStormData(params[0]);
                 Answers.getInstance().logContentView(new ContentViewEvent()
                         .putContentName("Widget")
                         .putContentType("Action")
@@ -87,9 +97,7 @@ public class CitiesWidget extends AppWidgetProvider {
     }
 
     public void RefreshData() {
-        StormOpenHelper db = new StormOpenHelper(ctx);
-        List<StormData> cities = db.getAllCities();
-        db.close();
+        List<StormData> cities = Utils.getAllData(context);
 
         JSONStormTask task = new JSONStormTask();
         task.execute(cities);

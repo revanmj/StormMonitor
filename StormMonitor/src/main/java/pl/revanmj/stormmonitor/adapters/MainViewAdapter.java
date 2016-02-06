@@ -15,8 +15,9 @@ import java.text.DecimalFormat;
 import java.util.List;
 
 /**
- * Created by revan_000 on 14.07.13.
+ * Created by revanmj on 14.07.2013.
  */
+
 public class MainViewAdapter extends ArrayAdapter<StormData> {
 
     private List<StormData> cityList;
@@ -30,8 +31,8 @@ public class MainViewAdapter extends ArrayAdapter<StormData> {
 
     public View getView(int position, View convertView, ViewGroup parent) {
         StormData d = cityList.get(position);
-        int t = d.getT_burzy();
-        int t_r = d.getT_opadow();
+        int t = d.getStormTime();
+        int t_r = d.getRainTime();
         ViewHolder holder;
 
         if (convertView == null) {
@@ -60,9 +61,9 @@ public class MainViewAdapter extends ArrayAdapter<StormData> {
         TextView rainChance = holder.rainChance;
         ImageView rect = holder.rect;
 
-        city.setText(d.getMiasto());
-        float chancePercentage = (d.getP_burzy() * 100.0f) / 255;
-        float rainChancePercentage = (d.getP_opadow() * 100.0f) / 255;
+        city.setText(d.getCityName());
+        float chancePercentage = (d.getStormChance() * 100.0f) / 255;
+        float rainChancePercentage = (d.getRainChance() * 100.0f) / 255;
         DecimalFormat form = new DecimalFormat("##.##");
         chance.setText(form.format(chancePercentage) + " %");
         rainChance.setText(form.format(rainChancePercentage) + " %");

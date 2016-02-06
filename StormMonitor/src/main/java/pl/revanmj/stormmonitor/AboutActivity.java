@@ -11,6 +11,10 @@ import android.widget.TextView;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.ContentViewEvent;
 
+/**
+ * Created by revanmj on 14.07.2013.
+ */
+
 public class AboutActivity extends AppCompatActivity {
 
     @Override

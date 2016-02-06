@@ -1,4 +1,4 @@
-package pl.revanmj.stormmonitor.sql;
+package pl.revanmj.stormmonitor.data;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -11,6 +11,7 @@ import pl.revanmj.stormmonitor.model.StormData;
 /**
  * Created by revanmj on 29.12.2013.
  */
+
 public class CitiesAssetHelper extends SQLiteAssetHelper {
     private static final String DATABASE_NAME = "cities";
     private static final int DATABASE_VERSION = 2;
@@ -37,8 +38,8 @@ public class CitiesAssetHelper extends SQLiteAssetHelper {
         StormData city = null;
         if (c.moveToFirst()) {
                 city = new StormData();
-                city.setMiasto_id(Integer.parseInt(c.getString(0)));
-                city.setMiasto(c.getString(1));
+                city.setCityId(Integer.parseInt(c.getString(0)));
+                city.setCityName(c.getString(1));
         }
         return city;
 

@@ -33,6 +33,10 @@ import java.util.regex.Pattern;
 
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 
+/**
+ * Created by revanmj on 7.12.2013.
+ */
+
 public class MapActivity extends AppCompatActivity {
 
     private final String serviceUrl = "http://antistorm.eu/";

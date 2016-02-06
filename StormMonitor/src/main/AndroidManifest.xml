@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="pl.revanmj.stormmonitor"
     android:versionCode="33"
-    android:versionName="1.4.10" >
+    android:versionName="1.4.10">
 
     <uses-sdk
         android:minSdkVersion="15"
@@ -11,19 +11,22 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
+    <android:uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <android:uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
         android:fullBackupContent="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <activity
-            android:name="pl.revanmj.stormmonitor.MainActivity"
+            android:name=".MainActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
-            android:label="@string/app_name" >
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -31,37 +34,41 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="pl.revanmj.stormmonitor.AboutActivity"
+            android:name=".AboutActivity"
             android:label="@string/menu_about">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="pl.revanmj.stormmonitor.MainActivity" />
         </activity>
         <activity
-            android:name="pl.revanmj.stormmonitor.MapActivity"
+            android:name=".MapActivity"
             android:configChanges="orientation"
             android:label="@string/title_activity_map"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="pl.revanmj.stormmonitor.MainActivity" />
         </activity>
         <activity
-            android:name="pl.revanmj.stormmonitor.SearchActivity"
+            android:name=".SearchActivity"
             android:label="@string/title_activity_search">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="pl.revanmj.stormmonitor.MainActivity" />
         </activity>
         <activity
-            android:name="pl.revanmj.stormmonitor.DetailsActivity"
+            android:name=".DetailsActivity"
             android:label="@string/title_activity_details">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="pl.revanmj.stormmonitor.MainActivity" />
         </activity>
 
-        <receiver android:name="pl.revanmj.stormmonitor.CitiesWidget" >
+        <provider
+            android:name=".data.StormDataProvider"
+            android:authorities="pl.revanmj.provider.StormData" />
+
+        <receiver android:name=".CitiesWidget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -72,7 +79,7 @@
         </receiver>
 
         <service
-            android:name="pl.revanmj.stormmonitor.WidgetService"
+            android:name=".WidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
 
         <meta-data

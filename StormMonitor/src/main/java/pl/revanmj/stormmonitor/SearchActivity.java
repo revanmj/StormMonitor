@@ -2,6 +2,7 @@ package pl.revanmj.stormmonitor;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -32,23 +33,27 @@ import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.ContentViewEvent;
 
 import pl.revanmj.stormmonitor.adapters.SearchAdapter;
+import pl.revanmj.stormmonitor.data.StormDataProvider;
+import pl.revanmj.stormmonitor.logic.Utils;
 import pl.revanmj.stormmonitor.model.StormData;
-import pl.revanmj.stormmonitor.sql.CitiesAssetHelper;
-import pl.revanmj.stormmonitor.sql.StormOpenHelper;
+import pl.revanmj.stormmonitor.data.CitiesAssetHelper;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.jar.Manifest;
+
+/**
+ * Created by revanmj on 29.12.2013.
+ */
 
 public class SearchActivity extends AppCompatActivity implements TextWatcher {
 
-    private ListView wyniki;
-    private EditText pole;
-    private SearchAdapter sAdapter;
+    private ListView resultsListView;
+    private EditText searchField;
+    private SearchAdapter searchAdapter;
     private List<StormData> cities;
-    private List<StormData> res;
+    private List<StormData> results;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,26 +69,20 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
                 .putContentId("addView"));
 
         // Get list of all cities
-        StormOpenHelper db = new StormOpenHelper(SearchActivity.this);
-        cities = db.getAllCities();
-        db.close();
+        cities = Utils.getAllData(this);
 
         // Prepare ListView
-        res = new ArrayList<>();
-        sAdapter = new SearchAdapter(res, this);
-        wyniki = (ListView)findViewById(R.id.list_search);
-        wyniki.setAdapter(sAdapter);
-        pole = (EditText)findViewById(R.id.editText);
+        results = new ArrayList<>();
+        searchAdapter = new SearchAdapter(results, this);
+        resultsListView = (ListView)findViewById(R.id.list_search);
+        resultsListView.setAdapter(searchAdapter);
+        searchField = (EditText)findViewById(R.id.editText);
 
         // Add listener for Search key presses on virtual keyboard
-        pole.setOnKeyListener(new View.OnKeyListener()
-        {
-            public boolean onKey(View v, int keyCode, KeyEvent event)
-            {
-                if (event.getAction() == KeyEvent.ACTION_DOWN)
-                {
-                    switch (keyCode)
-                    {
+        searchField.setOnKeyListener(new View.OnKeyListener() {
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                    switch (keyCode) {
                         case KeyEvent.KEYCODE_DPAD_CENTER:
                         case KeyEvent.KEYCODE_ENTER:
                             doSearch();
@@ -97,14 +96,14 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
                 return false;
             }
         });
-        pole.addTextChangedListener(this);
+        searchField.addTextChangedListener(this);
     }
 
     /**
      * Main method for searching the database
      */
     public void doSearch() {
-        String query = pole.getText().toString();
+        String query = searchField.getText().toString();
 
         // Remove polish letters
         if (query.toLowerCase().startsWith("ą") || query.toLowerCase().startsWith("ć")  || query.toLowerCase().startsWith("ę") || query.toLowerCase().startsWith("ł") || query.toLowerCase().startsWith("ń") || query.toLowerCase().startsWith("ó") || query.toLowerCase().startsWith("ś") || query.toLowerCase().startsWith("ż") || query.toLowerCase().startsWith("ź")) {
@@ -120,8 +119,8 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
         if (cursor.moveToFirst()) {
             do {
                 StormData city = new StormData();
-                city.setMiasto_id(Integer.parseInt(cursor.getString(0)));
-                city.setMiasto(cursor.getString(1));
+                city.setCityId(Integer.parseInt(cursor.getString(0)));
+                city.setCityName(cursor.getString(1));
 
                 results.add(city);
             } while (cursor.moveToNext());
@@ -132,20 +131,21 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
             Toast.makeText(SearchActivity.this, R.string.message_no_results, Toast.LENGTH_SHORT).show();
         } else {
             // Clear the ListView and add results to it
-            sAdapter.clear();
-            sAdapter.addAll(results);
-            sAdapter.notifyDataSetChanged();
+            searchAdapter.clear();
+            searchAdapter.addAll(results);
+            searchAdapter.notifyDataSetChanged();
 
-            wyniki.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            resultsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     // Add clicked city to the database
-                    StormData tmp = cities_db.getCity(results.get(position).getMiasto());
+                    StormData tmp = cities_db.getCity(results.get(position).getCityName());
                     if (tmp != null) {
-                        if (!cityExists(tmp.getMiasto_id())) {
-                            StormOpenHelper db = new StormOpenHelper(SearchActivity.this);
-                            db.addCity(tmp);
-                            db.close();
+                        if (!cityExists(tmp.getCityId())) {
+                            ContentValues cv = new ContentValues();
+                            cv.put(StormDataProvider.KEY_ID, tmp.getCityId());
+                            cv.put(StormDataProvider.KEY_CITYNAME, tmp.getCityName());
+                            getContentResolver().insert(StormDataProvider.CONTENT_URI, cv);
 
                             Answers.getInstance().logContentView(new ContentViewEvent()
                                     .putContentName("AddView")
@@ -215,10 +215,11 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
         CitiesAssetHelper cities_db = new CitiesAssetHelper(this);
         StormData tmp = cities_db.getCity(data);
         if (tmp != null) {
-            if (!cityExists(tmp.getMiasto_id())) {
-                StormOpenHelper db = new StormOpenHelper(this);
-                db.addCity(tmp);
-                db.close();
+            if (!cityExists(tmp.getCityId())) {
+                ContentValues cv = new ContentValues();
+                cv.put(StormDataProvider.KEY_ID, tmp.getCityId());
+                cv.put(StormDataProvider.KEY_CITYNAME, tmp.getCityName());
+                getContentResolver().insert(StormDataProvider.CONTENT_URI, cv);
 
                 Answers.getInstance().logContentView(new ContentViewEvent()
                         .putContentName("AddView")
@@ -240,7 +241,7 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
 
     private boolean cityExists(int cityId) {
         for (int i = 0; i < cities.size(); i++)
-            if (cities.get(i).getMiasto_id() == cityId)
+            if (cities.get(i).getCityId() == cityId)
                 return true;
         return false;
     }
@@ -294,22 +295,22 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
             String result = "";
             LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-            Criteria criteria = new Criteria();
-            String provider = locationManager.getBestProvider(criteria, false);
-            Location location = locationManager.getLastKnownLocation(provider);
-            latitude = location.getLatitude();
-            longitude = location.getLongitude();
-
-            Geocoder geocoder = new Geocoder(act, Locale.getDefault());
             try {
-                List<Address> addresses = geocoder.getFromLocation(latitude,
-                        longitude, 1);
-                Log.e("Addresses", "-->" + addresses);
-                Address tmp = addresses.get(0);
-                result = tmp.getLocality();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+                Criteria criteria = new Criteria();
+                String provider = locationManager.getBestProvider(criteria, false);
+                Location location = locationManager.getLastKnownLocation(provider);
+
+                latitude = location.getLatitude();
+                longitude = location.getLongitude();
+
+                Geocoder geocoder = new Geocoder(act, Locale.getDefault());
+                try {
+                    List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+                    Log.e("Addresses", "-->" + addresses);
+                    Address tmp = addresses.get(0);
+                    result = tmp.getLocality();
+            } catch (IOException e) {e.printStackTrace();}
+            } catch (SecurityException e) {}
             return result;
         }
 

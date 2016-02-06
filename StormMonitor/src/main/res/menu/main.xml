@@ -5,11 +5,6 @@
         android:icon="@drawable/ic_add_white_24dp"
         android:orderInCategory="1"
         app:showAsAction="ifRoom" />
-    <item android:id="@+id/action_map"
-        android:title="Mapa"
-        android:icon="@drawable/ic_map_white_24dp"
-        android:orderInCategory="200"
-        app:showAsAction="ifRoom" />
     <item android:id="@+id/action_refresh"
         android:icon="@drawable/ic_refresh_white_24dp"
         android:title="Odśwież"

@@ -19,6 +19,9 @@ import com.crashlytics.android.answers.ContentViewEvent;
 
 import im.delight.android.webview.AdvancedWebView;
 
+/**
+ * Created by revanmj on 25.01.2015.
+ */
 
 public class DetailsActivity extends AppCompatActivity {
 

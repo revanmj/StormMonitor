@@ -3,39 +3,40 @@ package pl.revanmj.stormmonitor.model;
 import java.io.Serializable;
 
 /**
- * Created by Student on 10.07.13.
+ * Created by revanmj on 10.07.2013.
  */
+
 public class StormData implements Serializable {
-    private int miasto_id;
-    private String miasto;
-    private int p_burzy;
-    private int t_burzy;
-    private int p_opadow;
-    private int t_opadow;
+    private int cityId;
+    private String cityName;
+    private int stormChance;
+    private int stormTime;
+    private int rainChance;
+    private int rainTime;
     private boolean error;
 
-    public String getMiasto() {
-        return miasto;
+    public String getCityName() {
+        return cityName;
     }
 
-    public void setMiasto(String miasto) {
-        this.miasto = miasto;
+    public void setCityName(String cityName) {
+        this.cityName = cityName;
     }
 
-    public int getP_burzy() {
-        return p_burzy;
+    public int getStormChance() {
+        return stormChance;
     }
 
-    public void setP_burzy(int p_burzy) {
-        this.p_burzy = p_burzy;
+    public void setStormChance(int stormChance) {
+        this.stormChance = stormChance;
     }
 
-    public int getT_burzy() {
-        return t_burzy;
+    public int getStormTime() {
+        return stormTime;
     }
 
-    public void setT_burzy(int t_burzy) {
-        this.t_burzy = t_burzy;
+    public void setStormTime(int stormTime) {
+        this.stormTime = stormTime;
     }
 
     public boolean isError() {
@@ -46,28 +47,28 @@ public class StormData implements Serializable {
         this.error = error;
     }
 
-    public int getMiasto_id() {
-        return miasto_id;
+    public int getCityId() {
+        return cityId;
     }
 
-    public void setMiasto_id(int miasto_id) {
-        this.miasto_id = miasto_id;
+    public void setCityId(int cityId) {
+        this.cityId = cityId;
     }
 
-    public int getT_opadow() {
-        return t_opadow;
+    public int getRainTime() {
+        return rainTime;
     }
 
-    public void setT_opadow(int t_opadow) {
-        this.t_opadow = t_opadow;
+    public void setRainTime(int rainTime) {
+        this.rainTime = rainTime;
     }
 
-    public int getP_opadow() {
-        return p_opadow;
+    public int getRainChance() {
+        return rainChance;
     }
 
-    public void setP_opadow(int p_opadow) {
-        this.p_opadow = p_opadow;
+    public void setRainChance(int rainChance) {
+        this.rainChance = rainChance;
     }
 }
 

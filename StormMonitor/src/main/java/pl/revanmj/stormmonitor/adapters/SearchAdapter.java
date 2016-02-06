@@ -15,6 +15,7 @@ import java.util.List;
 /**
  * Created by revanmj on 29.12.2013.
  */
+
 public class SearchAdapter extends ArrayAdapter<StormData> {
 
     private List<StormData> cityList;
@@ -44,7 +45,7 @@ public class SearchAdapter extends ArrayAdapter<StormData> {
 
         TextView city = holder.city;
 
-        city.setText(d.getMiasto());
+        city.setText(d.getCityName());
 
         return convertView;
     }
