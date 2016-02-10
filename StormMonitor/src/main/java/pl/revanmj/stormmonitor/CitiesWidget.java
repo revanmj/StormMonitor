@@ -74,7 +74,7 @@ public class CitiesWidget extends AppWidgetProvider {
 
             if (params[0] != null) {
                 // We list of the cities so download process can be started
-                result = Utils.getStormData(params[0]);
+                result = new DownloadResult(Utils.getStormData(params[0], context));
                 Answers.getInstance().logContentView(new ContentViewEvent()
                         .putContentName("Widget")
                         .putContentType("Action")

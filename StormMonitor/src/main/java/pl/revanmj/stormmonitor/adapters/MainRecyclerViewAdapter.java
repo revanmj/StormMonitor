@@ -51,8 +51,8 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
         holder._id = item.getInt(StormDataProvider.CITYID);
         holder.city.setText(item.getString(StormDataProvider.CITYNAME));
         DecimalFormat form = new DecimalFormat("##.##");
-        holder.stormChanceLabel.setText(form.format(stormChance));
-        holder.rainChanceLabel.setText(form.format(rainChance));
+        holder.stormChanceLabel.setText(form.format(stormChance) + " %");
+        holder.rainChanceLabel.setText(form.format(rainChance) + " %");
 
         if (stormTime < 240) {
             holder.stormTimeLabel.setText("~ " + stormTime + " min");

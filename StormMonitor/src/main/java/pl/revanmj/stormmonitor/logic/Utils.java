@@ -1,5 +1,6 @@
 package pl.revanmj.stormmonitor.logic;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.util.JsonReader;
@@ -12,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pl.revanmj.stormmonitor.data.StormDataProvider;
-import pl.revanmj.stormmonitor.model.DownloadResult;
 import pl.revanmj.stormmonitor.model.StormData;
 
 /**
@@ -44,7 +44,7 @@ public class Utils {
         return new ArrayList<>();
     }
 
-    static public DownloadResult getStormData(List<StormData> list) {
+    static public int getStormData(List<StormData> list, Context context) {
         int resultCode = 1;
         int responseCode = -1;
         HttpURLConnection con = null;
@@ -91,7 +91,7 @@ public class Utils {
                 // Couldn't connect to a host, so assume we have no internet connection (or host is down)
                 resultCode = 2;
             } catch (Exception e) {
-                // Unknown exception. If HTTP status code is available, pass it
+                // Unknown exception. If HTTP status code is available, pass it further
                 if (responseCode > 99 && responseCode < 600)
                     resultCode = responseCode;
                 else {
@@ -108,9 +108,20 @@ public class Utils {
         }
 
         // Create object with final list or just an error code
-        if (resultCode == 1)
-            return new DownloadResult(resultList);
-        else
-            return new DownloadResult(resultCode);
+        if (resultCode == 1) {
+            for (StormData city : resultList) {
+                ContentValues cv = new ContentValues();
+                cv.put(StormDataProvider.KEY_STORMCHANCE, city.getStormChance());
+                cv.put(StormDataProvider.KEY_STORMTIME, city.getStormTime());
+                cv.put(StormDataProvider.KEY_RAINCHANCE, city.getRainChance());
+                cv.put(StormDataProvider.KEY_RAINTIME, city.getRainTime());
+                String selection = StormDataProvider.KEY_ID + " = ?";
+                String[] selArgs = {Integer.toString(city.getCityId())};
+                context.getContentResolver().update(StormDataProvider.CONTENT_URI, cv, selection, selArgs);
+            }
+            return 1;
+        }
+
+        return resultCode;
     }
 }

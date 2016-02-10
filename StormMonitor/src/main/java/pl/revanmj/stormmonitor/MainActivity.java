@@ -146,58 +146,42 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
      * or showing AlertDialog with an error if downloading failed.
      * @param result
      */
-    private void setData(DownloadResult result)
+    private void downloadFinished(Integer result)
     {
-        if (result.getResultCode() == 1) {
-
-            for (StormData city : result.getCitiesData()) {
-                ContentValues cv = new ContentValues();
-                cv.put(StormDataProvider.KEY_STORMCHANCE, city.getStormChance());
-                cv.put(StormDataProvider.KEY_STORMTIME, city.getStormTime());
-                cv.put(StormDataProvider.KEY_RAINCHANCE, city.getRainChance());
-                cv.put(StormDataProvider.KEY_RAINTIME, city.getRainTime());
-                String selection = StormDataProvider.KEY_ID + " = ?";
-                String[] selArgs = {Integer.toString(city.getCityId())};
-                getContentResolver().update(StormDataProvider.CONTENT_URI, cv, selection, selArgs);
-            }
-
-        } else {
-            String error = getResources().getString(R.string.error_unknown) + result.getResultCode();
-
-            Answers.getInstance().logContentView(new ContentViewEvent()
-                    .putContentName("Error code: " + result.getResultCode())
-                    .putContentType("Error")
-                    .putContentId("downloadError"));
-
-            if (result.getResultCode() == 2)
-                error = getResources().getString(R.string.error_no_connection);
-
-            Snackbar.make(mySwipeRefreshLayout, error, Snackbar.LENGTH_LONG).show();
-        }
-
         mySwipeRefreshLayout.setRefreshing(false);
+
+        switch (result) {
+            case 1:
+                break;
+            case 2:
+                Snackbar.make(mySwipeRefreshLayout, R.string.error_no_connection, Snackbar.LENGTH_LONG);
+                break;
+            default:
+                Snackbar.make(mySwipeRefreshLayout, R.string.error_unknown, Snackbar.LENGTH_LONG);
+                Log.d("ConnError", result.toString());
+        }
     }
 
     /**
      * AsyncTask responsible for downloading data and showing ProgressDialog while doing that
      */
-    private class JSONStormTask extends AsyncTask<List<StormData>, Void, DownloadResult> {
+    private class JSONStormTask extends AsyncTask<List<StormData>, Void, Integer> {
 
         @Override
-        protected DownloadResult doInBackground(List<StormData>... params) {
-            DownloadResult result = null;
+        protected Integer doInBackground(List<StormData>... params) {
+            int result = -1;
 
             if (params[0] != null) {
                 // We list of the cities so download process can be started
-                result = Utils.getStormData(params[0]);
+                result = Utils.getStormData(params[0], MainActivity.this);
             }
 
             return result;
         }
 
         @Override
-        protected void onPostExecute(DownloadResult result) {
-            setData(result);
+        protected void onPostExecute(Integer result) {
+            downloadFinished(result);
             super.onPostExecute(result);
         }
 
