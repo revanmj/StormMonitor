@@ -12,10 +12,12 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -23,6 +25,8 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -60,8 +64,17 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        //toolbar.setTitle(R.string.title_activity_search);
         getSupportActionBar().setTitle(R.string.title_activity_search);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(getResources().getColor(R.color.md_blue_700));
+        }
 
         Answers.getInstance().logContentView(new ContentViewEvent()
                 .putContentName("AddView")
@@ -76,7 +89,7 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
         searchAdapter = new SearchAdapter(results, this);
         resultsListView = (ListView)findViewById(R.id.list_search);
         resultsListView.setAdapter(searchAdapter);
-        searchField = (EditText)findViewById(R.id.editText);
+        searchField = (EditText)findViewById(R.id.search_text);
 
         // Add listener for Search key presses on virtual keyboard
         searchField.setOnKeyListener(new View.OnKeyListener() {

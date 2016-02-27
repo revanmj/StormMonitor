@@ -1,20 +1,47 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SearchActivity"
+    android:fitsSystemWindows="true">
 
-    <EditText
-        android:layout_width="260dp"
-        android:layout_height="45dp"
-        android:id="@+id/editText"
-        android:singleLine="true"
-        android:hint="@string/search_hint"
-        android:imeOptions="actionSearch"
-        android:inputType="text"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp" />
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/appbar_toolbar"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_alignParentTop="true"
+            android:background="?attr/colorPrimary">
+
+            <LinearLayout
+                android:id="@+id/search_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:singleLine="true"
+                    android:hint="@string/search_hint"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:id="@+id/search_text"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginRight="16dp"/>
+            </LinearLayout>
+
+        </android.support.v7.widget.Toolbar>
+
+    </android.support.design.widget.AppBarLayout>
 
     <ListView
         android:id="@+id/list_search"
@@ -23,6 +50,8 @@
         android:layout_weight="1"
         android:divider="@drawable/divider"
         android:dividerHeight="1dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/editText" />
+        android:layout_below="@+id/appbar_toolbar" />
 </RelativeLayout>

@@ -11,7 +11,7 @@
     <string name="menu_delete_q">Usunąć cityName?</string>
     <string name="menu_details">Szczegóły</string>
     <string name="message_error">Błąd!</string>
-    <string name="message_city_exists">To cityName jest już dodane</string>
+    <string name="message_city_exists">To miasto jest już dodane</string>
     <string name="message_no_such_city">Twojego miasta nie ma w bazie</string>
     <string name="message_map_error">Pobieranie mapy nie powiodło się.</string>
     <string name="message_download_error">Pobieranie nie powiodło się.</string>

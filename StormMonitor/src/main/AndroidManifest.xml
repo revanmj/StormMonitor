@@ -51,7 +51,8 @@
         </activity>
         <activity
             android:name=".SearchActivity"
-            android:label="@string/title_activity_search">
+            android:label="@string/title_activity_search"
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="pl.revanmj.stormmonitor.MainActivity" />
