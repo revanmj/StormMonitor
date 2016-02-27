@@ -57,7 +57,6 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
     private EditText searchField;
     private SearchAdapter searchAdapter;
     private List<StormData> cities;
-    private List<StormData> results;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,8 +65,6 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        //toolbar.setTitle(R.string.title_activity_search);
-        getSupportActionBar().setTitle(R.string.title_activity_search);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -85,7 +82,7 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
         cities = Utils.getAllData(this);
 
         // Prepare ListView
-        results = new ArrayList<>();
+        List<StormData> results = new ArrayList<>();
         searchAdapter = new SearchAdapter(results, this);
         resultsListView = (ListView)findViewById(R.id.list_search);
         resultsListView.setAdapter(searchAdapter);

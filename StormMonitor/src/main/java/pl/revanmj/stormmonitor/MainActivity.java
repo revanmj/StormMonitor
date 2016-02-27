@@ -1,13 +1,23 @@
 package pl.revanmj.stormmonitor;
 
+import android.content.ComponentName;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.customtabs.CustomTabsClient;
+import android.support.customtabs.CustomTabsIntent;
+import android.support.customtabs.CustomTabsService;
+import android.support.customtabs.CustomTabsServiceConnection;
+import android.support.customtabs.CustomTabsSession;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -50,8 +60,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private final String serviceUrl = "http://antistorm.eu/";
 
     private MainRecyclerViewAdapter rcAdapter;
-    private RecyclerView recyclerView;
     private SwipeRefreshLayout mySwipeRefreshLayout;
+
+    private CustomTabsClient mClient;
+    private CustomTabsSession mCustomTabsSession;
+    private String chromePackageName = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_main);
 
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         mySwipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swiperefresh);
 
         mySwipeRefreshLayout.setOnRefreshListener(
@@ -73,19 +86,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 }
         );
         mySwipeRefreshLayout.setColorSchemeResources(R.color.md_blue_500);
-
-        // Setting up FAB
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_map);
-        fab.show();
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent browserIntent = new Intent(MainActivity.this, DetailsActivity.class);
-                browserIntent.putExtra("url", serviceUrl + "/m/");
-                browserIntent.putExtra("title", "map");
-                startActivity(browserIntent);
-            }
-        });
 
         // Setting up RecyclerView
         rcAdapter = new MainRecyclerViewAdapter(this);
@@ -111,6 +111,49 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         versionManager.setUpdateUrl(updateApkUrl);
         versionManager.setReminderTimer(1440); // this mean checkVersion() will not take effect within 10 minutes
         versionManager.checkVersion();
+
+        chromePackageName = chromeChannel();
+
+        if (chromePackageName != null) {
+            CustomTabsServiceConnection mCustomTabsServiceConnection = new CustomTabsServiceConnection() {
+                @Override
+                public void onCustomTabsServiceConnected(ComponentName componentName, CustomTabsClient customTabsClient) {
+                    //Pre-warming
+                    mClient = customTabsClient;
+                    mClient.warmup(0L);
+                    mCustomTabsSession = mClient.newSession(null);
+                    mCustomTabsSession.mayLaunchUrl(Uri.parse(serviceUrl + "/m/"), null, null);
+                }
+
+                @Override
+                public void onServiceDisconnected(ComponentName name) {
+                    mClient = null;
+                }
+            };
+
+            CustomTabsClient.bindCustomTabsService(MainActivity.this, chromePackageName, mCustomTabsServiceConnection);
+        }
+
+        // Setting up FAB
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_map);
+        fab.show();
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (chromePackageName != null) {
+                    CustomTabsIntent customTabsIntent = new CustomTabsIntent.Builder(mCustomTabsSession)
+                            .setToolbarColor(ContextCompat.getColor(MainActivity.this, R.color.md_blue_500))
+                            .setShowTitle(true)
+                            .build();
+                    customTabsIntent.launchUrl(MainActivity.this, Uri.parse(serviceUrl + "/m/"));
+                } else {
+                    Intent browserIntent = new Intent(MainActivity.this, DetailsActivity.class);
+                    browserIntent.putExtra("url", serviceUrl + "/m/");
+                    browserIntent.putExtra("title", "map");
+                    startActivity(browserIntent);
+                }
+            }
+        });
     }
 
     @Override
@@ -226,5 +269,30 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         Log.d("StormMonitor", "Initating data downloading, city ids: " + cities);
         JSONStormTask task = new JSONStormTask();
         task.execute(cities);
+    }
+
+    private String chromeChannel() {
+        String chromeStable = "com.android.chrome";
+        String chromeBeta = "com.chrome.beta";
+        String chromeDev = "com.chrome.dev";
+
+        if (isPackageInstalled(chromeStable))
+            return chromeStable;
+        if (isPackageInstalled(chromeBeta))
+            return chromeBeta;
+        if (isPackageInstalled(chromeDev))
+            return chromeDev;
+
+        return null;
+    }
+
+    private boolean isPackageInstalled(String packagename) {
+        PackageManager pm = MainActivity.this.getPackageManager();
+        try {
+            pm.getPackageInfo(packagename, PackageManager.GET_ACTIVITIES);
+            return true;
+        } catch (PackageManager.NameNotFoundException e) {
+            return false;
+        }
     }
 }
