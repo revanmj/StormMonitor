@@ -2,7 +2,7 @@
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:foreground="?selectableItemBackground">
 
     <ImageView
@@ -107,8 +107,5 @@
         android:id="@+id/rainTime"
         android:layout_alignStart="@+id/chanceText"
         android:layout_alignTop="@+id/textView4"
-        android:layout_alignLeft="@+id/chanceText" /><![CDATA[
-
-    />
-]]>
+        android:layout_alignLeft="@+id/chanceText" />
 </RelativeLayout>

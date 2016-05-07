@@ -8,6 +8,8 @@ import android.appwidget.AppWidgetManager;
 import android.content.Intent;
 import android.widget.RemoteViewsService;
 
+import pl.revanmj.stormmonitor.adapters.WidgetListAdapter;
+
 public class WidgetService extends RemoteViewsService {
 
     @Override
@@ -16,7 +18,7 @@ public class WidgetService extends RemoteViewsService {
                 AppWidgetManager.EXTRA_APPWIDGET_ID,
                 AppWidgetManager.INVALID_APPWIDGET_ID);
 
-        return (new WidgetListProvider(this.getApplicationContext(), intent));
+        return (new WidgetListAdapter(this.getApplicationContext(), intent));
     }
 
 }

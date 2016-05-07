@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         versionManager.setReminderTimer(1440); // this mean checkVersion() will not take effect within 10 minutes
         versionManager.checkVersion();
 
-        chromePackageName = chromeChannel();
+        chromePackageName = Utils.chromeChannel(this);
 
         if (chromePackageName != null) {
             CustomTabsServiceConnection mCustomTabsServiceConnection = new CustomTabsServiceConnection() {
@@ -120,9 +120,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 public void onCustomTabsServiceConnected(ComponentName componentName, CustomTabsClient customTabsClient) {
                     //Pre-warming
                     mClient = customTabsClient;
-                    mClient.warmup(0L);
-                    mCustomTabsSession = mClient.newSession(null);
-                    mCustomTabsSession.mayLaunchUrl(Uri.parse(serviceUrl + "/m/"), null, null);
+                    if (mClient != null) {
+                        mClient.warmup(0L);
+                        mCustomTabsSession = mClient.newSession(null);
+                        mCustomTabsSession.mayLaunchUrl(Uri.parse(serviceUrl + "/m/"), null, null);
+                    }
                 }
 
                 @Override
@@ -269,30 +271,5 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         Log.d("StormMonitor", "Initating data downloading, city ids: " + cities);
         JSONStormTask task = new JSONStormTask();
         task.execute(cities);
-    }
-
-    private String chromeChannel() {
-        String chromeStable = "com.android.chrome";
-        String chromeBeta = "com.chrome.beta";
-        String chromeDev = "com.chrome.dev";
-
-        if (isPackageInstalled(chromeStable))
-            return chromeStable;
-        if (isPackageInstalled(chromeBeta))
-            return chromeBeta;
-        if (isPackageInstalled(chromeDev))
-            return chromeDev;
-
-        return null;
-    }
-
-    private boolean isPackageInstalled(String packagename) {
-        PackageManager pm = MainActivity.this.getPackageManager();
-        try {
-            pm.getPackageInfo(packagename, PackageManager.GET_ACTIVITIES);
-            return true;
-        } catch (PackageManager.NameNotFoundException e) {
-            return false;
-        }
     }
 }

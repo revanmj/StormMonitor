@@ -13,6 +13,7 @@ import java.text.DecimalFormat;
 
 import pl.revanmj.stormmonitor.R;
 import pl.revanmj.stormmonitor.data.StormDataProvider;
+import pl.revanmj.stormmonitor.logic.Utils;
 
 /**
  * Created by revanmj on 05.02.2016.
@@ -45,33 +46,16 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
         Cursor item = getItem(position);
         int stormTime = item.getInt(StormDataProvider.STORMTIME);
         int rainTime = item.getInt(StormDataProvider.RAINTIME);
-        float stormChance = (item.getInt(StormDataProvider.STORMCHANCE) * 100.0f) / 255;
-        float rainChance = (item.getInt(StormDataProvider.RAINCHANCE) * 100.0f) / 255;
+        int stormChance = item.getInt(StormDataProvider.STORMCHANCE);
+        int rainChance = item.getInt(StormDataProvider.RAINCHANCE);
 
         holder._id = item.getInt(StormDataProvider.CITYID);
         holder.city.setText(item.getString(StormDataProvider.CITYNAME));
-        DecimalFormat form = new DecimalFormat("##.##");
-        holder.stormChanceLabel.setText(form.format(stormChance) + " %");
-        holder.rainChanceLabel.setText(form.format(rainChance) + " %");
-
-        if (stormTime < 240) {
-            holder.stormTimeLabel.setText("~ " + stormTime + " min");
-        } else {
-            holder.stormTimeLabel.setText("-");
-        }
-        if (rainTime < 240) {
-            holder.rainTimeLabel.setText("~ " + rainTime + " min");
-        } else {
-            holder.rainTimeLabel.setText("-");
-        }
-        if (stormTime <= 120 && stormChance > 30 && stormChance < 50 || rainTime <= 120 && rainChance > 30 && rainChance < 50)
-            holder.rect.setImageResource(R.drawable.rectangle_yellow);
-        else if (stormTime <= 20 && stormChance >= 50 || rainTime <= 20 && rainChance >= 50)
-            holder.rect.setImageResource(R.drawable.rectangle_red);
-        else if (stormTime <= 60 && stormChance > 30 || rainTime <= 60 && rainChance > 30)
-            holder.rect.setImageResource(R.drawable.rectangle_orange);
-        else
-            holder.rect.setImageResource(R.drawable.rectangle_green);
+        holder.stormChanceLabel.setText(Integer.toString(stormChance));
+        holder.rainChanceLabel.setText(Integer.toString(rainChance));
+        holder.stormTimeLabel.setText(Utils.getTimeString(stormTime, item.getInt(StormDataProvider.STORMALERT)));
+        holder.rainTimeLabel.setText(Utils.getTimeString(rainTime, item.getInt(StormDataProvider.RAINALERT)));
+        holder.rect.setImageResource(Utils.getRectColor(stormTime, stormChance, rainTime, rainChance));
 
     }
 

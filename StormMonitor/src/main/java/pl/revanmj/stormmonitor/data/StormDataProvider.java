@@ -24,12 +24,14 @@ import pl.revanmj.stormmonitor.model.StormData;
  */
 
 public class StormDataProvider extends ContentProvider {
-    public static int CITYID = 0;
-    public static int CITYNAME = 1;
-    public static int STORMCHANCE = 2;
-    public static int STORMTIME = 3;
-    public static int RAINCHANCE = 4;
-    public static int RAINTIME = 5;
+    public static final int CITYID = 0;
+    public static final int CITYNAME = 1;
+    public static final int STORMCHANCE = 2;
+    public static final int STORMTIME = 3;
+    public static final int RAINCHANCE = 4;
+    public static final int RAINTIME = 5;
+    public static final int STORMALERT = 6;
+    public static final int RAINALERT = 7;
 
     public static final String PROVIDER_NAME = "pl.revanmj.provider.StormData";
     public static final String URL = "content://" + PROVIDER_NAME + "/cities";
@@ -40,6 +42,8 @@ public class StormDataProvider extends ContentProvider {
     static final int URI_CITYID = 2;
 
     static final UriMatcher uriMatcher;
+
+
     static{
         uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         uriMatcher.addURI(PROVIDER_NAME, "cities", URI_CITIES);
@@ -158,15 +162,17 @@ public class StormDataProvider extends ContentProvider {
     }
 
     private SQLiteDatabase db;
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
     private static final String DATABASE_NAME = "dictionary";
     private static final String TABLE_STORMS = "StormData";
     public static final String KEY_ID = "city_id";
     public static final String KEY_CITYNAME = "name";
     public static final String KEY_STORMCHANCE = "p_burzy";
     public static final String KEY_STORMTIME = "t_burzy";
+    public static final String KEY_STORMALERT = "a_burzy";
     public static final String KEY_RAINTIME = "t_opadow";
     public static final String KEY_RAINCHANCE = "p_opadow";
+    public static final String KEY_RAINALERT = "a_opadow";
     private static final String TABLE_CREATE =
             "CREATE TABLE " + TABLE_STORMS + " ( " +
                     KEY_ID + " INTEGER PRIMARY KEY, " +
@@ -174,7 +180,9 @@ public class StormDataProvider extends ContentProvider {
                     KEY_STORMCHANCE + " INTEGER," +
                     KEY_STORMTIME + " INTEGER," +
                     KEY_RAINCHANCE + " INTEGER, " +
-                    KEY_RAINTIME + " INTEGER )";
+                    KEY_RAINTIME + " INTEGER, " +
+                    KEY_STORMALERT + " INTEGER, " +
+                    KEY_RAINALERT + " INTEGER )";
 
     public static class StormDataSqlHelper extends SQLiteOpenHelper {
 
@@ -199,12 +207,8 @@ public class StormDataProvider extends ContentProvider {
             if (cursor.moveToFirst()) {
                 do {
                     city = new StormData();
-                    city.setCityId(Integer.parseInt(cursor.getString(0)));
-                    city.setCityName(cursor.getString(1));
-                    city.setStormChance(Integer.parseInt(cursor.getString(2)));
-                    city.setStormTime(Integer.parseInt(cursor.getString(3)));
-                    city.setRainChance(Integer.parseInt(cursor.getString(4)));
-                    city.setRainTime(Integer.parseInt(cursor.getString(5)));
+                    city.setCityId(Integer.parseInt(cursor.getString(CITYID)));
+                    city.setCityName(cursor.getString(CITYNAME));
 
                     cities.add(city);
                 } while (cursor.moveToNext());
@@ -220,10 +224,12 @@ public class StormDataProvider extends ContentProvider {
                 ContentValues values = new ContentValues();
                 values.put(KEY_ID, cities.get(i).getCityId());
                 values.put(KEY_CITYNAME, cities.get(i).getCityName());
-                values.put(KEY_STORMCHANCE, cities.get(i).getStormChance());
-                values.put(KEY_STORMTIME, cities.get(i).getStormTime());
+                values.put(KEY_STORMCHANCE, 0);
+                values.put(KEY_STORMTIME, 255);
+                values.put(KEY_STORMALERT, 0);
                 values.put(KEY_RAINCHANCE, 0);
                 values.put(KEY_RAINTIME, 255);
+                values.put(KEY_RAINALERT, 0);
 
                 // 3. insert
                 db.insert(TABLE_STORMS, null, values);

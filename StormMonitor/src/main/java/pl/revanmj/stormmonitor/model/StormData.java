@@ -11,8 +11,10 @@ public class StormData implements Serializable {
     private String cityName;
     private int stormChance;
     private int stormTime;
+    private int stormAlert;
     private int rainChance;
     private int rainTime;
+    private int rainAlert;
     private boolean error;
 
     public String getCityName() {
@@ -69,6 +71,22 @@ public class StormData implements Serializable {
 
     public void setRainChance(int rainChance) {
         this.rainChance = rainChance;
+    }
+
+    public int getRainAlert() {
+        return rainAlert;
+    }
+
+    public void setRainAlert(int rainAlert) {
+        this.rainAlert = rainAlert;
+    }
+
+    public int getStormAlert() {
+        return stormAlert;
+    }
+
+    public void setStormAlert(int stormAlert) {
+        this.stormAlert = stormAlert;
     }
 }
 

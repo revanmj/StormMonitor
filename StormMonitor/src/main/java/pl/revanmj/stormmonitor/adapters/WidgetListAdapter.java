@@ -1,4 +1,4 @@
-package pl.revanmj.stormmonitor;
+package pl.revanmj.stormmonitor.adapters;
 
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
+import pl.revanmj.stormmonitor.R;
 import pl.revanmj.stormmonitor.logic.Utils;
 import pl.revanmj.stormmonitor.model.StormData;
 
@@ -16,12 +17,12 @@ import java.util.List;
  * Created by revanmj on 26.12.2013.
  */
 
-public class WidgetListProvider implements RemoteViewsService.RemoteViewsFactory {
+public class WidgetListAdapter implements RemoteViewsService.RemoteViewsFactory {
     private List<StormData> cities;
     private Context context = null;
     private int appWidgetId;
 
-    public WidgetListProvider(Context context, Intent intent) {
+    public WidgetListAdapter(Context context, Intent intent) {
         this.context = context;
         appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
                 AppWidgetManager.INVALID_APPWIDGET_ID);
@@ -50,34 +51,15 @@ public class WidgetListProvider implements RemoteViewsService.RemoteViewsFactory
 
         int t = listItem.getStormTime();
         int t_r = listItem.getRainTime();
-        float chancePercentage = (listItem.getStormChance() * 100.0f) / 255;
-        float rainChancePercentage = (listItem.getRainChance() * 100.0f) / 255;
-        DecimalFormat form = new DecimalFormat("##.##");
+        int ch = listItem.getStormChance();
+        int ch_r = listItem.getRainChance();
 
         remoteView.setTextViewText(R.id.widget_cityText, listItem.getCityName());
-        remoteView.setTextViewText(R.id.widget_chanceText, form.format(chancePercentage) + " %");
-        remoteView.setTextViewText(R.id.widget_rainChance, form.format(rainChancePercentage) + " %");
-
-        if (t < 240) {
-            remoteView.setTextViewText(R.id.widget_timeText, "~" + t + " min");
-        } else {
-            remoteView.setTextViewText(R.id.widget_timeText, "-");
-        }
-
-        if (t_r < 240) {
-            remoteView.setTextViewText(R.id.widget_rainTime,"~ " + t_r + " min");
-        } else {
-            remoteView.setTextViewText(R.id.widget_rainTime, "-");
-        }
-
-        if (t <= 120 && chancePercentage > 30 && chancePercentage < 50 || t_r <= 120 && rainChancePercentage > 30 && rainChancePercentage < 50)
-            remoteView.setImageViewResource(R.id.widget_colorRectangle, R.drawable.rectangle_yellow);
-        else if (t <= 20 && chancePercentage >= 50 || t_r <= 20 && rainChancePercentage >= 50)
-            remoteView.setImageViewResource(R.id.widget_colorRectangle, R.drawable.rectangle_red);
-        else if (t <= 60 && chancePercentage > 30 || t_r <= 60 && rainChancePercentage > 30)
-            remoteView.setImageViewResource(R.id.widget_colorRectangle, R.drawable.rectangle_orange);
-        else
-            remoteView.setImageViewResource(R.id.widget_colorRectangle, R.drawable.rectangle_green);
+        remoteView.setTextViewText(R.id.widget_chanceText, Integer.toString(ch));
+        remoteView.setTextViewText(R.id.widget_rainChance, Integer.toString(ch_r));
+        remoteView.setTextViewText(R.id.widget_timeText, Utils.getTimeString(t, listItem.getStormAlert()));
+        remoteView.setTextViewText(R.id.widget_rainTime, Utils.getTimeString(t_r, listItem.getRainAlert()));
+        remoteView.setImageViewResource(R.id.widget_colorRectangle, Utils.getRectColor(t, ch, t_r, ch_r));
 
         return remoteView;
     }

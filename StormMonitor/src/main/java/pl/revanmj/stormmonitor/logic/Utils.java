@@ -2,6 +2,7 @@ package pl.revanmj.stormmonitor.logic;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.util.JsonReader;
 
@@ -12,6 +13,8 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
+import pl.revanmj.stormmonitor.MainActivity;
+import pl.revanmj.stormmonitor.R;
 import pl.revanmj.stormmonitor.data.StormDataProvider;
 import pl.revanmj.stormmonitor.model.StormData;
 
@@ -68,18 +71,31 @@ public class Utils {
                 reader.beginObject();
                 while (reader.hasNext()) {
                     String name = reader.nextName();
-                    if (name.equals("m"))
-                        data.setCityName(reader.nextString());
-                    else if (name.equals("p_b"))
-                        data.setStormChance(reader.nextInt());
-                    else if (name.equals("t_b"))
-                        data.setStormTime(reader.nextInt());
-                    else if (name.equals("p_o"))
-                        data.setRainChance(reader.nextInt());
-                    else if (name.equals("t_o"))
-                        data.setRainTime(reader.nextInt());
-                    else {
-                        reader.skipValue();
+                    switch (name) {
+                        case "m":
+                            data.setCityName(reader.nextString());
+                            break;
+                        case "p_b":
+                            data.setStormChance(reader.nextInt());
+                            break;
+                        case "t_b":
+                            data.setStormTime(reader.nextInt());
+                            break;
+                        case "a_b":
+                            data.setStormAlert(reader.nextInt());
+                            break;
+                        case "p_o":
+                            data.setRainChance(reader.nextInt());
+                            break;
+                        case "t_o":
+                            data.setRainTime(reader.nextInt());
+                            break;
+                        case "a_o":
+                            data.setRainAlert(reader.nextInt());
+                            break;
+                        default:
+                            reader.skipValue();
+                            break;
                     }
                 }
                 reader.endObject();
@@ -113,8 +129,10 @@ public class Utils {
                 ContentValues cv = new ContentValues();
                 cv.put(StormDataProvider.KEY_STORMCHANCE, city.getStormChance());
                 cv.put(StormDataProvider.KEY_STORMTIME, city.getStormTime());
+                cv.put(StormDataProvider.KEY_STORMALERT, city.getStormAlert());
                 cv.put(StormDataProvider.KEY_RAINCHANCE, city.getRainChance());
                 cv.put(StormDataProvider.KEY_RAINTIME, city.getRainTime());
+                cv.put(StormDataProvider.KEY_RAINALERT, city.getRainAlert());
                 String selection = StormDataProvider.KEY_ID + " = ?";
                 String[] selArgs = {Integer.toString(city.getCityId())};
                 context.getContentResolver().update(StormDataProvider.CONTENT_URI, cv, selection, selArgs);
@@ -123,5 +141,49 @@ public class Utils {
         }
 
         return resultCode;
+    }
+
+    static public int getRectColor(int stormTime, int stormChance, int rainTime, int rainChance) {
+        if (stormTime <= 120 && stormChance >= 10 || rainTime <= 120 && rainChance >= 10)
+            return R.drawable.rectangle_yellow;
+        else if (stormTime <= 60 && stormTime >= 20 && stormChance >= 10 || rainTime <= 60 && rainTime >= 20 && rainChance >= 10)
+            return R.drawable.rectangle_orange;
+        else if (stormTime <= 30 && stormChance >= 30 || rainTime <= 30 && rainChance >= 30)
+            return R.drawable.rectangle_red;
+        else
+            return R.drawable.rectangle_green;
+    }
+
+    static public String getTimeString(int time, int alert) {
+        if (time < 240 && alert == 1) {
+            return "~ " + time + " min";
+        } else {
+            return "-";
+        }
+    }
+
+    static public String chromeChannel(Context ctx) {
+        String chromeStable = "com.android.chrome";
+        String chromeBeta = "com.chrome.beta";
+        String chromeDev = "com.chrome.dev";
+
+        if (isPackageInstalled(chromeStable, ctx))
+            return chromeStable;
+        if (isPackageInstalled(chromeBeta, ctx))
+            return chromeBeta;
+        if (isPackageInstalled(chromeDev, ctx))
+            return chromeDev;
+
+        return null;
+    }
+
+    static public boolean isPackageInstalled(String packagename, Context ctx) {
+        PackageManager pm = ctx.getPackageManager();
+        try {
+            pm.getPackageInfo(packagename, PackageManager.GET_ACTIVITIES);
+            return true;
+        } catch (PackageManager.NameNotFoundException e) {
+            return false;
+        }
     }
 }
