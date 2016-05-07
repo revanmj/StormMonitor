@@ -144,9 +144,9 @@ public class Utils {
     }
 
     static public int getRectColor(int stormTime, int stormChance, int rainTime, int rainChance) {
-        if (stormTime <= 120 && stormChance >= 10 || rainTime <= 120 && rainChance >= 10)
+        if (stormTime <= 120 && stormTime > 60 && stormChance >= 10 || rainTime <= 120 && rainTime > 60 && rainChance >= 10)
             return R.drawable.rectangle_yellow;
-        else if (stormTime <= 60 && stormTime >= 20 && stormChance >= 10 || rainTime <= 60 && rainTime >= 20 && rainChance >= 10)
+        else if (stormTime <= 60 && stormTime > 30 && stormChance >= 10 || rainTime <= 60 && rainTime > 30 && rainChance >= 10)
             return R.drawable.rectangle_orange;
         else if (stormTime <= 30 && stormChance >= 30 || rainTime <= 30 && rainChance >= 30)
             return R.drawable.rectangle_red;
