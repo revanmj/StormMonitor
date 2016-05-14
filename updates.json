@@ -1,4 +1,4 @@
 {
-"version_code": 35,
-"content": "Wersja 1.6.0 <p>Nowości:</p>&#8226; Poprawki interfejsu w stylu Material Design<br>&#8226; Wsparcie dla Chrome Custom Tabs"
+"version_code": 36,
+"content": "Wersja 1.6.5 <p>Nowości:</p>&#8226; Poprawki błędów<br>&#8226; Dokładniejszy algorytm ustalania poziomu zagrożenia (koloru)"
 }
