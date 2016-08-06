@@ -41,6 +41,7 @@ import pl.revanmj.stormmonitor.model.StormData;
 
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.ContentViewEvent;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.winsontan520.wversionmanager.library.WVersionManager;
 
 import io.fabric.sdk.android.Fabric;
@@ -71,6 +72,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         super.onCreate(savedInstanceState);
         Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_main);
+
+        FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         mySwipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swiperefresh);
