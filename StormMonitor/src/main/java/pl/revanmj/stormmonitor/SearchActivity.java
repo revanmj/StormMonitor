@@ -1,17 +1,15 @@
 package pl.revanmj.stormmonitor;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.location.Address;
-import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -20,7 +18,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -57,6 +54,7 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
     private EditText searchField;
     private SearchAdapter searchAdapter;
     private List<StormData> cities;
+    ProgressDialog locationLoading;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -180,13 +178,13 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
     private void checkForPermission() {
         int permission = ContextCompat.checkSelfPermission(this, "android.permission.ACCESS_FINE_LOCATION");
 
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this, "android.permission.ACCESS_FINE_LOCATION"))
-            Toast.makeText(this, R.string.error_location_denied, Toast.LENGTH_SHORT)
-                    .show();
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, "android.permission.ACCESS_FINE_LOCATION")) {
+            Toast.makeText(this, R.string.error_location_denied, Toast.LENGTH_SHORT).show();
+            return;
+        }
         else if (permission != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{"android.permission.ACCESS_FINE_LOCATION"},
-                        1);
-                return;
+            ActivityCompat.requestPermissions(this, new String[]{"android.permission.ACCESS_FINE_LOCATION"}, 1);
+            return;
         }
 
         addCityByLocation();
@@ -213,8 +211,12 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
      * Method for adding city via GPS without declaring AsyncTask objects all over the place
      */
     private void addCityByLocation() {
-        CityAsyncTask t = new CityAsyncTask(this);
-        t.execute();
+        try {
+            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            CityLocationListener locationListener = new CityLocationListener();
+            locationLoading = ProgressDialog.show(SearchActivity.this, null, "Trwa ustalanie lokalizacji ...", true, false);
+            locationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, locationListener, null);
+        } catch (SecurityException e) {}
     }
 
     /**
@@ -224,6 +226,8 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
     private void addLocationCity(String data) {
         CitiesAssetHelper cities_db = new CitiesAssetHelper(this);
         StormData tmp = cities_db.getCity(data);
+        cities_db.close();
+
         if (tmp != null) {
             if (!cityExists(tmp.getCityId())) {
                 ContentValues cv = new ContentValues();
@@ -290,51 +294,40 @@ public class SearchActivity extends AppCompatActivity implements TextWatcher {
      * Class for getting location data that's used for automatically adding city you're in now.
      * It returns a String with city's name returned by Google Play services API
      */
-    public class CityAsyncTask extends AsyncTask<String, String, String> {
-        Activity act;
-        double latitude;
-        double longitude;
-        protected ProgressDialog postep;
-
-        public CityAsyncTask(Activity act) {
-            this.act = act;
-        }
+    public class CityLocationListener implements LocationListener {
 
         @Override
-        protected String doInBackground(String... params) {
-            String result = "";
-            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
+        public void onLocationChanged(Location location) {
             try {
-                Criteria criteria = new Criteria();
-                String provider = locationManager.getBestProvider(criteria, false);
-                Location location = locationManager.getLastKnownLocation(provider);
+                double latitude = location.getLatitude();
+                double longitude = location.getLongitude();
+                Geocoder geocoder = new Geocoder(SearchActivity.this, Locale.getDefault());
+                Address tmp = geocoder.getFromLocation(latitude, longitude, 1).get(0);
 
-                latitude = location.getLatitude();
-                longitude = location.getLongitude();
-
-                Geocoder geocoder = new Geocoder(act, Locale.getDefault());
-                try {
-                    List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
-                    Log.e("Addresses", "-->" + addresses);
-                    Address tmp = addresses.get(0);
-                    result = tmp.getLocality();
-            } catch (IOException e) {e.printStackTrace();}
-            } catch (SecurityException e) {}
-            return result;
+                String result = tmp.getLocality();
+                if (result != null && !result.isEmpty())
+                    addLocationCity(result);
+                else
+                    Toast.makeText(SearchActivity.this, "No location found!", Toast.LENGTH_SHORT).show();
+            } catch (IOException e) {
+                Toast.makeText(SearchActivity.this, R.string.error_location_denied, Toast.LENGTH_SHORT).show();
+            }
+            locationLoading.dismiss();
         }
 
         @Override
-        protected void onPostExecute(String result) {
-            postep.dismiss();
-            addLocationCity(result);
-            super.onPostExecute(result);
+        public void onStatusChanged(String s, int i, Bundle bundle) {
+
         }
 
         @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            postep = ProgressDialog.show(SearchActivity.this, null, "Trwa ustalanie lokalizacji ...", true, false);
+        public void onProviderEnabled(String s) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String s) {
+
         }
     }
 
