@@ -84,15 +84,22 @@ public class DetailsActivity extends AppCompatActivity {
             }
 
             @Override
+            public void onDownloadRequested(String url, String suggestedFilename, String mimeType, long contentLength, String contentDisposition, String userAgent) {
+                if (AdvancedWebView.handleDownload(DetailsActivity.this, url, suggestedFilename)) {
+                    // download successfully handled
+                }
+                else {
+                    // download couldn't be handled because user has disabled download manager app on the device
+                    // TODO show some notice to the user
+                }
+
+            }
+
+            @Override
             public void onExternalPageRequest(String url) {
                 Intent i = new Intent(Intent.ACTION_VIEW);
                 i.setData(Uri.parse(url));
                 startActivity(i);
-            }
-
-            @Override
-            public void onDownloadRequested(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
-                // some file is available for download
             }
 
         });
@@ -125,6 +132,12 @@ public class DetailsActivity extends AppCompatActivity {
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        webview.onActivityResult(requestCode, resultCode, intent);
     }
 
     @Override
