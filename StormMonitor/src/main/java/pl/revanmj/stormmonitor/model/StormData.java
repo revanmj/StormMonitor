@@ -88,5 +88,10 @@ public class StormData implements Serializable {
     public void setStormAlert(int stormAlert) {
         this.stormAlert = stormAlert;
     }
+
+    @Override
+    public String toString() {
+        return cityName + ": id[" + cityId + "] p_b[" + stormChance + "] t_b[" + stormTime + "] p_o[" + rainChance + "] t_o[" + rainTime + "]";
+    }
 }
 

@@ -4,8 +4,18 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.util.JsonReader;
+import android.graphics.Bitmap;
+import android.util.Log;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -13,7 +23,6 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
-import pl.revanmj.stormmonitor.MainActivity;
 import pl.revanmj.stormmonitor.R;
 import pl.revanmj.stormmonitor.data.StormDataProvider;
 import pl.revanmj.stormmonitor.model.StormData;
@@ -47,84 +56,97 @@ public class Utils {
         return new ArrayList<>();
     }
 
-    static public int getStormData(List<StormData> list, Context context) {
-        int resultCode = 1;
-        int responseCode = -1;
-        HttpURLConnection con = null;
-        List<StormData> resultList = new ArrayList<>();
+    public static HttpResult makeHttpGetRequest(String url_s) throws IOException {
+        URL url = new URL(url_s);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestProperty("Connection", "close");
+        connection.setConnectTimeout(6000);
+        connection.setRequestMethod("GET");
 
+        int responseCode = connection.getResponseCode();
+        if (responseCode >= 400)
+            return new HttpResult(responseCode, null);
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), "utf-8"));
+        Log.d("makeHttpRequest", "GET: url[" + url_s + "], responseCode[" + responseCode + "]");
+
+        StringBuilder result = new StringBuilder("");
+        String line = "";
+        while ((line = br.readLine()) != null) {
+            result.append(line);
+        }
+        br.close();
+        connection.disconnect();
+
+        if (result.length() != 0)
+            return new HttpResult(responseCode, result.toString());
+        else
+            return new HttpResult(responseCode, null);
+    }
+
+    public static class HttpResult {
+        private int responseCode;
+        private String result;
+
+        public HttpResult(int code, String r) {
+            responseCode = code;
+            result = r;
+        }
+
+        public String getResult() {
+            return result;
+        }
+
+        public int getResponseCode() {
+            return responseCode;
+        }
+
+        public JsonObject getAsJsonObject() {
+            JsonElement element = new JsonParser().parse(result);
+            if (result != null && element.isJsonObject())
+                return element.getAsJsonObject();
+            else
+                return null;
+        }
+
+    }
+
+    static public int getStormData(List<StormData> list, Context context) {
+        List<StormData> resultList = new ArrayList<>();
+        int resultCode = -1;
         for (StormData city : list) {
             try {
-                con = (HttpURLConnection) (new URL(BASE_URL + city.getCityId())).openConnection();
-                con.setRequestMethod("GET");
-                con.setConnectTimeout(3000);
-                con.connect();
-                responseCode = con.getResponseCode();
+                HttpResult result = makeHttpGetRequest(BASE_URL + city.getCityId());
+                if (result.getResult() != null) {
+                    JsonObject json = result.getAsJsonObject();
 
-                JsonReader reader = new JsonReader(new InputStreamReader(con.getInputStream(), "UTF-8"));
+                    // Setting city database id
+                    StormData data = new StormData();
+                    data.setCityId(city.getCityId());
+                    data.setCityName(json.get("m").getAsString());
+                    data.setStormChance(json.get("p_b").getAsInt());
+                    data.setStormTime(json.get("t_b").getAsInt());
+                    data.setStormAlert(json.get("a_b").getAsInt());
+                    data.setRainChance(json.get("p_o").getAsInt());
+                    data.setRainTime(json.get("t_o").getAsInt());
+                    data.setRainAlert(json.get("a_o").getAsInt());
 
-                // Setting city database id
-                StormData data = new StormData();
-                data.setCityId(city.getCityId());
-
-                // Parsing received data into StormData obejct
-                reader.beginObject();
-                while (reader.hasNext()) {
-                    String name = reader.nextName();
-                    switch (name) {
-                        case "m":
-                            data.setCityName(reader.nextString());
-                            break;
-                        case "p_b":
-                            data.setStormChance(reader.nextInt());
-                            break;
-                        case "t_b":
-                            data.setStormTime(reader.nextInt());
-                            break;
-                        case "a_b":
-                            data.setStormAlert(reader.nextInt());
-                            break;
-                        case "p_o":
-                            data.setRainChance(reader.nextInt());
-                            break;
-                        case "t_o":
-                            data.setRainTime(reader.nextInt());
-                            break;
-                        case "a_o":
-                            data.setRainAlert(reader.nextInt());
-                            break;
-                        default:
-                            reader.skipValue();
-                            break;
-                    }
+                    // Adding result to a list
+                    resultList.add(data);
+                } else {
+                    resultCode = result.getResponseCode();
                 }
-                reader.endObject();
-
-                // Adding result to a list
-                resultList.add(data);
-
             } catch (UnknownHostException e) {
                 // Couldn't connect to a host, so assume we have no internet connection (or host is down)
                 resultCode = 2;
             } catch (Exception e) {
-                // Unknown exception. If HTTP status code is available, pass it further
-                if (responseCode > 99 && responseCode < 600)
-                    resultCode = responseCode;
-                else {
-                    resultCode = -1;
-                    e.printStackTrace();
-                }
-            } finally {
-                try {
-                    con.disconnect();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                // Unknown exception.
+                resultCode = -1;
+                e.printStackTrace();
             }
         }
 
-        // Create object with final list or just an error code
-        if (resultCode == 1) {
+        if (resultList.size() > 0) {
             for (StormData city : resultList) {
                 ContentValues cv = new ContentValues();
                 cv.put(StormDataProvider.KEY_STORMCHANCE, city.getStormChance());
@@ -137,6 +159,7 @@ public class Utils {
                 String[] selArgs = {Integer.toString(city.getCityId())};
                 context.getContentResolver().update(StormDataProvider.CONTENT_URI, cv, selection, selArgs);
             }
+            Log.d("getStormData", "result: " + resultList);
             return 1;
         }
 
