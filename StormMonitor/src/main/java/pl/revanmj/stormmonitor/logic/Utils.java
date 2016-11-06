@@ -46,8 +46,10 @@ public class Utils {
                 tmp.setCityName(c.getString(StormDataProvider.CITYNAME));
                 tmp.setStormChance(c.getInt(StormDataProvider.STORMCHANCE));
                 tmp.setStormTime(c.getInt(StormDataProvider.STORMTIME));
+                //tmp.setStormAlert(c.getInt(StormDataProvider.STORMALERT));
                 tmp.setRainChance(c.getInt(StormDataProvider.RAINCHANCE));
                 tmp.setRainTime(c.getInt(StormDataProvider.RAINTIME));
+                //tmp.setRainAlert(c.getInt(StormDataProvider.RAINALERT));
                 cities.add(tmp);
             }
             return cities;

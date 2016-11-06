@@ -2,6 +2,7 @@ package pl.revanmj.stormmonitor;
 
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +14,7 @@ import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.ContentViewEvent;
 
 import pl.revanmj.stormmonitor.data.StormDataProvider;
+import pl.revanmj.stormmonitor.logic.StormJob;
 import pl.revanmj.stormmonitor.logic.Utils;
 import pl.revanmj.stormmonitor.model.DownloadResult;
 import pl.revanmj.stormmonitor.model.StormData;
@@ -29,7 +31,6 @@ public class CitiesWidget extends AppWidgetProvider {
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         this.context = context;
-        RefreshData();
         final int N = appWidgetIds.length;
         for (int i=0; i<N; i++) {
             updateAppWidget(context, appWidgetManager, appWidgetIds[i]);
@@ -50,58 +51,16 @@ public class CitiesWidget extends AppWidgetProvider {
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 
-    private void setData(DownloadResult result)
-    {
-        if (result.getResultCode() == 1) {
-            for (StormData city : result.getCitiesData()) {
-                ContentValues cv = new ContentValues();
-                cv.put(StormDataProvider.KEY_STORMCHANCE, city.getStormChance());
-                cv.put(StormDataProvider.KEY_STORMTIME, city.getStormTime());
-                cv.put(StormDataProvider.KEY_RAINCHANCE, city.getRainChance());
-                cv.put(StormDataProvider.KEY_RAINTIME, city.getRainTime());
-                String selection = StormDataProvider.KEY_ID + " = ?";
-                String[] selArgs = {Integer.toString(city.getCityId())};
-                context.getContentResolver().update(StormDataProvider.CONTENT_URI, cv, selection, selArgs);
-            }
-        }
+    @Override
+    public void onEnabled(Context ctx) {
+        StormJob.scheduleJob(ctx);
     }
 
-    private class JSONStormTask extends AsyncTask<List<StormData>, Void, DownloadResult> {
-
-        @Override
-        protected DownloadResult doInBackground(List<StormData>... params) {
-            DownloadResult result = null;
-
-            if (params[0] != null) {
-                // We list of the cities so download process can be started
-                result = new DownloadResult(Utils.getStormData(params[0], context));
-                Answers.getInstance().logContentView(new ContentViewEvent()
-                        .putContentName("Widget")
-                        .putContentType("Action")
-                        .putContentId("widgetUpdated"));
-            }
-
-            return result;
-        }
-
-        @Override
-        protected void onPostExecute(DownloadResult result) {
-            setData(result);
-            super.onPostExecute(result);
-        }
-
-        @Override
-        protected void onPreExecute(){
-            super.onPreExecute();
-        }
+    @Override
+    public void onDisabled(Context ctx) {
+        StormJob.cancelJob();
     }
 
-    public void RefreshData() {
-        List<StormData> cities = Utils.getAllData(context);
-
-        JSONStormTask task = new JSONStormTask();
-        task.execute(cities);
-    }
 }
 
 

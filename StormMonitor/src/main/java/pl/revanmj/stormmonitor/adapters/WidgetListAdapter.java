@@ -3,6 +3,7 @@ package pl.revanmj.stormmonitor.adapters;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Binder;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
@@ -85,6 +86,12 @@ public class WidgetListAdapter implements RemoteViewsService.RemoteViewsFactory 
 
     @Override
     public void onDataSetChanged() {
+        final long token = Binder.clearCallingIdentity();
+        try {
+            populateListItem();
+        } finally {
+            Binder.restoreCallingIdentity(token);
+        }
     }
 
     @Override

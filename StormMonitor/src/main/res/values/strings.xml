@@ -39,4 +39,5 @@
     <string name="error_location_denied">Nie przyznano dostępu do danych lokalizacji!</string>
     <string name="error_no_connection">Nie masz połączenia z internetem lub usługa jest teraz niedostępna.</string>
     <string name="error_unknown">Nieznany bład\nKod: </string>
+    <string name="sharedpref">sharedpref.xml</string>
 </resources>
