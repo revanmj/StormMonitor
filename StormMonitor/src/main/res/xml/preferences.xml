@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <ListPreference
+        android:title="@string/sync_period"
+        android:summary="%s"
+        android:key="sync_period"
+        android:defaultValue="60"
+        android:entries="@array/sync_periods_labels"
+        android:entryValues="@array/sync_periods" />
+    <Preference
+        android:selectable="false"
+        android:enabled="true"
+        android:key="app_version"
+        android:title="@string/settings_version"
+        android:summary="@string/text_about" />
+    <Preference
+        android:selectable="false"
+        android:enabled="true"
+        android:key="app_version"
+        android:title="@string/settings_libs_title"
+        android:summary="@string/settings_libs" />
+</PreferenceScreen>

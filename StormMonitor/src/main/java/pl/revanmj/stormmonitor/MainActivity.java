@@ -250,12 +250,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 MainActivity.this.startActivity(search_a);
                 RefreshData(false);
                 return true;
-            case R.id.action_about:
-                Intent about = new Intent(MainActivity.this, AboutActivity.class);
-                MainActivity.this.startActivity(about);
-                return true;
             case R.id.action_refresh:
                 RefreshData(false);
+                return true;
+            case R.id.action_settings:
+                Intent preferencesIntent = new Intent(MainActivity.this, PreferencesActivity.class);
+                startActivity(preferencesIntent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="sync_periods">
+        <item>30</item>
+        <item>60</item>
+        <item>120</item>
+        <item>180</item>
+        <item>240</item>
+    </string-array>
+    <string-array name="sync_periods_labels">
+        <item>30 minuty</item>
+        <item>1 godzina</item>
+        <item>2 godziny</item>
+        <item>3 godziny</item>
+        <item>4 godziny</item>
+    </string-array>
+</resources>

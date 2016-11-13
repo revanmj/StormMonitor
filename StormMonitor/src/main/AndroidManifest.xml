@@ -29,12 +29,15 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".AboutActivity"
-            android:label="@string/menu_about">
+            android:name=".PreferencesActivity"
+            android:label="@string/title_activity_settings"
+            android:theme="@style/AppThemeSettings"
+            android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="pl.revanmj.stormmonitor.MainActivity" />
         </activity>
+
         <activity
             android:name=".MapActivity"
             android:configChanges="orientation"

@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.evernote.android.job.Job;
@@ -51,8 +52,20 @@ public class StormJob extends Job {
     }
 
     public static void scheduleJob(Context ctx) {
-        SharedPreferences settings = ctx.getSharedPreferences(SharedSettings.FILE, Context.MODE_PRIVATE);
-        int period = settings.getInt(SharedSettings.SYNC_PERIOD, 15);
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(ctx);
+        int period = Integer.parseInt(settings.getString(SharedSettings.SYNC_PERIOD, "60"));
+        Log.d("StormJob", "scheduled job with period: " + period);
+        new JobRequest.Builder(StormJob.TAG)
+                .setPersisted(true)
+                .setPeriodic(TimeUnit.MINUTES.toMillis(period), TimeUnit.MINUTES.toMillis(5))
+                .setRequiredNetworkType(JobRequest.NetworkType.CONNECTED)
+                .setRequirementsEnforced(true)
+                .setUpdateCurrent(true)
+                .build()
+                .schedule();
+    }
+
+    public static void scheduleJob(Integer period) {
         Log.d("StormJob", "scheduled job with period: " + period);
         new JobRequest.Builder(StormJob.TAG)
                 .setPersisted(true)

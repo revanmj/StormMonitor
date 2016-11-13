@@ -10,8 +10,8 @@
         android:title="Odśwież"
         app:showAsAction="never"
         android:orderInCategory="300" />
-    <item android:id="@+id/action_about"
-        android:title="O aplikacji"
+    <item android:id="@+id/action_settings"
+        android:title="@string/menu_settings"
         android:orderInCategory="500"
         app:showAsAction="never" />
 </menu>
