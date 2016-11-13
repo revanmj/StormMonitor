@@ -67,10 +67,11 @@ public class StormJob extends Job {
     public static void cancelJob() {
         int jobId = new JobRequest.Builder(StormJob.TAG)
                 .setPeriodic(TimeUnit.MINUTES.toMillis(15), TimeUnit.MINUTES.toMillis(5))
+                .setUpdateCurrent(true)
                 .build()
                 .schedule();
-        Log.d("StormJob", "cancelled job with id: " + jobId);
 
         JobManager.instance().cancel(jobId);
+        Log.d("StormJob", "cancelled job with id: " + jobId);
     }
 }
