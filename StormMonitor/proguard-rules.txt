@@ -16,3 +16,5 @@
 }
 
 -keep public class org.apache.http.**
+
+-dontwarn android.webkit.*

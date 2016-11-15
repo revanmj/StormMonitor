@@ -2,7 +2,6 @@ package pl.revanmj.stormmonitor.logic;
 
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -12,15 +11,12 @@ import com.evernote.android.job.Job;
 import com.evernote.android.job.JobManager;
 import com.evernote.android.job.JobRequest;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import pl.revanmj.stormmonitor.CitiesWidget;
 import pl.revanmj.stormmonitor.R;
 import pl.revanmj.stormmonitor.data.SharedSettings;
-import pl.revanmj.stormmonitor.data.StormDataProvider;
 import pl.revanmj.stormmonitor.model.StormData;
 
 /**
