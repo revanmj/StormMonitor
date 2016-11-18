@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
+import android.view.MenuItem;
 
 import pl.revanmj.stormmonitor.data.SharedSettings;
 import pl.revanmj.stormmonitor.logic.AppCompatPreferenceActivity;
@@ -51,4 +52,16 @@ public class PreferencesActivity extends AppCompatPreferenceActivity {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        super.onOptionsItemSelected(item);
+        switch(item.getItemId()) {
+            case android.R.id.home:
+                PreferencesActivity.this.onBackPressed();
+                break;
+        }
+        return true;
+    }
+
 }
