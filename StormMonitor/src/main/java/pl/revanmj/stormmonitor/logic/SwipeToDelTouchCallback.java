@@ -10,6 +10,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.View;
 
 import pl.revanmj.stormmonitor.R;
@@ -90,18 +91,20 @@ public class SwipeToDelTouchCallback extends ItemTouchHelper.Callback {
         background.setBounds(itemView.getRight() + (int) dX, itemView.getTop(), itemView.getRight(), itemView.getBottom());
         background.draw(c);
 
-        // draw x mark
-        int itemHeight = itemView.getBottom() - itemView.getTop();
-        int intrinsicWidth = deleteIcon.getIntrinsicWidth();
-        int intrinsicHeight = deleteIcon.getIntrinsicWidth();
+        if (isCurrentlyActive) {
+            // draw x mark when user is swiping the item
+            int itemHeight = itemView.getBottom() - itemView.getTop();
+            int intrinsicWidth = deleteIcon.getIntrinsicWidth();
+            int intrinsicHeight = deleteIcon.getIntrinsicWidth();
 
-        int xMarkLeft = itemView.getRight() - deleteIconMargin - intrinsicWidth;
-        int xMarkRight = itemView.getRight() - deleteIconMargin;
-        int xMarkTop = itemView.getTop() + (itemHeight - intrinsicHeight)/2;
-        int xMarkBottom = xMarkTop + intrinsicHeight;
-        deleteIcon.setBounds(xMarkLeft, xMarkTop, xMarkRight, xMarkBottom);
+            int xMarkLeft = itemView.getRight() - deleteIconMargin - intrinsicWidth;
+            int xMarkRight = itemView.getRight() - deleteIconMargin;
+            int xMarkTop = itemView.getTop() + (itemHeight - intrinsicHeight)/2;
+            int xMarkBottom = xMarkTop + intrinsicHeight;
 
-        deleteIcon.draw(c);
+            deleteIcon.setBounds(xMarkLeft, xMarkTop, xMarkRight, xMarkBottom);
+            deleteIcon.draw(c);
+        }
 
         super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
     }
