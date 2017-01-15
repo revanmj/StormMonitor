@@ -24,7 +24,6 @@
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -33,6 +32,10 @@
             android:label="@string/title_activity_settings"
             android:theme="@style/AppThemeSettings"
             android:parentActivityName=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.APPLICATION_PREFERENCES"/>
+                <category android:name="android.intent.category.PREFERENCE" />
+            </intent-filter>
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="pl.revanmj.stormmonitor.MainActivity" />
