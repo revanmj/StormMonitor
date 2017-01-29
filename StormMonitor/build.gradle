@@ -41,8 +41,8 @@ android {
 }
 
 dependencies {
-    compile 'it.sephiroth.android.library.imagezoom:imagezoom:+'
     compile files('src/main/libs/wversionmanager-1.4.jar')
+    compile 'it.sephiroth.android.library.imagezoom:imagezoom:+'
     compile 'com.github.delight-im:Android-AdvancedWebView:v3.0.0'
     compile 'com.readystatesoftware.sqliteasset:sqliteassethelper:+'
     compile 'com.android.support:support-v4:25.1.0'
