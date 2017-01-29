@@ -4,7 +4,7 @@
     tools:context="pl.revanmj.stormmonitor.DetailsActivity">
     <item android:id="@+id/action_refresh"
         android:title="@string/label_update"
-        android:icon="@drawable/ic_refresh_white_24dp"
+        android:icon="@drawable/ic_action_refresh"
         android:orderInCategory="100"
         app:showAsAction="ifRoom" />
 </menu>

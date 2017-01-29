@@ -4,7 +4,7 @@
     tools:context="pl.revanmj.stormmonitor.SearchActivity" >
     <item android:id="@+id/action_add_gps"
         android:title="@string/menu_addcity_gps"
-        android:icon="@drawable/ic_my_location_white_24dp"
+        android:icon="@drawable/ic_action_my_location"
         android:orderInCategory="1"
         app:showAsAction="ifRoom" />
 </menu>
