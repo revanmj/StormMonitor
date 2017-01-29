@@ -45,4 +45,6 @@
     <string name="sync_period">Częstotliwość odświeżania widżetu</string>
     <string name="settings_version">Wersja 1.0</string>
     <string name="menu_settings">Ustawienia</string>
+    <string name="map_sh_label">Mapa</string>
+    <string name="map_sh_disabled">Skrót wyłączony</string>
 </resources>

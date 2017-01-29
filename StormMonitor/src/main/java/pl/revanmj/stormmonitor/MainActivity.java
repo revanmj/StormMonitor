@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     if (mClient != null) {
                         mClient.warmup(0L);
                         mCustomTabsSession = mClient.newSession(null);
-                        mCustomTabsSession.mayLaunchUrl(Uri.parse(serviceUrl + "/m/"), null, null);
+                        mCustomTabsSession.mayLaunchUrl(Uri.parse(serviceUrl + "m/"), null, null);
                     }
                 }
 
@@ -150,10 +150,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                             .setToolbarColor(ContextCompat.getColor(MainActivity.this, R.color.md_blue_500))
                             .setShowTitle(true)
                             .build();
-                    customTabsIntent.launchUrl(MainActivity.this, Uri.parse(serviceUrl + "/m/"));
+                    customTabsIntent.launchUrl(MainActivity.this, Uri.parse(serviceUrl + "m/"));
                 } else {
                     Intent browserIntent = new Intent(MainActivity.this, DetailsActivity.class);
-                    browserIntent.putExtra("url", serviceUrl + "/m/");
+                    browserIntent.putExtra("url", serviceUrl + "m/");
                     browserIntent.putExtra("title", "map");
                     startActivity(browserIntent);
                 }

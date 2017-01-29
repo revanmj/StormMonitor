@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_map"
+        android:shortcutDisabledMessage="@string/map_sh_disabled"
+        android:shortcutId="static"
+        android:shortcutShortLabel="@string/map_sh_label">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="http://antistorm.eu/m/">
+        </intent>
+    </shortcut>
+</shortcuts>
