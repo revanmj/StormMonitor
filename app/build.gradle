@@ -4,7 +4,7 @@ buildscript {
         maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.3'
+        classpath 'com.android.tools.build:gradle:2.3.0'
         classpath 'io.fabric.tools:gradle:1.+'
         classpath 'com.google.firebase:firebase-plugins:1.0.5'
         classpath 'com.google.gms:google-services:3.0.0'
@@ -43,17 +43,15 @@ android {
     }
 }
 
-setProperty("FirebaseServiceAccountFilePath", rootProject.rootDir.absolutePath + FirebaseServiceAccountFilePath)
-
 dependencies {
     compile files('src/main/libs/wversionmanager-1.4.jar')
     compile 'it.sephiroth.android.library.imagezoom:imagezoom:+'
     compile 'com.github.delight-im:Android-AdvancedWebView:v3.0.0'
     compile 'com.readystatesoftware.sqliteasset:sqliteassethelper:+'
-    compile 'com.android.support:support-v4:25.2.0'
-    compile 'com.android.support:appcompat-v7:25.2.0'
-    compile 'com.android.support:design:25.2.0'
-    compile 'com.android.support:customtabs:25.2.0'
+    compile 'com.android.support:support-v4:25.3.0'
+    compile 'com.android.support:appcompat-v7:25.3.0'
+    compile 'com.android.support:design:25.3.0'
+    compile 'com.android.support:customtabs:25.3.0'
     compile 'com.google.android.gms:play-services-base:10.2.0'
     compile 'com.google.firebase:firebase-core:10.2.0'
     compile 'com.google.firebase:firebase-crash:10.2.0'

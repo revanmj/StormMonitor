@@ -1,1 +1,1 @@
-include ':StormMonitor'
+include ':app'
