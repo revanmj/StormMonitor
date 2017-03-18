@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mySwipeRefreshLayout.setColorSchemeResources(R.color.md_blue_500);
 
         // Setting up RecyclerView
-        rcAdapter = new MainRecyclerViewAdapter(this);
+        rcAdapter = new MainRecyclerViewAdapter();
         recyclerView.setAdapter(rcAdapter);
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager llm = new LinearLayoutManager(this);

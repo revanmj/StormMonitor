@@ -23,10 +23,10 @@ import pl.revanmj.stormmonitor.data.StormDataProvider;
 
 public class SwipeToDelTouchCallback extends ItemTouchHelper.Callback {
     // we want to cache these and not allocate anything repeatedly in the onChildDraw method
-    Context context;
-    Drawable background;
-    Drawable deleteIcon;
-    int deleteIconMargin;
+    private Context context;
+    private Drawable background;
+    private Drawable deleteIcon;
+    private int deleteIconMargin;
 
     public SwipeToDelTouchCallback(Context c) {
         context = c;
@@ -67,7 +67,7 @@ public class SwipeToDelTouchCallback extends ItemTouchHelper.Callback {
 
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
-        int id = ((MainRecyclerViewAdapter.StormDataViewHolder)viewHolder)._id;
+        int id = ((MainRecyclerViewAdapter.StormDataViewHolder)viewHolder).getId();
 
         String selection = StormDataProvider.KEY_ID + " = ?";
         String[] selArgs = {Integer.toString(id)};
