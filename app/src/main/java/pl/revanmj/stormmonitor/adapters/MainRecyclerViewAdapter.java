@@ -62,6 +62,14 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
             return 1;
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        if (mCursor == null || mCursor.getCount() == 0) {
+            return EMPTY_VIEW;
+        }
+        return super.getItemViewType(position);
+    }
+
     public Cursor getItem(int pos) {
         if (this.mCursor != null && !this.mCursor.isClosed()) {
             this.mCursor.moveToPosition(pos);
