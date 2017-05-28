@@ -16,16 +16,20 @@ import pl.revanmj.stormmonitor.logic.Utils;
  * Created by revanmj on 05.02.2016.
  */
 
-public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerViewAdapter.StormDataViewHolder> {
-    private Cursor cursor;
-
-    public void swapCursor(Cursor c) {
-        cursor = c;
-        notifyDataSetChanged();
-    }
+public class MainRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    private static final int EMPTY_VIEW = 10;
+    private Cursor mCursor;
 
     @Override
-    public StormDataViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        if (viewType == EMPTY_VIEW) {
+            View itemView = LayoutInflater
+                    .from(parent.getContext())
+                    .inflate(R.layout.empty_view, parent, false);
+
+            return new EmptyViewHolder(itemView);
+        }
+
         View itemView = LayoutInflater.
                 from(parent.getContext()).
                 inflate(R.layout.row_listview, parent, false);
@@ -34,35 +38,40 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
     }
 
     @Override
-    public void onBindViewHolder(StormDataViewHolder holder, int position) {
-        Cursor item = getItem(position);
-        int id = item.getInt(StormDataProvider.CITYID);
-        int stormTime = item.getInt(StormDataProvider.STORMTIME);
-        int rainTime = item.getInt(StormDataProvider.RAINTIME);
-        int stormChance = item.getInt(StormDataProvider.STORMCHANCE);
-        int rainChance = item.getInt(StormDataProvider.RAINCHANCE);
-        int stormAlert = item.getInt(StormDataProvider.STORMALERT);
-        int rainAlert = item.getInt(StormDataProvider.RAINALERT);
-        String city = item.getString(StormDataProvider.CITYNAME);
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        if (holder instanceof StormDataViewHolder) {
+            Cursor item = getItem(position);
+            int id = item.getInt(StormDataProvider.CITYID);
+            int stormTime = item.getInt(StormDataProvider.STORMTIME);
+            int rainTime = item.getInt(StormDataProvider.RAINTIME);
+            int stormChance = item.getInt(StormDataProvider.STORMCHANCE);
+            int rainChance = item.getInt(StormDataProvider.RAINCHANCE);
+            int stormAlert = item.getInt(StormDataProvider.STORMALERT);
+            int rainAlert = item.getInt(StormDataProvider.RAINALERT);
+            String city = item.getString(StormDataProvider.CITYNAME);
 
-        holder.bind(id, city, stormChance, rainChance, stormTime, rainTime, stormAlert, rainAlert);
+            ((StormDataViewHolder)holder).bind(id, city, stormChance, rainChance, stormTime, rainTime, stormAlert, rainAlert);
+        }
     }
 
     @Override
     public int getItemCount() {
-        if (cursor != null)
-            return cursor.getCount();
+        if (mCursor != null && mCursor.getCount() > 0)
+            return mCursor.getCount();
         else
-            return 0;
+            return 1;
     }
 
     public Cursor getItem(int pos) {
-        if (this.cursor != null && !this.cursor.isClosed())
-        {
-            this.cursor.moveToPosition(pos);
+        if (this.mCursor != null && !this.mCursor.isClosed()) {
+            this.mCursor.moveToPosition(pos);
         }
+        return this.mCursor;
+    }
 
-        return this.cursor;
+    public void swapCursor(Cursor c) {
+        mCursor = c;
+        notifyDataSetChanged();
     }
 
     public static class StormDataViewHolder extends RecyclerView.ViewHolder {
@@ -98,6 +107,12 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
 
         public int getId() {
             return this._id;
+        }
+    }
+
+    public class EmptyViewHolder extends RecyclerView.ViewHolder {
+        public EmptyViewHolder(View itemView) {
+            super(itemView);
         }
     }
 }
