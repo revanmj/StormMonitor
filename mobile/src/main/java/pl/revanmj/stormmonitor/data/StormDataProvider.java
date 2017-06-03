@@ -163,7 +163,7 @@ public class StormDataProvider extends ContentProvider {
 
     private SQLiteDatabase db;
     private static final int DATABASE_VERSION = 4;
-    private static final String DATABASE_NAME = "dictionary";
+    private static final String DATABASE_NAME = "stormdata.db";
     private static final String TABLE_STORMS = "StormData";
     public static final String KEY_ID = "city_id";
     public static final String KEY_CITYNAME = "name";

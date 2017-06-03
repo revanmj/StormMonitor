@@ -1,17 +1,13 @@
 package pl.revanmj.stormmonitor;
 
 import android.content.ComponentName;
-import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.customtabs.CustomTabsClient;
 import android.support.customtabs.CustomTabsIntent;
-import android.support.customtabs.CustomTabsService;
 import android.support.customtabs.CustomTabsServiceConnection;
 import android.support.customtabs.CustomTabsSession;
 import android.support.design.widget.FloatingActionButton;
@@ -36,11 +32,8 @@ import pl.revanmj.stormmonitor.adapters.MainRecyclerViewAdapter;
 import pl.revanmj.stormmonitor.data.StormDataProvider;
 import pl.revanmj.stormmonitor.logic.Utils;
 import pl.revanmj.stormmonitor.logic.SwipeToDelTouchCallback;
-import pl.revanmj.stormmonitor.model.DownloadResult;
 import pl.revanmj.stormmonitor.model.StormData;
 
-import com.crashlytics.android.answers.Answers;
-import com.crashlytics.android.answers.ContentViewEvent;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.winsontan520.wversionmanager.library.WVersionManager;
 
@@ -54,11 +47,13 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     // Data for updater from WVersionManager library
-    private final String updateApkUrl = "https://github.com/revanmj/StormMonitor/raw/master/StormMonitor.apk";
-    private final String updateChangelogUrl = "https://github.com/revanmj/StormMonitor/raw/master/updates.json";
+    private static final String updateApkUrl = "https://github.com/revanmj/StormMonitor/raw/master/StormMonitor.apk";
+    private static final String updateChangelogUrl = "https://github.com/revanmj/StormMonitor/raw/master/updates.json";
 
     // URL for opening a map in WebView
-    private final String serviceUrl = "http://antistorm.eu/";
+    private static final String serviceUrl = "http://antistorm.eu/";
+
+    private static final String KEY_LAST_UPDATE = "lastUpdate";
 
     private MainRecyclerViewAdapter rcAdapter;
     private SwipeRefreshLayout mySwipeRefreshLayout;
@@ -84,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     public void onRefresh() {
                         // This method performs the actual data-refresh operation.
                         // The method calls setRefreshing(false) when it's finished.
-                        RefreshData(true);
+                        refreshData(true);
                     }
                 }
         );
@@ -159,12 +154,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 }
             }
         });
-    }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        RefreshData(false);
+        // If more there was more than 15 minutes since last update, refresh data
+        if (System.currentTimeMillis() - getPreferences(0).getLong(KEY_LAST_UPDATE, 0) > 900000) {
+            refreshData(false);
+        }
     }
 
     @Override
@@ -208,6 +202,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 Snackbar.make(mySwipeRefreshLayout, R.string.error_unknown, Snackbar.LENGTH_LONG);
                 Log.d("ConnError", result.toString());
         }
+
+        getPreferences(0).edit().putLong(KEY_LAST_UPDATE, System.currentTimeMillis()).apply();
     }
 
     /**
@@ -248,10 +244,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             case R.id.action_add:
                 Intent search_a = new Intent(MainActivity.this, SearchActivity.class);
                 MainActivity.this.startActivity(search_a);
-                RefreshData(false);
+                refreshData(false);
                 return true;
             case R.id.action_refresh:
-                RefreshData(false);
+                refreshData(false);
                 return true;
             case R.id.action_settings:
                 Intent preferencesIntent = new Intent(MainActivity.this, PreferencesActivity.class);
@@ -265,7 +261,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     /**
      * Method for initating process of downloading data
      */
-    public void RefreshData(Boolean byGesture) {
+    public void refreshData(Boolean byGesture) {
         if (!byGesture)
             mySwipeRefreshLayout.setRefreshing(true);
 

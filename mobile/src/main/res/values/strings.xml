@@ -48,4 +48,6 @@
     <string name="map_sh_label">Mapa</string>
     <string name="map_sh_disabled">Skrót wyłączony</string>
     <string name="label_empty_list">Nie obserwujesz żadnych miast</string>
+    <string name="no_location">Nie udało się ustalić lokalizacji</string>
+    <string name="no_permission">Brak dostępu do lokalizacji!</string>
 </resources>
