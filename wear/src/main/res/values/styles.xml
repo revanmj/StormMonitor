@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppBase" parent="@android:style/Theme.DeviceDefault">
+        <item name="android:color">@color/darker_blue</item>
+        <item name="android:colorAccent">@color/action_bar_blue</item>
+        <item name="android:colorPrimary">@color/action_bar_blue</item>
+        <item name="android:colorPrimaryDark">@color/darker_blue</item>
+        <item name="android:colorBackground">@color/darker_blue</item>
+    </style>
+</resources>

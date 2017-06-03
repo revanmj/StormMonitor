@@ -1,0 +1,15 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="1dip"
+    android:paddingBottom="4dip"
+    android:paddingStart="8dp"
+    android:paddingEnd="1dp">
+
+    <TextView android:id="@+id/text1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large"
+        android:paddingStart="2dp" />
+</LinearLayout>

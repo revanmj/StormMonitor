@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Storm Monitor</string>
+    <string name="hello_world">Hello World!</string>
+    <string name="add_by_search">Add by search</string>
+    <string name="add_via_gps">Add via GPS</string>
+    <string name="refresh">Refresh</string>
+    <string name="label_empty_list">Nie obserwujesz żadnych miast</string>
+    <string name="label__time">Czas do burzy: </string>
+    <string name="label_storm_prob">Szanse na burzę: </string>
+    <string name="error_no_connection">Brak połączenia z siecią</string>
+    <string name="error_unknown">Nieznany błąd</string>
+    <string name="title_activity_add">AddActivity</string>
+    <string name="message_city_exists">Miasto już jest dodane</string>
+    <string name="message_no_such_city">Brak miasta w bazie</string>
+    <string name="message_no_results">Nie znaleziono miast</string>
+    <string name="no_permission">Brak uprawnienia do lokalizacji!</string>
+    <string name="no_location">Nie udało się ustalić położenia</string>
+</resources>

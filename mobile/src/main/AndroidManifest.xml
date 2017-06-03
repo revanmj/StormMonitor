@@ -7,42 +7,46 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
+        android:name=".StormApp"
         android:allowBackup="true"
         android:fullBackupContent="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme"
-        android:name=".StormApp">
+        android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <meta-data android:name="android.app.shortcuts"
+
+            <meta-data
+                android:name="android.app.shortcuts"
                 android:resource="@xml/shortcuts" />
         </activity>
         <activity
             android:name=".PreferencesActivity"
             android:label="@string/title_activity_settings"
-            android:theme="@style/AppThemeSettings"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppThemeSettings">
             <intent-filter>
-                <action android:name="android.intent.action.APPLICATION_PREFERENCES"/>
+                <action android:name="android.intent.action.APPLICATION_PREFERENCES" />
+
                 <category android:name="android.intent.category.PREFERENCE" />
             </intent-filter>
+
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="pl.revanmj.stormmonitor.MainActivity" />
         </activity>
-
         <activity
             android:name=".MapActivity"
             android:configChanges="orientation"
@@ -89,7 +93,6 @@
         <meta-data
             android:name="com.crashlytics.ApiKey"
             android:value="a13f1a8d8359fda1ea856cb5907b8aa64fde7d9b" />
-
     </application>
 
 </manifest>
