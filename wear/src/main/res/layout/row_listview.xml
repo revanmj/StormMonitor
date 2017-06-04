@@ -47,7 +47,7 @@
         android:layout_below="@+id/textView2"
         android:layout_marginTop="-2dp"
         android:layout_toRightOf="@+id/colorRectangle"
-        android:text="@string/label__time"
+        android:text="@string/label_storm_time"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="@color/white"
         android:visibility="visible" />
@@ -82,7 +82,7 @@
         android:layout_alignStart="@+id/textView3"
         android:layout_below="@+id/textView3"
         android:layout_marginTop="-2dp"
-        android:text="Sanse na opady:"
+        android:text="@string/label_rain_prob"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="@color/white" />
 
@@ -94,7 +94,7 @@
         android:layout_alignStart="@+id/textView"
         android:layout_below="@+id/textView"
         android:layout_marginTop="-2dp"
-        android:text="Czas do opadów:"
+        android:text="@string/label_rain_time"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="@color/white" />
 
