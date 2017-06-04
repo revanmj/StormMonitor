@@ -28,11 +28,11 @@ public class CitiesAssetHelper extends SQLiteAssetHelper {
         SQLiteDatabase db = getReadableDatabase();
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
 
-        String [] sqlSelect = {CITY_ID, CITY_NAME};
-        String select = CITY_NAME + " = '" + city_name +"'";
+        String [] select = {CITY_ID, CITY_NAME};
+        String where = CITY_NAME + " = '" + city_name +"'";
 
         qb.setTables(CITIES_TABLE);
-        Cursor c = qb.query(db, sqlSelect, select, null,
+        Cursor c = qb.query(db, select, where, null,
                 null, null, null);
 
         StormData city = null;
@@ -50,11 +50,11 @@ public class CitiesAssetHelper extends SQLiteAssetHelper {
         SQLiteDatabase db = getReadableDatabase();
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
 
-        String [] sqlSelect = {CITY_ID, CITY_NAME};
-        String select = CITY_NAME + " LIKE '%" + city_name +"%'";
+        String [] select = {CITY_ID, CITY_NAME};
+        String where = CITY_NAME + " LIKE '%" + city_name +"%'";
 
         qb.setTables(CITIES_TABLE);
-        Cursor c = qb.query(db, sqlSelect, select, null,
+        Cursor c = qb.query(db, select, where, null,
                 null, null, null);
         return c;
 

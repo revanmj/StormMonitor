@@ -24,8 +24,6 @@ import pl.revanmj.stormmonitor.data.StormData;
 import pl.revanmj.stormmonitor.data.StormDataProvider;
 
 public class AddActivity extends WearableActivity {
-    private WearableRecyclerView mListView;
-    private EditText searchField;
     private SearchAdapter searchAdapter;
 
     @Override
@@ -34,44 +32,22 @@ public class AddActivity extends WearableActivity {
         setContentView(R.layout.activity_add);
 
         searchAdapter = new SearchAdapter(this);
-        mListView = (WearableRecyclerView) findViewById(R.id.listView);
+        WearableRecyclerView mListView = (WearableRecyclerView) findViewById(R.id.listView);
         mListView.setAdapter(searchAdapter);
         mListView.setCenterEdgeItems(true);
         CurvedChildLayoutManager mChildLayoutManager = new CurvedChildLayoutManager(this);
         mListView.setLayoutManager(mChildLayoutManager);
 
-        searchField = (EditText) findViewById(R.id.cityEditText);
-        searchField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                doSearch();
-                InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(textView.getWindowToken(), 0);
-                return true;
-            }
-        });
+        loadData();
     }
 
-    public void doSearch() {
-        searchField.setVisibility(View.GONE);
-        mListView.setVisibility(View.VISIBLE);
-        String query = searchField.getText().toString();
-
-        // Remove polish letters
-        if (query.toLowerCase().startsWith("ą") || query.toLowerCase().startsWith("ć")  ||
-                query.toLowerCase().startsWith("ę") || query.toLowerCase().startsWith("ł") ||
-                query.toLowerCase().startsWith("ń") || query.toLowerCase().startsWith("ó") ||
-                query.toLowerCase().startsWith("ś") || query.toLowerCase().startsWith("ż") ||
-                query.toLowerCase().startsWith("ź")) {
-            query = query.substring(1);
-        }
-
+    public void loadData() {
         // Prepare database
         final CitiesAssetHelper cities_db = new CitiesAssetHelper(this);
         final List<StormData> results = new ArrayList<>();
 
         // Get the results
-        Cursor cursor = cities_db.searchCity(query);
+        Cursor cursor = cities_db.getAllCities();
         if (cursor.moveToFirst()) {
             do {
                 StormData city = new StormData();
@@ -82,15 +58,10 @@ public class AddActivity extends WearableActivity {
             } while (cursor.moveToNext());
         }
 
-        if (results.size() == 0) {
-            // No city fits the query
-            Toast.makeText(AddActivity.this, R.string.message_no_results, Toast.LENGTH_SHORT).show();
-        } else {
-            // Clear the ListView and add results to it
-            searchAdapter.clear();
-            searchAdapter.addAll(results);
-            searchAdapter.notifyDataSetChanged();
-        }
+        // Clear the ListView and add results to it
+        searchAdapter.clear();
+        searchAdapter.addAll(results);
+        searchAdapter.notifyDataSetChanged();
     }
 
     private class SearchAdapter extends WearableRecyclerView.Adapter<WearableRecyclerView.ViewHolder> {
