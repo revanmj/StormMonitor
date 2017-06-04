@@ -9,4 +9,4 @@ Screeny:
 
 ![MyImage](https://github.com/revanmj/StormMonitor/raw/master/readme_files/screen1.png) ![MyImage](https://github.com/revanmj/StormMonitor/raw/master/readme_files/screen2.png) ![MyImage](https://github.com/revanmj/StormMonitor/raw/master/readme_files/screen3.png)
 
-![MyImage](https://github.com/revanmj/StormMonitor/raw/master/readme_files/wear1.png) ![MyImage](https://github.com/revanmj/StormMonitor/raw/master/readme_files/wear22.png) ![MyImage](https://github.com/revanmj/StormMonitor/raw/master/readme_files/wear3.png)
+![MyImage](https://github.com/revanmj/StormMonitor/raw/master/readme_files/wear1.png) ![MyImage](https://github.com/revanmj/StormMonitor/raw/master/readme_files/wear2.png) ![MyImage](https://github.com/revanmj/StormMonitor/raw/master/readme_files/wear3.png)
