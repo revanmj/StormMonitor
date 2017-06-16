@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 if (chromePackageName != null) {
                     CustomTabsIntent customTabsIntent = new CustomTabsIntent.Builder(mCustomTabsSession)
                             .setToolbarColor(ContextCompat.getColor(MainActivity.this, R.color.md_blue_500))
-                            .setCloseButtonIcon(BitmapFactory.decodeResource(getResources(), android.R.drawable.arrow_up_float))
+                            .setCloseButtonIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_action_arrow_back))
                             .setShowTitle(true)
                             .build();
                     customTabsIntent.launchUrl(MainActivity.this, Uri.parse(serviceUrl + "m/"));
