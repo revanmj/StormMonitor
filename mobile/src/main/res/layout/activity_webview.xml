@@ -4,7 +4,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="pl.revanmj.stormmonitor.DetailsActivity"
+    tools:context="pl.revanmj.stormmonitor.WebViewActivity"
     android:padding="0dp">
 
     <im.delight.android.webview.AdvancedWebView

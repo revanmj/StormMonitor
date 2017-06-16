@@ -23,7 +23,7 @@ import im.delight.android.webview.AdvancedWebView;
  * Created by revanmj on 25.01.2015.
  */
 
-public class DetailsActivity extends AppCompatActivity {
+public class WebViewActivity extends AppCompatActivity {
 
     private AdvancedWebView webview;
     private ProgressBar loadingAnim;
@@ -32,12 +32,12 @@ public class DetailsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_details);
+        setContentView(R.layout.activity_webview);
 
         // Getting parameters
         String url = getIntent().getStringExtra("url");
         String title = getIntent().getStringExtra("title");
-        if (title.equals("map")) {
+        if (title.equals("menu_map")) {
             getSupportActionBar().setTitle(R.string.title_activity_maps);
             Answers.getInstance().logContentView(new ContentViewEvent()
                     .putContentName("Map (webView)")
@@ -85,7 +85,7 @@ public class DetailsActivity extends AppCompatActivity {
 
             @Override
             public void onDownloadRequested(String url, String suggestedFilename, String mimeType, long contentLength, String contentDisposition, String userAgent) {
-                if (AdvancedWebView.handleDownload(DetailsActivity.this, url, suggestedFilename)) {
+                if (AdvancedWebView.handleDownload(WebViewActivity.this, url, suggestedFilename)) {
                     // download successfully handled
                 }
                 else {
@@ -143,7 +143,7 @@ public class DetailsActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_details, menu);
+        getMenuInflater().inflate(R.menu.menu_webview, menu);
         return true;
     }
 

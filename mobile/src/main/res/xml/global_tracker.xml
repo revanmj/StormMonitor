@@ -15,7 +15,7 @@
     <screenName name="pl.revanmj.stormmonitor.SearchActivity">
         Add City Screen
     </screenName>
-    <screenName name="pl.revanmj.stormmonitor.DetailsActivity">
+    <screenName name="pl.revanmj.stormmonitor.WebViewActivity">
         Details Screen
     </screenName>
     <!--  The following value should be replaced with correct property id. -->

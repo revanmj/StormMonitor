@@ -57,7 +57,6 @@ public class SearchActivity extends AppCompatActivity {
 
     private static final String PERMISSION_COARSE_LOCATION = "android.permission.ACCESS_COARSE_LOCATION";
     private ListView resultsListView;
-    private EditText searchField;
     private SearchAdapter searchAdapter;
     private List<StormData> cities;
     private ProgressDialog locationLoading;
@@ -91,13 +90,13 @@ public class SearchActivity extends AppCompatActivity {
         searchAdapter = new SearchAdapter(results, this);
         resultsListView = (ListView)findViewById(R.id.list_search);
         resultsListView.setAdapter(searchAdapter);
-        searchField = (EditText)findViewById(R.id.search_text);
+        EditText searchField = (EditText) findViewById(R.id.search_text);
 
         // Add listener for Search key presses on virtual keyboard
         searchField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                doSearch();
+                doSearch(textView.getText().toString());
                 final InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.toggleSoftInput(InputMethodManager.RESULT_UNCHANGED_HIDDEN, 0);
                 return true;
@@ -109,12 +108,13 @@ public class SearchActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                doSearch();
+                doSearch(charSequence.toString());
             }
 
             @Override
             public void afterTextChanged(Editable editable) {}
         });
+        doSearch("");
     }
 
     /**
@@ -153,7 +153,7 @@ public class SearchActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.search, menu);
+        getMenuInflater().inflate(R.menu.menu_search, menu);
         return true;
     }
 
@@ -170,9 +170,7 @@ public class SearchActivity extends AppCompatActivity {
     /**
      * Main method for searching the database
      */
-    public void doSearch() {
-        String query = searchField.getText().toString();
-
+    public void doSearch(String query) {
         // Remove polish letters
         if (query.toLowerCase().startsWith("ą") || query.toLowerCase().startsWith("ć")  ||
                 query.toLowerCase().startsWith("ę") || query.toLowerCase().startsWith("ł") ||

@@ -95,11 +95,11 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
             super(itemView);
 
             city = (TextView) itemView.findViewById(R.id.cityText);
-            stormChanceLabel = (TextView) itemView.findViewById(R.id.chanceText);
-            stormTimeLabel = (TextView) itemView.findViewById(R.id.timeText);
+            stormChanceLabel = (TextView) itemView.findViewById(R.id.stormChanceText);
+            stormTimeLabel = (TextView) itemView.findViewById(R.id.stormTimeText);
             rect = (ImageView) itemView.findViewById(R.id.colorRectangle);
-            rainChanceLabel = (TextView) itemView.findViewById(R.id.rainChance);
-            rainTimeLabel = (TextView) itemView.findViewById(R.id.rainTime);
+            rainChanceLabel = (TextView) itemView.findViewById(R.id.rainChanceText);
+            rainTimeLabel = (TextView) itemView.findViewById(R.id.rainTimeText);
         }
 
         public void bind(int id, String city, int stormChance, int rainChance, int stormTime, int rainTime,

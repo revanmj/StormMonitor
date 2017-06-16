@@ -62,7 +62,7 @@
                 android:value="pl.revanmj.stormmonitor.MainActivity" />
         </activity>
         <activity
-            android:name=".DetailsActivity"
+            android:name=".WebViewActivity"
             android:label="@string/title_activity_details">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

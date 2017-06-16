@@ -108,7 +108,7 @@ public class MapActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.map, menu);
+        getMenuInflater().inflate(R.menu.menu_map, menu);
 
         SharedPreferences settings = getPreferences(0);
         map_mode = settings.getInt("map_mode", 1);
