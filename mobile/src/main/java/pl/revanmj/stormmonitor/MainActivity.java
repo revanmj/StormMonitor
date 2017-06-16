@@ -3,6 +3,7 @@ package pl.revanmj.stormmonitor;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -34,7 +35,6 @@ import pl.revanmj.stormmonitor.logic.Utils;
 import pl.revanmj.stormmonitor.logic.SwipeToDelTouchCallback;
 import pl.revanmj.stormmonitor.model.StormData;
 
-import com.google.firebase.analytics.FirebaseAnalytics;
 import com.winsontan520.wversionmanager.library.WVersionManager;
 
 import io.fabric.sdk.android.Fabric;
@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private static final String updateApkUrl = "https://github.com/revanmj/StormMonitor/raw/master/StormMonitor.apk";
     private static final String updateChangelogUrl = "https://github.com/revanmj/StormMonitor/raw/master/updates.json";
 
-    // URL for opening a map in WebView
+    // URL for opening a menu_map in WebView
     private static final String serviceUrl = "http://antistorm.eu/";
 
     private static final String KEY_LAST_UPDATE = "lastUpdate";
@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private CustomTabsClient mClient;
     private CustomTabsSession mCustomTabsSession;
+    private CustomTabsServiceConnection mCustomTabsServiceConnection;
     private String chromePackageName = null;
 
     @Override
@@ -67,8 +68,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         super.onCreate(savedInstanceState);
         Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_main);
-
-        FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         mySwipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swiperefresh);
@@ -110,10 +109,44 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         versionManager.setReminderTimer(1440); // this mean checkVersion() will not take effect within 10 minutes
         versionManager.checkVersion();
 
+        // Check if chrome is available
         chromePackageName = Utils.chromeChannel(this);
 
+        // Setting up FAB
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_map);
+        fab.show();
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (chromePackageName != null) {
+                    CustomTabsIntent customTabsIntent = new CustomTabsIntent.Builder(mCustomTabsSession)
+                            .setToolbarColor(ContextCompat.getColor(MainActivity.this, R.color.md_blue_500))
+                            .setCloseButtonIcon(BitmapFactory.decodeResource(getResources(), android.R.drawable.arrow_up_float))
+                            .setShowTitle(true)
+                            .build();
+                    customTabsIntent.launchUrl(MainActivity.this, Uri.parse(serviceUrl + "m/"));
+                } else {
+                    Intent browserIntent = new Intent(MainActivity.this, WebViewActivity.class);
+                    browserIntent.putExtra("url", serviceUrl + "m/");
+                    browserIntent.putExtra("title", "menu_map");
+                    startActivity(browserIntent);
+                }
+            }
+        });
+
+        // If more there was more than 15 minutes since last update, refresh data
+        if (System.currentTimeMillis() - getPreferences(0).getLong(KEY_LAST_UPDATE, 0) > 900000) {
+            refreshData(false);
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // Warmup Chrome Custom Tabs client
         if (chromePackageName != null) {
-            CustomTabsServiceConnection mCustomTabsServiceConnection = new CustomTabsServiceConnection() {
+            mCustomTabsServiceConnection = new CustomTabsServiceConnection() {
                 @Override
                 public void onCustomTabsServiceConnected(ComponentName componentName, CustomTabsClient customTabsClient) {
                     //Pre-warming
@@ -128,44 +161,45 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 @Override
                 public void onServiceDisconnected(ComponentName name) {
                     mClient = null;
+                    mCustomTabsSession = null;
+                    mCustomTabsServiceConnection = null;
                 }
             };
-
             CustomTabsClient.bindCustomTabsService(MainActivity.this, chromePackageName, mCustomTabsServiceConnection);
-        }
-
-        // Setting up FAB
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_map);
-        fab.show();
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (chromePackageName != null) {
-                    CustomTabsIntent customTabsIntent = new CustomTabsIntent.Builder(mCustomTabsSession)
-                            .setToolbarColor(ContextCompat.getColor(MainActivity.this, R.color.md_blue_500))
-                            .setShowTitle(true)
-                            .build();
-                    customTabsIntent.launchUrl(MainActivity.this, Uri.parse(serviceUrl + "m/"));
-                } else {
-                    Intent browserIntent = new Intent(MainActivity.this, DetailsActivity.class);
-                    browserIntent.putExtra("url", serviceUrl + "m/");
-                    browserIntent.putExtra("title", "map");
-                    startActivity(browserIntent);
-                }
-            }
-        });
-
-        // If more there was more than 15 minutes since last update, refresh data
-        if (System.currentTimeMillis() - getPreferences(0).getLong(KEY_LAST_UPDATE, 0) > 900000) {
-            refreshData(false);
         }
     }
 
     @Override
+    public void onStop() {
+        super.onStop();
+        this.unbindService(mCustomTabsServiceConnection);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
+        getMenuInflater().inflate(R.menu.menu_main, menu);
 
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_add:
+                Intent search_a = new Intent(MainActivity.this, SearchActivity.class);
+                MainActivity.this.startActivity(search_a);
+                refreshData(false);
+                return true;
+            case R.id.action_refresh:
+                refreshData(false);
+                return true;
+            case R.id.action_settings:
+                Intent preferencesIntent = new Intent(MainActivity.this, PreferencesActivity.class);
+                startActivity(preferencesIntent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -232,29 +266,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         @Override
         protected void onPreExecute(){
             super.onPreExecute();
-        }
-    }
-
-    /**
-     * Method supporting ActionBar's menu
-     */
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_add:
-                Intent search_a = new Intent(MainActivity.this, SearchActivity.class);
-                MainActivity.this.startActivity(search_a);
-                refreshData(false);
-                return true;
-            case R.id.action_refresh:
-                refreshData(false);
-                return true;
-            case R.id.action_settings:
-                Intent preferencesIntent = new Intent(MainActivity.this, PreferencesActivity.class);
-                startActivity(preferencesIntent);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
         }
     }
 

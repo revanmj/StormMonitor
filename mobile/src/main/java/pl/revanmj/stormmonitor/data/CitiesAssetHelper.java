@@ -51,12 +51,11 @@ public class CitiesAssetHelper extends SQLiteAssetHelper {
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
 
         String [] select = {CITY_ID, CITY_NAME};
-        String where = CITY_NAME + " LIKE '%" + city_name +"%'";
+        String where = null;
+        if (city_name != null && !city_name.isEmpty())
+            where = CITY_NAME + " LIKE '%" + city_name +"%'";
 
         qb.setTables(CITIES_TABLE);
-        Cursor c = qb.query(db, select, where, null,
-                null, null, null);
-        return c;
-
+        return qb.query(db, select, where, null, null, null, null);
     }
 }
