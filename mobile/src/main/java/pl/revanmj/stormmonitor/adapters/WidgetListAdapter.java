@@ -50,17 +50,21 @@ public class WidgetListAdapter implements RemoteViewsService.RemoteViewsFactory 
                 context.getPackageName(), R.layout.cities_widget_row);
         StormData listItem = cities.get(position);
 
-        int t = listItem.getStormTime();
-        int t_r = listItem.getRainTime();
-        int ch = listItem.getStormChance();
-        int ch_r = listItem.getRainChance();
+        int stormTime = listItem.getStormTime();
+        int stormChance = listItem.getStormChance();
+        int stormAlert = listItem.getStormAlert();
+
+        int rainTime = listItem.getRainTime();
+        int rainChance = listItem.getRainChance();
+        int rainAlert = listItem.getRainAlert();
 
         remoteView.setTextViewText(R.id.widget_cityText, listItem.getCityName());
-        remoteView.setTextViewText(R.id.widget_chanceText, Integer.toString(ch));
-        remoteView.setTextViewText(R.id.widget_rainChance, Integer.toString(ch_r));
-        remoteView.setTextViewText(R.id.widget_timeText, Utils.getTimeString(t, listItem.getStormAlert()));
-        remoteView.setTextViewText(R.id.widget_rainTime, Utils.getTimeString(t_r, listItem.getRainAlert()));
-        remoteView.setImageViewResource(R.id.widget_colorRectangle, Utils.getRectColor(t, ch, t_r, ch_r));
+        remoteView.setTextViewText(R.id.widget_chanceText, Integer.toString(stormChance));
+        remoteView.setTextViewText(R.id.widget_rainChance, Integer.toString(rainChance));
+        remoteView.setTextViewText(R.id.widget_timeText, Utils.getTimeString(stormTime, stormAlert));
+        remoteView.setTextViewText(R.id.widget_rainTime, Utils.getTimeString(rainTime, rainAlert));
+        remoteView.setImageViewResource(R.id.widget_colorRectangle,
+                Utils.getRectColor(stormTime, stormChance, rainTime, rainChance));
 
         return remoteView;
     }

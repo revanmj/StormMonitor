@@ -35,8 +35,7 @@ public class Utils {
     private static String BASE_URL = "http://antistorm.eu/webservice.php?id=";
 
     static public List<StormData> getAllData(Context context){
-        String[] projection = {StormDataProvider.KEY_ID, StormDataProvider.KEY_CITYNAME, StormDataProvider.KEY_STORMCHANCE, StormDataProvider.KEY_STORMTIME, StormDataProvider.KEY_RAINCHANCE, StormDataProvider.KEY_RAINTIME};
-        Cursor c = context.getContentResolver().query(StormDataProvider.CONTENT_URI, projection, null, null, null);
+        Cursor c = context.getContentResolver().query(StormDataProvider.CONTENT_URI, null, null, null, null);
 
         if (c != null) {
             List<StormData> cities = new ArrayList<>();
@@ -46,12 +45,13 @@ public class Utils {
                 tmp.setCityName(c.getString(StormDataProvider.CITYNAME));
                 tmp.setStormChance(c.getInt(StormDataProvider.STORMCHANCE));
                 tmp.setStormTime(c.getInt(StormDataProvider.STORMTIME));
-                //tmp.setStormAlert(c.getInt(StormDataProvider.STORMALERT));
+                tmp.setStormAlert(c.getInt(StormDataProvider.STORMALERT));
                 tmp.setRainChance(c.getInt(StormDataProvider.RAINCHANCE));
                 tmp.setRainTime(c.getInt(StormDataProvider.RAINTIME));
-                //tmp.setRainAlert(c.getInt(StormDataProvider.RAINALERT));
+                tmp.setRainAlert(c.getInt(StormDataProvider.RAINALERT));
                 cities.add(tmp);
             }
+            c.close();
             return cities;
         }
 
