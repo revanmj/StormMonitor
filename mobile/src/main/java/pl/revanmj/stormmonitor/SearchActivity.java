@@ -17,25 +17,18 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.ContentViewEvent;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 
 import pl.revanmj.stormmonitor.adapters.SearchAdapter;
@@ -54,20 +47,20 @@ import java.util.Locale;
  */
 
 public class SearchActivity extends AppCompatActivity {
-
+    private static final String LOG_TAG = SearchActivity.class.getSimpleName();
     private static final String PERMISSION_COARSE_LOCATION = "android.permission.ACCESS_COARSE_LOCATION";
     private ListView resultsListView;
+    private EditText searchField;
     private SearchAdapter searchAdapter;
     private List<StormData> cities;
     private ProgressDialog locationLoading;
-    private GoogleApiClient googleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -88,19 +81,16 @@ public class SearchActivity extends AppCompatActivity {
         // Prepare ListView
         List<StormData> results = new ArrayList<>();
         searchAdapter = new SearchAdapter(results, this);
-        resultsListView = (ListView)findViewById(R.id.list_search);
+        resultsListView = findViewById(R.id.list_search);
         resultsListView.setAdapter(searchAdapter);
-        EditText searchField = (EditText) findViewById(R.id.search_text);
+        searchField = findViewById(R.id.search_text);
 
         // Add listener for Search key presses on virtual keyboard
-        searchField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                doSearch(textView.getText().toString());
-                final InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.toggleSoftInput(InputMethodManager.RESULT_UNCHANGED_HIDDEN, 0);
-                return true;
-            }
+        searchField.setOnEditorActionListener((textView, i, keyEvent) -> {
+            doSearch(textView.getText().toString());
+            final InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.toggleSoftInput(InputMethodManager.RESULT_UNCHANGED_HIDDEN, 0);
+            return true;
         });
         searchField.addTextChangedListener(new TextWatcher() {
             @Override
@@ -115,6 +105,38 @@ public class SearchActivity extends AppCompatActivity {
             public void afterTextChanged(Editable editable) {}
         });
         doSearch("");
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_search, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_add_gps:
+                checkForPermission();
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case 1:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    addCityByLocation();
+                } else {
+                    Toast.makeText(this, R.string.error_location_denied, Toast.LENGTH_SHORT)
+                            .show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 
     /**
@@ -135,44 +157,12 @@ public class SearchActivity extends AppCompatActivity {
         addCityByLocation();
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        switch (requestCode) {
-            case 1:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    addCityByLocation();
-                } else {
-                    Toast.makeText(this, R.string.error_location_denied, Toast.LENGTH_SHORT)
-                            .show();
-                }
-                break;
-            default:
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_search, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_add_gps:
-                checkForPermission();
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
     /**
      * Main method for searching the database
      */
     public void doSearch(String query) {
         // Remove polish letters
-        if (query.toLowerCase().startsWith("ą") || query.toLowerCase().startsWith("ć")  ||
+        if (query.toLowerCase().startsWith("ą") || query.toLowerCase().startsWith("ć") ||
                 query.toLowerCase().startsWith("ę") || query.toLowerCase().startsWith("ł") ||
                 query.toLowerCase().startsWith("ń") || query.toLowerCase().startsWith("ó") ||
                 query.toLowerCase().startsWith("ś") || query.toLowerCase().startsWith("ż") ||
@@ -205,30 +195,28 @@ public class SearchActivity extends AppCompatActivity {
             searchAdapter.addAll(results);
             searchAdapter.notifyDataSetChanged();
 
-            resultsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    // Add clicked city to the database
-                    StormData tmp = cities_db.getCity(results.get(position).getCityName());
-                    if (tmp != null) {
-                        if (!cityExists(tmp.getCityId())) {
-                            ContentValues cv = new ContentValues();
-                            cv.put(StormDataProvider.KEY_ID, tmp.getCityId());
-                            cv.put(StormDataProvider.KEY_CITYNAME, tmp.getCityName());
-                            getContentResolver().insert(StormDataProvider.CONTENT_URI, cv);
+            resultsListView.setOnItemClickListener((parent, view, position, id) -> {
+                // Add clicked city to the database
+                StormData tmp = cities_db.getCity(results.get(position).getCityName());
+                if (tmp != null) {
+                    if (!cityExists(tmp.getCityId())) {
+                        ContentValues cv = new ContentValues();
+                        cv.put(StormDataProvider.KEY_ID, tmp.getCityId());
+                        cv.put(StormDataProvider.KEY_CITYNAME, tmp.getCityName());
+                        getContentResolver().insert(StormDataProvider.CONTENT_URI, cv);
 
-                            Answers.getInstance().logContentView(new ContentViewEvent()
-                                    .putContentName("AddView")
-                                    .putContentType("Actions")
-                                    .putContentId("addedCityFromList"));
+                        Answers.getInstance().logContentView(new ContentViewEvent()
+                                .putContentName("AddView")
+                                .putContentType("Actions")
+                                .putContentId("addedCityFromList"));
 
-                            finish();
-                        } else {
-                            Toast.makeText(SearchActivity.this, R.string.message_city_exists, Toast.LENGTH_SHORT).show();
-                        }
+                        setResult(RESULT_OK);
+                        finish();
                     } else {
-                        Toast.makeText(SearchActivity.this, R.string.message_no_such_city, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(SearchActivity.this, R.string.message_city_exists, Toast.LENGTH_SHORT).show();
                     }
+                } else {
+                    Toast.makeText(SearchActivity.this, R.string.message_no_such_city, Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -239,23 +227,45 @@ public class SearchActivity extends AppCompatActivity {
      */
     private void addCityByLocation() {
         try {
-            locationLoading = ProgressDialog.show(SearchActivity.this, null,
-                    "Trwa ustalanie lokalizacji ...", true, false);
-            GoogleApiConnectionCallbacks connectionCallbacks = new GoogleApiConnectionCallbacks();
-            googleApiClient = new GoogleApiClient.Builder(SearchActivity.this)
-                    .addApi(LocationServices.API)
-                    .addConnectionCallbacks(connectionCallbacks)
-                    .addOnConnectionFailedListener(connectionCallbacks)
-                    .build();
-            googleApiClient.connect();
+            FusedLocationProviderClient client = LocationServices.getFusedLocationProviderClient(this);
+            locationLoading = new ProgressDialog(this);
+            // Get the last known location
+            client.getLastLocation()
+                    .addOnCompleteListener(this, task -> {
+                        Log.d(LOG_TAG, "MapMyLocationCallback - onLocationAquired");
+                        Location location = task.getResult();
+                        if (location != null) {
+                            try {
+                                double latitude = location.getLatitude();
+                                double longitude = location.getLongitude();
+                                Geocoder geocoder = new Geocoder(SearchActivity.this, Locale.getDefault());
+                                Address tmp = geocoder.getFromLocation(latitude, longitude, 1).get(0);
+
+                                String result = tmp.getLocality();
+                                if (result != null && !result.isEmpty())
+                                    addCityByName(result);
+                                else
+                                    Toast.makeText(SearchActivity.this, R.string.no_location, Toast.LENGTH_SHORT).show();
+                            } catch (IOException e) {
+                                Toast.makeText(SearchActivity.this, R.string.no_permission, Toast.LENGTH_SHORT).show();
+                            }
+                        } else
+                            Toast.makeText(SearchActivity.this, R.string.no_location, Toast.LENGTH_SHORT).show();
+
+                        locationLoading.dismiss();
+                    })
+                    .addOnFailureListener(this, task -> {
+                        locationLoading.dismiss();
+                        Log.d(LOG_TAG, "getLastLocation failed");
+                    });
         } catch (SecurityException e) {}
     }
 
     /**
-     * Method for adding a city from GPS data
+     * Method for adding a city with name found from GPS data
      * @param data string that contains city name returned by Google Play services API
      */
-    private void addLocationCity(String data) {
+    private void addCityByName(String data) {
         CitiesAssetHelper cities_db = new CitiesAssetHelper(this);
         StormData tmp = cities_db.getCity(data);
         cities_db.close();
@@ -291,58 +301,4 @@ public class SearchActivity extends AppCompatActivity {
                 return true;
         return false;
     }
-
-    /**
-     * Class for getting location data that's used for automatically adding city you're in now.
-     * It returns a String with city's name returned by Google Play services API
-     */
-    class GoogleApiConnectionCallbacks implements
-            GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-            LocationListener {
-
-        @Override
-        public void onConnected(Bundle connectionHint) {
-            Location location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-
-            if (location != null) {
-                onLocationChanged(location);
-            } else {
-                Log.d("SearchActivity", "location is null!");
-                LocationRequest request = new LocationRequest();
-                request.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-                LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, request, this);
-            }
-        }
-
-        @Override
-        public void onConnectionSuspended(int cause) {
-            //your code goes here
-        }
-
-        @Override
-        public void onLocationChanged(Location location) {
-            try {
-                double latitude = location.getLatitude();
-                double longitude = location.getLongitude();
-                Geocoder geocoder = new Geocoder(SearchActivity.this, Locale.getDefault());
-                Address tmp = geocoder.getFromLocation(latitude, longitude, 1).get(0);
-
-                String result = tmp.getLocality();
-                if (result != null && !result.isEmpty())
-                    addLocationCity(result);
-                else
-                    Toast.makeText(SearchActivity.this, R.string.no_location, Toast.LENGTH_SHORT).show();
-            } catch (IOException e) {
-                Toast.makeText(SearchActivity.this, R.string.no_permission, Toast.LENGTH_SHORT).show();
-            }
-            locationLoading.dismiss();
-            googleApiClient.disconnect();
-        }
-
-        @Override
-        public void onConnectionFailed(ConnectionResult connectionResult) {
-
-        }
-    }
-
 }

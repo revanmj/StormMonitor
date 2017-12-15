@@ -4,17 +4,13 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Bitmap;
+import android.net.Uri;
+import android.support.annotation.WorkerThread;
 import android.util.Log;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.Gson;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -23,6 +19,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
+import pl.revanmj.stormmonitor.BuildConfig;
 import pl.revanmj.stormmonitor.R;
 import pl.revanmj.stormmonitor.data.StormDataProvider;
 import pl.revanmj.stormmonitor.model.StormData;
@@ -32,7 +29,15 @@ import pl.revanmj.stormmonitor.model.StormData;
  */
 
 public class Utils {
-    private static String BASE_URL = "http://antistorm.eu/webservice.php?id=";
+    private static final String LOG_TAG = Utils.class.getSimpleName();
+
+    public static final String APP_VERSION = BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE + ")";
+
+    private final static String BASE_URL = "http://antistorm.eu/webservice.php?id=";
+
+    public final static String STORM_FILENAME = "finalStormMap.jpg";
+    public final static String RAIN_FILENAME = "finalRainMap.jpg";
+
 
     static public List<StormData> getAllData(Context context){
         Cursor c = context.getContentResolver().query(StormDataProvider.CONTENT_URI, null, null, null, null);
@@ -41,14 +46,14 @@ public class Utils {
             List<StormData> cities = new ArrayList<>();
             while (c.moveToNext()) {
                 StormData tmp = new StormData();
-                tmp.setCityId(c.getInt(StormDataProvider.CITYID));
-                tmp.setCityName(c.getString(StormDataProvider.CITYNAME));
-                tmp.setStormChance(c.getInt(StormDataProvider.STORMCHANCE));
-                tmp.setStormTime(c.getInt(StormDataProvider.STORMTIME));
-                tmp.setStormAlert(c.getInt(StormDataProvider.STORMALERT));
-                tmp.setRainChance(c.getInt(StormDataProvider.RAINCHANCE));
-                tmp.setRainTime(c.getInt(StormDataProvider.RAINTIME));
-                tmp.setRainAlert(c.getInt(StormDataProvider.RAINALERT));
+                tmp.setCityId(c.getInt(c.getColumnIndex(StormDataProvider.KEY_ID)));
+                tmp.setCityName(c.getString(c.getColumnIndex(StormDataProvider.KEY_CITYNAME)));
+                tmp.setStormChance(c.getInt(c.getColumnIndex(StormDataProvider.KEY_STORMCHANCE)));
+                tmp.setStormTime(c.getInt(c.getColumnIndex(StormDataProvider.KEY_STORMTIME)));
+                tmp.setStormAlert(c.getInt(c.getColumnIndex(StormDataProvider.KEY_STORMALERT)));
+                tmp.setRainChance(c.getInt(c.getColumnIndex(StormDataProvider.KEY_RAINCHANCE)));
+                tmp.setRainTime(c.getInt(c.getColumnIndex(StormDataProvider.KEY_RAINTIME)));
+                tmp.setRainAlert(c.getInt(c.getColumnIndex(StormDataProvider.KEY_RAINALERT)));
                 cities.add(tmp);
             }
             c.close();
@@ -58,6 +63,7 @@ public class Utils {
         return new ArrayList<>();
     }
 
+    @WorkerThread
     public static HttpResult makeHttpGetRequest(String url_s) throws IOException {
         URL url = new URL(url_s);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -70,7 +76,7 @@ public class Utils {
             return new HttpResult(responseCode, null);
 
         BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), "utf-8"));
-        Log.d("makeHttpRequest", "GET: url[" + url_s + "], responseCode[" + responseCode + "]");
+        Log.d(LOG_TAG, "GET: url[" + url_s + "], responseCode[" + responseCode + "]");
 
         StringBuilder result = new StringBuilder("");
         String line = "";
@@ -102,36 +108,21 @@ public class Utils {
         public int getResponseCode() {
             return responseCode;
         }
-
-        public JsonObject getAsJsonObject() {
-            JsonElement element = new JsonParser().parse(result);
-            if (result != null && element.isJsonObject())
-                return element.getAsJsonObject();
-            else
-                return null;
-        }
-
     }
 
+    @WorkerThread
     static public int getStormData(List<StormData> list, Context context) {
         List<StormData> resultList = new ArrayList<>();
         int resultCode = -1;
         for (StormData city : list) {
             try {
                 HttpResult result = makeHttpGetRequest(BASE_URL + city.getCityId());
-                if (result.getResult() != null) {
-                    JsonObject json = result.getAsJsonObject();
+                String json = result.getResult();
 
-                    // Setting city database id
-                    StormData data = new StormData();
+                if (json != null) {
+                    Gson gson = new Gson();
+                    StormData data = gson.fromJson(json, StormData.class);
                     data.setCityId(city.getCityId());
-                    data.setCityName(json.get("m").getAsString());
-                    data.setStormChance(json.get("p_b").getAsInt());
-                    data.setStormTime(json.get("t_b").getAsInt());
-                    data.setStormAlert(json.get("a_b").getAsInt());
-                    data.setRainChance(json.get("p_o").getAsInt());
-                    data.setRainTime(json.get("t_o").getAsInt());
-                    data.setRainAlert(json.get("a_o").getAsInt());
 
                     // Adding result to a list
                     resultList.add(data);
@@ -157,11 +148,10 @@ public class Utils {
                 cv.put(StormDataProvider.KEY_RAINCHANCE, city.getRainChance());
                 cv.put(StormDataProvider.KEY_RAINTIME, city.getRainTime());
                 cv.put(StormDataProvider.KEY_RAINALERT, city.getRainAlert());
-                String selection = StormDataProvider.KEY_ID + " = ?";
-                String[] selArgs = {Integer.toString(city.getCityId())};
-                context.getContentResolver().update(StormDataProvider.CONTENT_URI, cv, selection, selArgs);
+                context.getContentResolver().update(Uri.withAppendedPath(StormDataProvider.CONTENT_URI, Integer.toString(city.getCityId())),
+                        cv, null, null);
             }
-            Log.d("getStormData", "result: " + resultList);
+            Log.d(LOG_TAG, "result: " + resultList);
             return 1;
         }
 

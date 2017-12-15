@@ -70,3 +70,4 @@ proguard/
 gen-external-apklibs
 /app/google-services.json
 /firebase_key.json
+/.project

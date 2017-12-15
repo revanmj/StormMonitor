@@ -3,18 +3,15 @@ package pl.revanmj.stormmonitor;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.customtabs.CustomTabsClient;
-import android.support.customtabs.CustomTabsIntent;
 import android.support.customtabs.CustomTabsServiceConnection;
 import android.support.customtabs.CustomTabsSession;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.ContextCompat;
+import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -25,27 +22,22 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.crashlytics.android.Crashlytics;
+import com.winsontan520.wversionmanager.library.WVersionManager;
 
 import pl.revanmj.stormmonitor.adapters.MainRecyclerViewAdapter;
 import pl.revanmj.stormmonitor.data.StormDataProvider;
 import pl.revanmj.stormmonitor.logic.Utils;
 import pl.revanmj.stormmonitor.logic.SwipeToDelTouchCallback;
-import pl.revanmj.stormmonitor.model.StormData;
-
-import com.winsontan520.wversionmanager.library.WVersionManager;
 
 import io.fabric.sdk.android.Fabric;
-
-import java.util.List;
 
 /**
  * Created by revanmj on 14.07.2013.
  */
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class MainActivity extends AppCompatActivity {
     // Data for updater from WVersionManager library
     private static final String updateApkUrl = "https://github.com/revanmj/StormMonitor/raw/master/StormMonitor.apk";
     private static final String updateChangelogUrl = "https://github.com/revanmj/StormMonitor/raw/master/updates.json";
@@ -55,8 +47,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private static final String KEY_LAST_UPDATE = "lastUpdate";
 
+    private static final int LOADER_STORM_PROVIDER = 1;
+    private static final int LOADER_STORM_WEBSERVICE = 2;
+
     private MainRecyclerViewAdapter rcAdapter;
     private SwipeRefreshLayout mySwipeRefreshLayout;
+    private StormCursorLoader mStormCursorLoader = new StormCursorLoader();
+    private StormWebLoader mStormWebLoader = new StormWebLoader();
 
     private CustomTabsClient mClient;
     private CustomTabsSession mCustomTabsSession;
@@ -69,17 +66,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_main);
 
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        mySwipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swiperefresh);
+        RecyclerView recyclerView = findViewById(R.id.recyclerView);
+        mySwipeRefreshLayout = findViewById(R.id.swiperefresh);
 
         mySwipeRefreshLayout.setOnRefreshListener(
-                new SwipeRefreshLayout.OnRefreshListener() {
-                    @Override
-                    public void onRefresh() {
-                        // This method performs the actual data-refresh operation.
-                        // The method calls setRefreshing(false) when it's finished.
-                        refreshData(true);
-                    }
+                () -> {
+                    // This method performs the actual data-refresh operation.
+                    // The method calls setRefreshing(false) when it's finished.
+                    refreshData(true);
                 }
         );
         mySwipeRefreshLayout.setColorSchemeResources(R.color.md_blue_500);
@@ -96,7 +90,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(stdcallback);
         mItemTouchHelper.attachToRecyclerView(recyclerView);
 
-        getSupportLoaderManager().initLoader(1, null, this);
+        if (savedInstanceState == null) {
+            getSupportLoaderManager().initLoader(LOADER_STORM_PROVIDER, null, mStormCursorLoader);
+            getSupportLoaderManager().initLoader(LOADER_STORM_WEBSERVICE, null, mStormWebLoader);
+        }
 
         // Setting up updater form WVersionManager library
         WVersionManager versionManager = new WVersionManager(this);
@@ -113,31 +110,25 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         chromePackageName = Utils.chromeChannel(this);
 
         // Setting up FAB
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_map);
+        FloatingActionButton fab = findViewById(R.id.fab_map);
         fab.show();
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (chromePackageName != null) {
-                    CustomTabsIntent customTabsIntent = new CustomTabsIntent.Builder(mCustomTabsSession)
-                            .setToolbarColor(ContextCompat.getColor(MainActivity.this, R.color.md_blue_500))
-                            .setCloseButtonIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_action_arrow_back))
-                            .setShowTitle(true)
-                            .build();
-                    customTabsIntent.launchUrl(MainActivity.this, Uri.parse(serviceUrl + "m/"));
-                } else {
-                    Intent browserIntent = new Intent(MainActivity.this, WebViewActivity.class);
-                    browserIntent.putExtra("url", serviceUrl + "m/");
-                    browserIntent.putExtra("title", "menu_map");
-                    startActivity(browserIntent);
-                }
-            }
-        });
+        fab.setOnClickListener(view -> {
+            /*String chromePackageName = Utils.chromeChannel(this);
+            if (chromePackageName != null) {
+                CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+                builder.setToolbarColor(getResources().getColor(R.color.md_blue_500));
+                CustomTabsIntent customTabsIntent = builder.build();
+                customTabsIntent.launchUrl(this, chromePackageName, Uri.parse(serviceUrl + "/m/");
+            } else {
+                Intent webviewIntent = new Intent(MainActivity.this, WebViewActivity.class);
+                webviewIntent.putExtra("url", serviceUrl);
+                webviewIntent.putExtra("title", "map");
+                startActivity(webviewIntent);
+            }*/
 
-        // If more there was more than 15 minutes since last update, refresh data
-        if (System.currentTimeMillis() - getPreferences(0).getLong(KEY_LAST_UPDATE, 0) > 900000) {
-            refreshData(false);
-        }
+            Intent mapIntent = new Intent(MainActivity.this, MapActivity.class);
+            startActivity(mapIntent);
+        });
     }
 
     @Override
@@ -202,25 +193,20 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
     }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(this, StormDataProvider.CONTENT_URI, null, null, null, null);
-    }
+    /**
+     * Method for initating process of downloading data
+     */
+    public void refreshData(Boolean byGesture) {
+        if (!byGesture)
+            mySwipeRefreshLayout.setRefreshing(true);
 
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        rcAdapter.swapCursor(data);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        rcAdapter.swapCursor(null);
+        getSupportLoaderManager().restartLoader(LOADER_STORM_WEBSERVICE, null, mStormWebLoader);
     }
 
     /**
      * Method for updating database after downloading data and refreshing the ListVieww (if succesful)
      * or showing AlertDialog with an error if downloading failed.
-     * @param result
+     * @param result Integer value representing operation status (failed or success)
      */
     private void downloadFinished(Integer result)
     {
@@ -240,46 +226,48 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         getPreferences(0).edit().putLong(KEY_LAST_UPDATE, System.currentTimeMillis()).apply();
     }
 
-    /**
-     * AsyncTask responsible for downloading data and showing ProgressDialog while doing that
-     */
-    private class JSONStormTask extends AsyncTask<List<StormData>, Void, Integer> {
-
+    private class StormCursorLoader implements LoaderManager.LoaderCallbacks<Cursor> {
         @Override
-        protected Integer doInBackground(List<StormData>... params) {
-            int result = -1;
-
-            if (params[0] != null) {
-                // We list of the cities so download process can be started
-                result = Utils.getStormData(params[0], MainActivity.this);
-            }
-
-            return result;
+        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            return new CursorLoader(MainActivity.this,
+                    StormDataProvider.CONTENT_URI, null, null, null, null);
         }
 
         @Override
-        protected void onPostExecute(Integer result) {
-            downloadFinished(result);
-            super.onPostExecute(result);
+        public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+            rcAdapter.swapCursor(data);
         }
 
         @Override
-        protected void onPreExecute(){
-            super.onPreExecute();
+        public void onLoaderReset(Loader<Cursor> loader) {
+            rcAdapter.swapCursor(null);
         }
     }
 
-    /**
-     * Method for initating process of downloading data
-     */
-    public void refreshData(Boolean byGesture) {
-        if (!byGesture)
-            mySwipeRefreshLayout.setRefreshing(true);
+    private class StormWebLoader implements LoaderManager.LoaderCallbacks<Integer> {
+        @Override
+        public Loader<Integer> onCreateLoader(int id, Bundle args) {
+            return new AsyncTaskLoader<Integer>(MainActivity.this) {
+                @Override
+                public Integer loadInBackground() {
+                    return Utils.getStormData(Utils.getAllData(MainActivity.this), MainActivity.this);
+                }
 
-        List<StormData> cities = Utils.getAllData(this);
+                @Override
+                protected void onStartLoading() {
+                    forceLoad();
+                }
+            };
+        }
 
-        Log.d("StormMonitor", "Initating data downloading, city ids: " + cities);
-        JSONStormTask task = new JSONStormTask();
-        task.execute(cities);
+        @Override
+        public void onLoadFinished(Loader<Integer> loader, Integer data) {
+            downloadFinished(data);
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Integer> loader) {
+            rcAdapter.swapCursor(null);
+        }
     }
 }

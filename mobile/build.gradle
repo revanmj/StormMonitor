@@ -1,35 +1,22 @@
-buildscript {
-    repositories {
-        jcenter()
-        maven { url 'https://maven.fabric.io/public' }
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.2'
-        classpath 'io.fabric.tools:gradle:1.+'
-        classpath 'com.google.firebase:firebase-plugins:1.0.5'
-        classpath 'com.google.gms:google-services:3.0.0'
-    }
-}
-
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
 
 repositories {
-    jcenter()
+    mavenCentral()
     maven { url 'https://jitpack.io' }
     maven { url 'https://maven.fabric.io/public' }
     maven { url 'https://maven.google.com' }
 }
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.3"
+    compileSdkVersion 26
+    buildToolsVersion "26.0.2"
 
     defaultConfig {
         applicationId "pl.revanmj.stormmonitor"
         minSdkVersion 16
-        targetSdkVersion 25
-        versionCode 40
-        versionName "1.7.5"
+        targetSdkVersion 26
+        versionCode 41
+        versionName "1.7.4"
     }
 
 
@@ -42,6 +29,10 @@ android {
             minifyEnabled false
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
@@ -49,13 +40,14 @@ dependencies {
     compile 'it.sephiroth.android.library.imagezoom:imagezoom:+'
     compile 'com.github.delight-im:Android-AdvancedWebView:v3.0.0'
     compile 'com.readystatesoftware.sqliteasset:sqliteassethelper:+'
-    compile 'com.android.support:support-v4:25.3.1'
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.support:design:25.3.1'
-    compile 'com.android.support:customtabs:25.3.1'
-    compile 'com.google.android.gms:play-services-base:10.2.6'
-    compile 'com.google.android.gms:play-services-location:10.2.6'
-    compile 'com.google.firebase:firebase-core:10.2.6'
+    compile 'com.android.support.constraint:constraint-layout:1.0.+'
+    compile 'com.android.support:support-v4:26.+'
+    compile 'com.android.support:appcompat-v7:26.+'
+    compile 'com.android.support:design:26.+'
+    compile 'com.android.support:customtabs:26.+'
+    compile 'com.google.android.gms:play-services-base:11.6.2'
+    compile 'com.google.android.gms:play-services-location:11.6.2'
+    compile 'com.google.firebase:firebase-core:11.6.2'
     compile 'com.google.code.gson:gson:2.8.0'
     compile 'com.evernote:android-job:1.1.10'
     compile('com.crashlytics.sdk.android:crashlytics:2.6.8@aar') {
