@@ -8,11 +8,13 @@
     tools:context="pl.revanmj.stormmonitor.AddActivity"
     tools:deviceIds="wear">
 
-    <android.support.wearable.view.WearableRecyclerView
+
+    <android.support.wear.widget.WearableRecyclerView
         android:id="@+id/listView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="left"
         android:scrollbars="vertical" />
+
 
 </android.support.wearable.view.drawer.WearableDrawerLayout>

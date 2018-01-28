@@ -76,7 +76,7 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
         return super.getItemViewType(position);
     }
 
-    public Cursor getItem(int pos) {
+    private Cursor getItem(int pos) {
         if (this.mCursor != null && !this.mCursor.isClosed()) {
             this.mCursor.moveToPosition(pos);
         }
@@ -97,31 +97,28 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
         private TextView rainChanceLabel;
         private ImageView rect;
 
-        public StormDataViewHolder(View itemView) {
+        StormDataViewHolder(View itemView) {
             super(itemView);
 
-            city = (TextView) itemView.findViewById(R.id.cityText);
-            stormChanceLabel = (TextView) itemView.findViewById(R.id.chanceText);
-            stormTimeLabel = (TextView) itemView.findViewById(R.id.timeText);
-            rect = (ImageView) itemView.findViewById(R.id.colorRectangle);
-            rainChanceLabel = (TextView) itemView.findViewById(R.id.rainChance);
-            rainTimeLabel = (TextView) itemView.findViewById(R.id.rainTime);
+            city = itemView.findViewById(R.id.city_label);
+            stormChanceLabel = itemView.findViewById(R.id.chance_value_label);
+            stormTimeLabel = itemView.findViewById(R.id.time_value_label);
+            rect = itemView.findViewById(R.id.color_rectangle);
+            rainChanceLabel = itemView.findViewById(R.id.rchance_value_label);
+            rainTimeLabel = itemView.findViewById(R.id.rtime_value_label);
 
-            itemView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View view) {
-                    String selection = StormDataProvider.KEY_ID + " = ?";
-                    String[] selArgs = {Integer.toString(_id)};
-                    int count = mContext.getContentResolver().delete(StormDataProvider.CONTENT_URI, selection, selArgs);
-                    Log.d("MainRecyclerViewAdapter", "Deleted rows: " + count);
-                    Toast.makeText(mContext, "Deleted city", Toast.LENGTH_SHORT).show();
-                    return true;
-                }
+            itemView.setOnLongClickListener(view -> {
+                String selection = StormDataProvider.KEY_ID + " = ?";
+                String[] selArgs = {Integer.toString(_id)};
+                int count = mContext.getContentResolver().delete(StormDataProvider.CONTENT_URI, selection, selArgs);
+                Log.d("MainRecyclerViewAdapter", "Deleted rows: " + count);
+                Toast.makeText(mContext, "Deleted city", Toast.LENGTH_SHORT).show();
+                return true;
             });
         }
 
-        public void bind(int id, String city, int stormChance, int rainChance, int stormTime, int rainTime,
-                         int stormAlert, int rainAlert) {
+        void bind(int id, String city, int stormChance, int rainChance, int stormTime, int rainTime,
+                  int stormAlert, int rainAlert) {
             this._id = id;
             this.city.setText(city);
             this.stormChanceLabel.setText(Integer.toString(stormChance));
@@ -137,7 +134,7 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     public class EmptyViewHolder extends RecyclerView.ViewHolder {
-        public EmptyViewHolder(View itemView) {
+        EmptyViewHolder(View itemView) {
             super(itemView);
         }
     }

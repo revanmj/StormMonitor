@@ -1,5 +1,6 @@
 package pl.revanmj.stormmonitor;
 
+import android.content.AsyncTaskLoader;
 import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -9,28 +10,23 @@ import android.database.Cursor;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.LoaderManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.wear.widget.WearableLinearLayoutManager;
+import android.support.wear.widget.drawer.WearableActionDrawerView;
+import android.support.wear.widget.WearableRecyclerView;
 import android.support.wearable.activity.WearableActivity;
-import android.support.wearable.view.CurvedChildLayoutManager;
-import android.support.wearable.view.WearableRecyclerView;
-import android.support.wearable.view.drawer.WearableActionDrawer;
-import android.support.wearable.view.drawer.WearableDrawerLayout;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 
 import java.io.IOException;
@@ -41,60 +37,40 @@ import pl.revanmj.stormmonitor.data.CitiesAssetHelper;
 import pl.revanmj.stormmonitor.data.StormData;
 import pl.revanmj.stormmonitor.data.StormDataProvider;
 
-public class MainActivity extends WearableActivity
-        implements LoaderManager.LoaderCallbacks<Cursor>, WearableActionDrawer.OnMenuItemClickListener {
+public class MainActivity extends WearableActivity implements MenuItem.OnMenuItemClickListener {
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
     private static final String PERMISSION_COARSE_LOCATION = "android.permission.ACCESS_COARSE_LOCATION";
     private static final String KEY_LAST_UPDATE = "lastUpdate";
 
     private WearableRecyclerView recyclerView;
     private MainRecyclerViewAdapter rcAdapter;
-    private WearableDrawerLayout mContainerView;
-    private WearableActionDrawer actionDrawer;
     private ProgressBar loadingAnim;
-    private GoogleApiClient googleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mContainerView = (WearableDrawerLayout) findViewById(R.id.container);
-        recyclerView = (WearableRecyclerView) findViewById(R.id.recycler_launcher_view);
-        loadingAnim = (ProgressBar) findViewById(R.id.progressBar);
+        recyclerView = findViewById(R.id.recycler_launcher_view);
+        loadingAnim = findViewById(R.id.progressBar);
 
         rcAdapter = new MainRecyclerViewAdapter(this);
         recyclerView.setAdapter(rcAdapter);
-        recyclerView.setCenterEdgeItems(true);
-        CurvedChildLayoutManager mChildLayoutManager = new CurvedChildLayoutManager(this);
-        recyclerView.setLayoutManager(mChildLayoutManager);
+        recyclerView.setEdgeItemsCenteringEnabled(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        actionDrawer = (WearableActionDrawer) findViewById(R.id.bottom_action_drawer);
+        WearableActionDrawerView actionDrawer = findViewById(R.id.bottom_action_drawer);
         actionDrawer.setOnMenuItemClickListener(this);
-        mContainerView.peekDrawer(Gravity.BOTTOM);
+        actionDrawer.getController().peekDrawer();
 
-        getLoaderManager().initLoader(1, null, this);
+        getLoaderManager().initLoader(0, null, new StormCursorLoader());
 
         loadingAnim.setProgress(0);
 
         if (System.currentTimeMillis() - getPreferences(0).getLong(KEY_LAST_UPDATE, 0) > 900000) {
             refreshData();
         }
-    }
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(this, StormDataProvider.CONTENT_URI, null, null, null, null);
-    }
-
-    @Override
-    public void onLoadFinished(android.content.Loader<Cursor> loader, Cursor cursor) {
-        rcAdapter.swapCursor(cursor);
-    }
-
-    @Override
-    public void onLoaderReset(android.content.Loader<Cursor> loader) {
-        rcAdapter.swapCursor(null);
     }
 
     @Override
@@ -116,7 +92,8 @@ public class MainActivity extends WearableActivity
                 done = true;
                 break;
         }
-        mContainerView.closeDrawer(actionDrawer);
+        WearableActionDrawerView actionDrawer = findViewById(R.id.bottom_action_drawer);
+        actionDrawer.getController().closeDrawer();
         return done;
     }
 
@@ -139,7 +116,7 @@ public class MainActivity extends WearableActivity
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case 1:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -159,17 +136,43 @@ public class MainActivity extends WearableActivity
      */
     private void addCityByLocation() {
         try {
+            FusedLocationProviderClient client = LocationServices.getFusedLocationProviderClient(this);
             loadingAnim.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
+            // Get the last known location
+            client.getLastLocation()
+                    .addOnCompleteListener(this, task -> {
+                        Log.d(LOG_TAG, "MapMyLocationCallback - onLocationAquired");
+                        Location location = task.getResult();
+                        if (location != null) {
+                            try {
+                                double latitude = location.getLatitude();
+                                double longitude = location.getLongitude();
+                                Geocoder geocoder = new Geocoder(MainActivity.this, Locale.getDefault());
+                                Address tmp = geocoder.getFromLocation(latitude, longitude, 1).get(0);
 
-            GoogleApiConnectionCallbacks connectionCallbacks = new GoogleApiConnectionCallbacks();
-            googleApiClient = new GoogleApiClient.Builder(MainActivity.this)
-                    .addApi(LocationServices.API)
-                    .addConnectionCallbacks(connectionCallbacks)
-                    .addOnConnectionFailedListener(connectionCallbacks)
-                    .build();
-            googleApiClient.connect();
-        } catch (SecurityException e) {}
+                                String result = tmp.getLocality();
+                                if (result != null && !result.isEmpty())
+                                    addLocationCity(result);
+                                else
+                                    Toast.makeText(MainActivity.this, R.string.no_location, Toast.LENGTH_SHORT).show();
+                            } catch (IOException e) {
+                                Toast.makeText(MainActivity.this, R.string.no_permission, Toast.LENGTH_SHORT).show();
+                            }
+                        } else
+                            Toast.makeText(MainActivity.this, R.string.no_location, Toast.LENGTH_SHORT).show();
+
+                        loadingAnim.setVisibility(View.GONE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                    })
+                    .addOnFailureListener(this, task -> {
+                        loadingAnim.setVisibility(View.GONE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                        Log.d(LOG_TAG, "getLastLocation failed");
+                    });
+        } catch (SecurityException e) {
+            Log.e(LOG_TAG, e.getMessage());
+        }
     }
 
     /**
@@ -198,124 +201,83 @@ public class MainActivity extends WearableActivity
     }
 
     /**
-     * Method for updating database after downloading data and refreshing the ListVieww (if succesful)
-     * or showing AlertDialog with an error if downloading failed.
-     * @param result
-     */
-    private void downloadFinished(Integer result)
-    {
-        switch (result) {
-            case 1:
-                break;
-            case 2:
-                Toast.makeText(this, R.string.error_no_connection, Toast.LENGTH_LONG);
-                break;
-            default:
-                Toast.makeText(this, R.string.error_unknown, Toast.LENGTH_LONG);
-                Log.d("ConnError", result.toString());
-        }
-
-        loadingAnim.setVisibility(View.GONE);
-        recyclerView.setVisibility(View.VISIBLE);
-        recyclerView.setCenterEdgeItems(true);
-
-        getPreferences(0).edit().putLong(KEY_LAST_UPDATE, System.currentTimeMillis()).apply();
-    }
-
-    /**
      * Method for initating process of downloading data
      */
     public void refreshData() {
-        List<StormData> cities = Utils.getAllData(this);
+        Log.d("StormMonitor", "Initating data downloading...");
+        recyclerView.setVisibility(View.GONE);
+        loadingAnim.setVisibility(View.VISIBLE);
 
-        Log.d("StormMonitor", "Initating data downloading, city ids: " + cities);
-        JSONStormTask task = new JSONStormTask();
-        task.execute(cities);
+        getLoaderManager().initLoader(1, null, new StormWebLoader());
     }
 
-    /**
-     * AsyncTask responsible for downloading data and showing ProgressDialog while doing that
-     */
-    private class JSONStormTask extends AsyncTask<List<StormData>, Void, Integer> {
+    private class StormCursorLoader implements LoaderManager.LoaderCallbacks<Cursor> {
 
         @Override
-        protected Integer doInBackground(List<StormData>... params) {
-            int result = -1;
-
-            if (params[0] != null && !params[0].isEmpty()) {
-                // We list of the cities so download process can be started
-                result = Utils.getStormData(params[0], MainActivity.this);
-            }
-
-            return result;
+        public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+            return new CursorLoader(MainActivity.this,
+                    StormDataProvider.CONTENT_URI, null, null, null, null);
         }
 
         @Override
-        protected void onPostExecute(Integer result) {
-            downloadFinished(result);
-            super.onPostExecute(result);
+        public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+            rcAdapter.swapCursor(cursor);
         }
 
         @Override
-        protected void onPreExecute(){
-            recyclerView.setVisibility(View.GONE);
-            loadingAnim.setVisibility(View.VISIBLE);
-
-            super.onPreExecute();
+        public void onLoaderReset(Loader<Cursor> loader) {
+            rcAdapter.swapCursor(null);
         }
     }
 
-    /**
-     * Class for getting location data that's used for automatically adding city you're in now.
-     * It returns a String with city's name returned by Google Play services API
-     */
-    class GoogleApiConnectionCallbacks implements
-            GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-            LocationListener {
+    private class StormWebLoader implements LoaderManager.LoaderCallbacks<Integer> {
 
         @Override
-        public void onConnected(Bundle connectionHint) {
-            Location location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+        public Loader<Integer> onCreateLoader(int id, Bundle args) {
+            final List<StormData> cities = Utils.getAllData(MainActivity.this);
+            return new AsyncTaskLoader<Integer>(MainActivity.this) {
+                @Override
+                protected void onStartLoading() {
+                    forceLoad();
+                }
 
-            if (location != null) {
-                onLocationChanged(location);
-            } else {
-                Log.d("MainActivity", "location is null!");
-                LocationRequest request = new LocationRequest();
-                request.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-                LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, request, this);
-            }
+                @Override
+                public Integer loadInBackground() {
+                    Integer result = -1;
+
+                    if (cities != null && !cities.isEmpty()) {
+                        // We list of the cities so download process can be started
+                        result = Utils.getStormData(cities, MainActivity.this);
+                    }
+
+                    return result;
+                }
+            };
         }
 
         @Override
-        public void onConnectionSuspended(int cause) {
-            //your code goes here
-        }
-
-        @Override
-        public void onLocationChanged(Location location) {
-            try {
-                double latitude = location.getLatitude();
-                double longitude = location.getLongitude();
-                Geocoder geocoder = new Geocoder(MainActivity.this, Locale.getDefault());
-                Address tmp = geocoder.getFromLocation(latitude, longitude, 1).get(0);
-
-                String result = tmp.getLocality();
-                if (result != null && !result.isEmpty())
-                    addLocationCity(result);
-                else
-                    Toast.makeText(MainActivity.this, R.string.no_location, Toast.LENGTH_SHORT).show();
-            } catch (IOException e) {
-                Toast.makeText(MainActivity.this, R.string.no_permission, Toast.LENGTH_SHORT).show();
+        public void onLoadFinished(Loader<Integer> loader, Integer result) {
+            switch (result) {
+                case 1:
+                    break;
+                case 2:
+                    Toast.makeText(MainActivity.this, R.string.error_no_connection, Toast.LENGTH_LONG).show();
+                    break;
+                default:
+                    Toast.makeText(MainActivity.this, R.string.error_unknown, Toast.LENGTH_LONG).show();
+                    Log.d("ConnError", result.toString());
             }
+
             loadingAnim.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
-            recyclerView.setCenterEdgeItems(true);
-            googleApiClient.disconnect();
+            recyclerView.setEdgeItemsCenteringEnabled(true);
+
+            getPreferences(0).edit().putLong(KEY_LAST_UPDATE, System.currentTimeMillis()).apply();
+            MainActivity.this.getLoaderManager().destroyLoader(loader.getId());
         }
 
         @Override
-        public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        public void onLoaderReset(Loader<Integer> loader) {
 
         }
     }

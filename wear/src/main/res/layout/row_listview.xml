@@ -1,121 +1,137 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_gravity="center_vertical|left"
+    android:layout_gravity="center_vertical|center_horizontal"
     android:layout_alignParentStart="true"
-    android:layout_marginBottom="18dp"
-    android:layout_marginEnd="40dp"
+    android:layout_marginStart="8dp"
+    android:layout_marginEnd="8dp"
     android:clickable="true"
     android:gravity="center">
 
     <ImageView
-        android:id="@+id/colorRectangle"
+        android:id="@+id/color_rectangle"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_alignParentLeft="true"
-        android:layout_centerVertical="true"
-        android:layout_marginLeft="4dp"
-        android:layout_marginRight="4dp" />
+        android:layout_marginBottom="4dp"
+        android:layout_marginTop="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/cityText"
+        android:id="@+id/city_label"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/colorRectangle"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="4dp"
         android:text="Miasto"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@color/white"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@+id/color_rectangle"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textView2"
-        android:layout_width="90dp"
+        android:id="@+id/change_label"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/cityText"
+        android:layout_marginEnd="8dp"
         android:layout_marginTop="-2dp"
-        android:layout_toRightOf="@+id/colorRectangle"
         android:text="@string/label_storm_prob"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="@color/white" />
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toStartOf="@+id/chance_value_label"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/city_label"
+        app:layout_constraintTop_toBottomOf="@id/city_label" />
 
     <TextView
-        android:id="@+id/textView3"
-        android:layout_width="90dp"
+        android:id="@+id/time_label"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/textView2"
+        android:layout_marginEnd="8dp"
         android:layout_marginTop="-2dp"
-        android:layout_toRightOf="@+id/colorRectangle"
         android:text="@string/label_storm_time"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="@color/white"
-        android:visibility="visible" />
+        android:visibility="visible"
+        app:layout_constraintEnd_toStartOf="@+id/time_value_label"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/change_label"
+        app:layout_constraintTop_toBottomOf="@id/change_label" />
 
     <TextView
-        android:id="@+id/chanceText"
+        android:id="@+id/chance_value_label"
         android:layout_width="45dp"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/textView2"
-        android:layout_marginLeft="4dp"
-        android:layout_toRightOf="@+id/textView2"
         android:text="0 / 255"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="@color/white" />
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/city_label" />
 
     <TextView
-        android:id="@+id/timeText"
+        android:id="@+id/time_value_label"
         android:layout_width="45dp"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/chanceText"
-        android:layout_alignTop="@+id/textView3"
         android:text="0 min"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="@color/white"
-        android:visibility="visible" />
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/time_label" />
 
     <TextView
-        android:id="@+id/textView"
-        android:layout_width="90dp"
+        android:id="@+id/rchance_label"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView3"
-        android:layout_alignStart="@+id/textView3"
-        android:layout_below="@+id/textView3"
-        android:layout_marginTop="-2dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
         android:text="@string/label_rain_prob"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="@color/white" />
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toStartOf="@+id/rchance_value_label"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/time_label"
+        app:layout_constraintTop_toBottomOf="@+id/time_label" />
 
     <TextView
-        android:id="@+id/textView4"
-        android:layout_width="90dp"
+        android:id="@+id/rtime_label"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView"
-        android:layout_alignStart="@+id/textView"
-        android:layout_below="@+id/textView"
+        android:layout_marginBottom="4dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginTop="-2dp"
         android:text="@string/label_rain_time"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="@color/white" />
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/rtime_value_label"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/rchance_label"
+        app:layout_constraintTop_toBottomOf="@id/rchance_label" />
 
     <TextView
-        android:id="@+id/rainChance"
+        android:id="@+id/rchance_value_label"
         android:layout_width="45dp"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/textView"
-        android:layout_alignLeft="@+id/chanceText"
+        android:layout_marginTop="8dp"
         android:text="0 / 255"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="@color/white" />
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/time_label" />
 
     <TextView
-        android:id="@+id/rainTime"
+        android:id="@+id/rtime_value_label"
         android:layout_width="45dp"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/chanceText"
-        android:layout_alignStart="@+id/chanceText"
-        android:layout_alignTop="@+id/textView4"
         android:text="0 min"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="@color/white" />
-</RelativeLayout>
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/rtime_label" />
+</android.support.constraint.ConstraintLayout>

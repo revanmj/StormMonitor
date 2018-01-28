@@ -4,15 +4,13 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.wear.widget.WearableLinearLayoutManager;
+import android.support.wear.widget.WearableRecyclerView;
 import android.support.wearable.activity.WearableActivity;
-import android.support.wearable.view.CurvedChildLayoutManager;
-import android.support.wearable.view.WearableRecyclerView;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,11 +30,10 @@ public class AddActivity extends WearableActivity {
         setContentView(R.layout.activity_add);
 
         searchAdapter = new SearchAdapter(this);
-        WearableRecyclerView mListView = (WearableRecyclerView) findViewById(R.id.listView);
+        WearableRecyclerView mListView = findViewById(R.id.listView);
         mListView.setAdapter(searchAdapter);
-        mListView.setCenterEdgeItems(true);
-        CurvedChildLayoutManager mChildLayoutManager = new CurvedChildLayoutManager(this);
-        mListView.setLayoutManager(mChildLayoutManager);
+        mListView.setEdgeItemsCenteringEnabled(true);
+        mListView.setLayoutManager(new WearableLinearLayoutManager(this));
 
         loadData();
     }
@@ -79,7 +76,7 @@ public class AddActivity extends WearableActivity {
 
         @Override
         public void onBindViewHolder(WearableRecyclerView.ViewHolder holder, int position) {
-            TextView view = (TextView) holder.itemView.findViewById(R.id.text1);
+            TextView view = holder.itemView.findViewById(R.id.text1);
 
             view.setText(listItems.get(position).getCityName());
             view.setTag(listItems.get(position).getCityId());
@@ -106,18 +103,18 @@ public class AddActivity extends WearableActivity {
             return listItems.size();
         }
 
-        public void addAll(List<StormData> list) {
+        void addAll(List<StormData> list) {
             listItems.addAll(list);
         }
 
-        public void clear() {
+        void clear() {
             listItems.clear();
         }
     }
 
     class SearchViewHolder extends WearableRecyclerView.ViewHolder {
 
-        public SearchViewHolder(View itemView) {
+        SearchViewHolder(View itemView) {
             super(itemView);
         }
     }
