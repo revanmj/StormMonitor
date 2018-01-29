@@ -52,7 +52,6 @@ public class StormJob extends Job {
         int period = Integer.parseInt(settings.getString(SharedSettings.SYNC_PERIOD, "60"));
         Log.d("StormJob", "scheduled job with period: " + period);
         new JobRequest.Builder(StormJob.TAG)
-                .setPersisted(true)
                 .setPeriodic(TimeUnit.MINUTES.toMillis(period), TimeUnit.MINUTES.toMillis(5))
                 .setRequiredNetworkType(JobRequest.NetworkType.CONNECTED)
                 .setRequirementsEnforced(true)
@@ -64,7 +63,6 @@ public class StormJob extends Job {
     public static void scheduleJob(Integer period) {
         Log.d("StormJob", "scheduled job with period: " + period);
         new JobRequest.Builder(StormJob.TAG)
-                .setPersisted(true)
                 .setPeriodic(TimeUnit.MINUTES.toMillis(period), TimeUnit.MINUTES.toMillis(5))
                 .setRequiredNetworkType(JobRequest.NetworkType.CONNECTED)
                 .setRequirementsEnforced(true)
