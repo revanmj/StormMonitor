@@ -1,52 +1,65 @@
 package pl.revanmj.stormmonitor.model;
 
-import java.io.Serializable;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
 /**
  * Created by revanmj on 10.07.2013.
  */
 
-public class StormData implements Serializable {
+public class StormData {
     private int cityId;
+
+    @Expose
+    @SerializedName("m")
     private String cityName;
+
+    @Expose
+    @SerializedName("p_b")
     private int stormChance;
+
+    @Expose
+    @SerializedName("t_b")
     private int stormTime;
+
+    @Expose
+    @SerializedName("a_b")
     private int stormAlert;
+
+    @Expose
+    @SerializedName("p_o")
     private int rainChance;
+
+    @Expose
+    @SerializedName("t_o")
     private int rainTime;
+
+    @Expose
+    @SerializedName("a_o")
     private int rainAlert;
-    private boolean error;
+
+    public StormData(int cityId, String cityName, int stormChance, int stormTime, int stormAlert,
+                     int rainChance, int rainTime, int rainAlert) {
+        this.cityId = cityId;
+        this.cityName = cityName;
+        this.stormChance = stormChance;
+        this.stormTime = stormTime;
+        this.stormAlert = stormAlert;
+        this.rainChance = rainChance;
+        this.rainTime = rainTime;
+        this.rainAlert = rainAlert;
+    }
 
     public String getCityName() {
         return cityName;
-    }
-
-    public void setCityName(String cityName) {
-        this.cityName = cityName;
     }
 
     public int getStormChance() {
         return stormChance;
     }
 
-    public void setStormChance(int stormChance) {
-        this.stormChance = stormChance;
-    }
-
     public int getStormTime() {
         return stormTime;
-    }
-
-    public void setStormTime(int stormTime) {
-        this.stormTime = stormTime;
-    }
-
-    public boolean isError() {
-        return error;
-    }
-
-    public void setError(boolean error) {
-        this.error = error;
     }
 
     public int getCityId() {
@@ -61,37 +74,16 @@ public class StormData implements Serializable {
         return rainTime;
     }
 
-    public void setRainTime(int rainTime) {
-        this.rainTime = rainTime;
-    }
-
     public int getRainChance() {
         return rainChance;
-    }
-
-    public void setRainChance(int rainChance) {
-        this.rainChance = rainChance;
     }
 
     public int getRainAlert() {
         return rainAlert;
     }
 
-    public void setRainAlert(int rainAlert) {
-        this.rainAlert = rainAlert;
-    }
-
     public int getStormAlert() {
         return stormAlert;
-    }
-
-    public void setStormAlert(int stormAlert) {
-        this.stormAlert = stormAlert;
-    }
-
-    @Override
-    public String toString() {
-        return cityName + ": id[" + cityId + "] p_b[" + stormChance + "] t_b[" + stormTime + "] p_o[" + rainChance + "] t_o[" + rainTime + "]";
     }
 }
 

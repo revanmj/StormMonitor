@@ -10,11 +10,10 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.View;
 
 import pl.revanmj.stormmonitor.R;
-import pl.revanmj.stormmonitor.adapters.MainRecyclerViewAdapter;
+import pl.revanmj.stormmonitor.adapters.StormRcAdapter;
 import pl.revanmj.stormmonitor.data.StormDataProvider;
 
 /**
@@ -67,7 +66,7 @@ public class SwipeToDelTouchCallback extends ItemTouchHelper.Callback {
 
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
-        int id = ((MainRecyclerViewAdapter.StormDataViewHolder)viewHolder).getId();
+        int id = ((StormRcAdapter.StormDataViewHolder)viewHolder).getId();
 
         String selection = StormDataProvider.KEY_ID + " = ?";
         String[] selArgs = {Integer.toString(id)};

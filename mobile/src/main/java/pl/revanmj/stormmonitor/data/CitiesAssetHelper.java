@@ -6,6 +6,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
+
+import pl.revanmj.stormmonitor.logic.Utils;
 import pl.revanmj.stormmonitor.model.StormData;
 
 /**
@@ -15,9 +17,9 @@ import pl.revanmj.stormmonitor.model.StormData;
 public class CitiesAssetHelper extends SQLiteAssetHelper {
     private static final String DATABASE_NAME = "cities";
     private static final int DATABASE_VERSION = 2;
-    public static final String CITY_ID = "city_id";
-    public static final String CITY_NAME = "name";
-    public static final String CITIES_TABLE = "cities";
+    private static final String CITY_ID = "city_id";
+    private static final String CITY_NAME = "name";
+    private static final String CITIES_TABLE = "cities";
 
     public CitiesAssetHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -37,9 +39,7 @@ public class CitiesAssetHelper extends SQLiteAssetHelper {
 
         StormData city = null;
         if (c.moveToFirst()) {
-                city = new StormData();
-                city.setCityId(Integer.parseInt(c.getString(0)));
-                city.setCityName(c.getString(1));
+                city = Utils.getCityFromCursor(c);
         }
         return city;
 

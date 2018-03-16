@@ -1,6 +1,7 @@
 package pl.revanmj.stormmonitor.adapters;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,25 +19,26 @@ import java.util.List;
 
 public class SearchAdapter extends ArrayAdapter<StormData> {
 
-    private List<StormData> cityList;
-    private Context context;
+    private List<StormData> mCitiesList;
+    private Context mContext;
 
     public SearchAdapter(List<StormData> cityList, Context ctx) {
         super(ctx, R.layout.row_search, cityList);
-        this.cityList = cityList;
-        this.context = ctx;
+        this.mCitiesList = cityList;
+        this.mContext = ctx;
     }
 
+    @NonNull
     public View getView(int position, View convertView, ViewGroup parent) {
-        StormData d = cityList.get(position);
+        StormData data = mCitiesList.get(position);
         ViewHolder holder;
 
         if (convertView == null) {
-            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.row_search, parent, false);
 
             holder = new ViewHolder();
-            holder.city = (TextView) convertView.findViewById(R.id.city_search);
+            holder.city = convertView.findViewById(R.id.city_search);
 
             convertView.setTag(holder);
         } else {
@@ -44,14 +46,12 @@ public class SearchAdapter extends ArrayAdapter<StormData> {
         }
 
         TextView city = holder.city;
-
-        city.setText(d.getCityName());
+        city.setText(data.getCityName());
 
         return convertView;
     }
 
     private static class ViewHolder {
-        public TextView city;
-
+        TextView city;
     }
 }

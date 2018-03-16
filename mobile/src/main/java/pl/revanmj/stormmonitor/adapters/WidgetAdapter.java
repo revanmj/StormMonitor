@@ -1,6 +1,5 @@
 package pl.revanmj.stormmonitor.adapters;
 
-import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
@@ -11,27 +10,23 @@ import pl.revanmj.stormmonitor.R;
 import pl.revanmj.stormmonitor.logic.Utils;
 import pl.revanmj.stormmonitor.model.StormData;
 
-import java.text.DecimalFormat;
 import java.util.List;
 
 /**
  * Created by revanmj on 26.12.2013.
  */
 
-public class WidgetListAdapter implements RemoteViewsService.RemoteViewsFactory {
+public class WidgetAdapter implements RemoteViewsService.RemoteViewsFactory {
     private List<StormData> cities;
     private Context context = null;
-    private int appWidgetId;
 
-    public WidgetListAdapter(Context context, Intent intent) {
+    public WidgetAdapter(Context context, Intent intent) {
         this.context = context;
-        appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
-                AppWidgetManager.INVALID_APPWIDGET_ID);
         populateListItem();
     }
 
     private void populateListItem() {
-        cities = Utils.getAllData(context);
+        cities = Utils.loadCitiesFromDb(context);
     }
 
     @Override

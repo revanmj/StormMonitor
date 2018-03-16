@@ -1,5 +1,7 @@
 package pl.revanmj.stormmonitor.logic;
 
+import android.support.annotation.NonNull;
+
 import com.evernote.android.job.Job;
 import com.evernote.android.job.JobCreator;
 
@@ -10,7 +12,7 @@ import com.evernote.android.job.JobCreator;
 public class StormJobCreator implements JobCreator {
 
     @Override
-    public Job create(String tag) {
+    public Job create(@NonNull String tag) {
         switch (tag) {
             case StormJob.TAG:
                 return new StormJob();

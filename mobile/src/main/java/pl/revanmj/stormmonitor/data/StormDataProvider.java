@@ -12,11 +12,13 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import pl.revanmj.stormmonitor.logic.Utils;
 import pl.revanmj.stormmonitor.model.StormData;
 
 /**
@@ -24,18 +26,20 @@ import pl.revanmj.stormmonitor.model.StormData;
  */
 
 public class StormDataProvider extends ContentProvider {
-    public static final int CITYID = 0;
-    public static final int CITYNAME = 1;
-    public static final int STORMCHANCE = 2;
-    public static final int STORMTIME = 3;
-    public static final int RAINCHANCE = 4;
-    public static final int RAINTIME = 5;
-    public static final int STORMALERT = 6;
-    public static final int RAINALERT = 7;
-
+    private static final String LOG_TAG = StormDataProvider.class.getSimpleName();
     public static final String PROVIDER_NAME = "pl.revanmj.provider.StormData";
-    public static final String URL = "content://" + PROVIDER_NAME + "/cities";
-    public static final Uri CONTENT_URI = Uri.parse(URL);
+    public static final String URI = "content://" + PROVIDER_NAME + "/cities";
+    public static final Uri CONTENT_URI = Uri.parse(URI);
+
+    public static final String KEY_ID = "city_id";
+    public static final String KEY_CITYNAME = "name";
+    public static final String KEY_STORMCHANCE = "p_burzy";
+    public static final String KEY_STORMTIME = "t_burzy";
+    public static final String KEY_STORMALERT = "a_burzy";
+    public static final String KEY_RAINTIME = "t_opadow";
+    public static final String KEY_RAINCHANCE = "p_opadow";
+    public static final String KEY_RAINALERT = "a_opadow";
+
     private static HashMap<String, String> CITIES_PROJECTION_MAP;
 
     static final int URI_CITIES = 1;
@@ -70,7 +74,7 @@ public class StormDataProvider extends ContentProvider {
                 break;
 
             case URI_CITYID:
-                qb.appendWhere( CITYID + "=" + uri.getPathSegments().get(1));
+                qb.appendWhere( KEY_ID + "=" + uri.getPathSegments().get(1));
                 break;
 
             default:
@@ -128,7 +132,7 @@ public class StormDataProvider extends ContentProvider {
 
             case URI_CITYID:
                 String id = uri.getPathSegments().get(1);
-                count = db.delete(TABLE_STORMS, CITYID +  " = " + id +
+                count = db.delete(TABLE_STORMS, KEY_ID +  " = " + id +
                         (!TextUtils.isEmpty(selection) ? " AND (" + selection + ')' : ""), selectionArgs);
                 break;
 
@@ -147,17 +151,24 @@ public class StormDataProvider extends ContentProvider {
         switch (uriMatcher.match(uri)){
             case URI_CITIES:
                 count = db.update(TABLE_STORMS, values, selection, selectionArgs);
+                if (count > 0)
+                    getContext().getContentResolver().notifyChange(uri, null);
+                else
+                    Log.e(LOG_TAG, "Updating rows in db failed!");
                 break;
 
             case URI_CITYID:
-                count = db.update(TABLE_STORMS, values, CITYID + " = " + uri.getPathSegments().get(1) +
-                        (!TextUtils.isEmpty(selection) ? " AND (" +selection + ')' : ""), selectionArgs);
+                count = db.update(TABLE_STORMS, values, KEY_ID + " = " + uri.getLastPathSegment() +
+                        (!TextUtils.isEmpty(selection) ? " AND (" + selection + ')' : ""), selectionArgs);
+                if (count > 0)
+                    getContext().getContentResolver().notifyChange(uri, null);
+                else
+                    Log.e(LOG_TAG, "Updating row in db failed!");
                 break;
 
             default:
                 throw new IllegalArgumentException("Unknown URI " + uri );
         }
-        getContext().getContentResolver().notifyChange(uri, null);
         return count;
     }
 
@@ -165,14 +176,6 @@ public class StormDataProvider extends ContentProvider {
     private static final int DATABASE_VERSION = 4;
     private static final String DATABASE_NAME = "stormdata.db";
     private static final String TABLE_STORMS = "StormData";
-    public static final String KEY_ID = "city_id";
-    public static final String KEY_CITYNAME = "name";
-    public static final String KEY_STORMCHANCE = "p_burzy";
-    public static final String KEY_STORMTIME = "t_burzy";
-    public static final String KEY_STORMALERT = "a_burzy";
-    public static final String KEY_RAINTIME = "t_opadow";
-    public static final String KEY_RAINCHANCE = "p_opadow";
-    public static final String KEY_RAINALERT = "a_opadow";
     private static final String TABLE_CREATE =
             "CREATE TABLE " + TABLE_STORMS + " ( " +
                     KEY_ID + " INTEGER PRIMARY KEY, " +
@@ -203,14 +206,9 @@ public class StormDataProvider extends ContentProvider {
 
             Cursor cursor = db.rawQuery(query, null);
 
-            StormData city = null;
             if (cursor.moveToFirst()) {
                 do {
-                    city = new StormData();
-                    city.setCityId(Integer.parseInt(cursor.getString(CITYID)));
-                    city.setCityName(cursor.getString(CITYNAME));
-
-                    cities.add(city);
+                    cities.add(Utils.getCityFromCursor(cursor));
                 } while (cursor.moveToNext());
             }
 

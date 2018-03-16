@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.evernote.android.job.Job;
@@ -24,14 +25,14 @@ import pl.revanmj.stormmonitor.model.StormData;
  */
 
 public class StormJob extends Job {
+    static final String TAG = "StormJob";
 
-    public static final String TAG = "job_storm_tag";
-
+    @NonNull
     @Override
-    protected Result onRunJob(Params params) {
-        List<StormData> cities = Utils.getAllData(getContext());
-        int result = Utils.getStormData(cities, getContext());
-        Log.d("StormJob", "job finished with result: " + result);
+    protected Result onRunJob(@NonNull Params params) {
+        List<StormData> cities = Utils.loadCitiesFromDb(getContext());
+        int result = Utils.downloadStormData(cities, getContext());
+        Log.d(TAG, "Job finished with result: " + result);
 
         int[] widgetIDs = AppWidgetManager.getInstance(getContext().getApplicationContext())
                 .getAppWidgetIds(new ComponentName(getContext().getApplicationContext(), CitiesWidget.class));
@@ -39,7 +40,6 @@ public class StormJob extends Job {
         for (int id : widgetIDs)
             AppWidgetManager.getInstance(getContext().getApplicationContext())
                     .notifyAppWidgetViewDataChanged(id, R.id.widget_listView);
-
 
         if (result == 1)
             return Result.SUCCESS;
@@ -50,7 +50,7 @@ public class StormJob extends Job {
     public static void scheduleJob(Context ctx) {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(ctx);
         int period = Integer.parseInt(settings.getString(SharedSettings.SYNC_PERIOD, "60"));
-        Log.d("StormJob", "scheduled job with period: " + period);
+        Log.d(TAG, "Scheduled job with period: " + period);
         new JobRequest.Builder(StormJob.TAG)
                 .setPeriodic(TimeUnit.MINUTES.toMillis(period), TimeUnit.MINUTES.toMillis(5))
                 .setRequiredNetworkType(JobRequest.NetworkType.CONNECTED)
@@ -61,7 +61,7 @@ public class StormJob extends Job {
     }
 
     public static void scheduleJob(Integer period) {
-        Log.d("StormJob", "scheduled job with period: " + period);
+        Log.d(TAG, "Scheduled job with period: " + period);
         new JobRequest.Builder(StormJob.TAG)
                 .setPeriodic(TimeUnit.MINUTES.toMillis(period), TimeUnit.MINUTES.toMillis(5))
                 .setRequiredNetworkType(JobRequest.NetworkType.CONNECTED)
@@ -79,6 +79,6 @@ public class StormJob extends Job {
                 .schedule();
 
         JobManager.instance().cancel(jobId);
-        Log.d("StormJob", "cancelled job with id: " + jobId);
+        Log.d(TAG, "Cancelled job with id: " + jobId);
     }
 }

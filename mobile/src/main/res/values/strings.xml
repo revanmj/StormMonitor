@@ -23,6 +23,7 @@
     <string name="label_update">Aktualizacja:</string>
     <string name="label_downloading">Trwa pobieranie …</string>
     <string name="text_about">Autor: Michał Jakubowski (revanmj)\n\nStrona: revanmj.pl/apps\n\nAplikacja wykorzystuje dane pochodzące z serwisu antistorm.eu</string>
+    <string name="settings_version">Wersja %s</string>
     <string name="settings_libs_title">Wykorzystywane biblioteki:</string>
     <string name="settings_libs">- ImageViewTouch autorstwa Alessandro Crugnola (sephiroth) do wyświetlania mapy\n- SQLiteAssetHelper autorstwa Jeff Gilfelt do wczytywania bazy danych miast\n- Advanced WebView autorstwa delight.im do wyświetlania strony z mapami\n\nAplikacja wykorzystuje usługę Crashlytics do anonimowego przesyłania raportów błędów oraz Google Analytics do gromadzenia anonimowych statystyk.</string>
     <string name="button_cancel">Anuluj</string>
@@ -42,10 +43,9 @@
     <string name="title_activity_settings">Ustawienia</string>
     <string name="error_location_denied">Nie przyznano dostępu do danych lokalizacji!</string>
     <string name="error_no_connection">Nie masz połączenia z internetem lub usługa jest teraz niedostępna.</string>
-    <string name="error_unknown">Nieznany bład\nKod: </string>
+    <string name="error_unknown">Nieznany bład. Kod: </string>
     <string name="sharedpref">sharedpref.xml</string>
     <string name="sync_period">Częstotliwość odświeżania widżetu</string>
-    <string name="settings_version">Wersja 1.0</string>
     <string name="menu_settings">Ustawienia</string>
     <string name="map_sh_label">Mapa</string>
     <string name="map_sh_disabled">Skrót wyłączony</string>

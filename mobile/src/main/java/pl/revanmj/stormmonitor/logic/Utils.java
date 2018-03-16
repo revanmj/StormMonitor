@@ -30,37 +30,97 @@ import pl.revanmj.stormmonitor.model.StormData;
 
 public class Utils {
     private static final String LOG_TAG = Utils.class.getSimpleName();
-
-    public static final String APP_VERSION = BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE + ")";
-
     private final static String BASE_URL = "http://antistorm.eu/webservice.php?id=";
+    public static final String APP_VERSION = BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE + ")";
+    public static final int CONNECTION_ERROR = 2;
+    public static final int UNKOWN_ERROR = -1;
+    public static final int SUCCESS = 1;
 
-    public final static String STORM_FILENAME = "finalStormMap.jpg";
-    public final static String RAIN_FILENAME = "finalRainMap.jpg";
+    public static List<StormData> loadCitiesFromDb(Context context){
+        Cursor cursor = context.getContentResolver().query(StormDataProvider.CONTENT_URI,
+                null, null, null, null);
 
-
-    static public List<StormData> getAllData(Context context){
-        Cursor c = context.getContentResolver().query(StormDataProvider.CONTENT_URI, null, null, null, null);
-
-        if (c != null) {
+        if (cursor != null) {
             List<StormData> cities = new ArrayList<>();
-            while (c.moveToNext()) {
-                StormData tmp = new StormData();
-                tmp.setCityId(c.getInt(c.getColumnIndex(StormDataProvider.KEY_ID)));
-                tmp.setCityName(c.getString(c.getColumnIndex(StormDataProvider.KEY_CITYNAME)));
-                tmp.setStormChance(c.getInt(c.getColumnIndex(StormDataProvider.KEY_STORMCHANCE)));
-                tmp.setStormTime(c.getInt(c.getColumnIndex(StormDataProvider.KEY_STORMTIME)));
-                tmp.setStormAlert(c.getInt(c.getColumnIndex(StormDataProvider.KEY_STORMALERT)));
-                tmp.setRainChance(c.getInt(c.getColumnIndex(StormDataProvider.KEY_RAINCHANCE)));
-                tmp.setRainTime(c.getInt(c.getColumnIndex(StormDataProvider.KEY_RAINTIME)));
-                tmp.setRainAlert(c.getInt(c.getColumnIndex(StormDataProvider.KEY_RAINALERT)));
-                cities.add(tmp);
+            while (cursor.moveToNext()) {
+                cities.add(getCityFromCursor(cursor));
             }
-            c.close();
+            cursor.close();
             return cities;
         }
-
         return new ArrayList<>();
+    }
+
+    public static StormData getCityFromCursor(Cursor cursor) {
+        int cityId = cursor.getInt(cursor.getColumnIndex(StormDataProvider.KEY_ID));
+        String cityName = cursor.getString(cursor.getColumnIndex(StormDataProvider.KEY_CITYNAME));
+        int stormChance = getIntFromCursor(cursor, StormDataProvider.KEY_STORMCHANCE, 0);
+        int stormTime = getIntFromCursor(cursor, StormDataProvider.KEY_STORMTIME, 255);
+        int stormAlert = getIntFromCursor(cursor, StormDataProvider.KEY_STORMALERT, 0);
+        int rainChance = getIntFromCursor(cursor, StormDataProvider.KEY_RAINCHANCE, 0);
+        int rainTime = getIntFromCursor(cursor, StormDataProvider.KEY_RAINTIME, 255);
+        int rainAlert = getIntFromCursor(cursor, StormDataProvider.KEY_RAINALERT, 0);
+
+        return new StormData(cityId, cityName, stormChance, stormTime, stormAlert,
+                rainChance, rainTime, rainAlert);
+    }
+
+    public static int getIntFromCursor(Cursor cursor, String column, int defaultValue) {
+        try {
+            return cursor.getInt(cursor.getColumnIndex(column));
+        } catch (IllegalStateException e) {
+            Log.e(LOG_TAG, "Null value, use default int");
+            return defaultValue;
+        }
+    }
+
+    @WorkerThread
+    public static int downloadStormData(List<StormData> list, Context context) {
+        List<StormData> resultList = new ArrayList<>();
+        int resultCode = UNKOWN_ERROR;
+        for (StormData city : list) {
+            try {
+                HttpResult result = makeHttpGetRequest(BASE_URL + city.getCityId());
+                String json = result.getResult();
+
+                if (json != null) {
+                    Gson gson = new Gson();
+                    StormData data = gson.fromJson(json, StormData.class);
+                    data.setCityId(city.getCityId());
+
+                    // Adding result to a list
+                    resultList.add(data);
+                } else {
+                    resultCode = result.getResponseCode();
+                }
+            } catch (UnknownHostException e) {
+                // Couldn't connect to a host, so assume we have no internet connection (or host is down)
+                resultCode = CONNECTION_ERROR;
+            } catch (Exception e) {
+                // Unknown exception.
+                resultCode = UNKOWN_ERROR;
+                e.printStackTrace();
+            }
+        }
+
+        if (resultList.size() > 0) {
+            for (StormData city : resultList) {
+                ContentValues cv = new ContentValues();
+                cv.put(StormDataProvider.KEY_STORMCHANCE, city.getStormChance());
+                cv.put(StormDataProvider.KEY_STORMTIME, city.getStormTime());
+                cv.put(StormDataProvider.KEY_STORMALERT, city.getStormAlert());
+                cv.put(StormDataProvider.KEY_RAINCHANCE, city.getRainChance());
+                cv.put(StormDataProvider.KEY_RAINTIME, city.getRainTime());
+                cv.put(StormDataProvider.KEY_RAINALERT, city.getRainAlert());
+                context.getContentResolver().update(
+                        Uri.withAppendedPath(StormDataProvider.CONTENT_URI, Integer.toString(city.getCityId())),
+                        cv, null, null);
+            }
+            Log.d(LOG_TAG, "result: " + resultList);
+            return SUCCESS;
+        }
+
+        return resultCode;
     }
 
     @WorkerThread
@@ -86,9 +146,10 @@ public class Utils {
         br.close();
         connection.disconnect();
 
-        if (result.length() != 0)
+        if (result.length() > 0) {
+            Log.d(LOG_TAG, "GET: body[" + result + "]]");
             return new HttpResult(responseCode, result.toString());
-        else
+        } else
             return new HttpResult(responseCode, null);
     }
 
@@ -110,66 +171,21 @@ public class Utils {
         }
     }
 
-    @WorkerThread
-    static public int getStormData(List<StormData> list, Context context) {
-        List<StormData> resultList = new ArrayList<>();
-        int resultCode = -1;
-        for (StormData city : list) {
-            try {
-                HttpResult result = makeHttpGetRequest(BASE_URL + city.getCityId());
-                String json = result.getResult();
-
-                if (json != null) {
-                    Gson gson = new Gson();
-                    StormData data = gson.fromJson(json, StormData.class);
-                    data.setCityId(city.getCityId());
-
-                    // Adding result to a list
-                    resultList.add(data);
-                } else {
-                    resultCode = result.getResponseCode();
-                }
-            } catch (UnknownHostException e) {
-                // Couldn't connect to a host, so assume we have no internet connection (or host is down)
-                resultCode = 2;
-            } catch (Exception e) {
-                // Unknown exception.
-                resultCode = -1;
-                e.printStackTrace();
-            }
-        }
-
-        if (resultList.size() > 0) {
-            for (StormData city : resultList) {
-                ContentValues cv = new ContentValues();
-                cv.put(StormDataProvider.KEY_STORMCHANCE, city.getStormChance());
-                cv.put(StormDataProvider.KEY_STORMTIME, city.getStormTime());
-                cv.put(StormDataProvider.KEY_STORMALERT, city.getStormAlert());
-                cv.put(StormDataProvider.KEY_RAINCHANCE, city.getRainChance());
-                cv.put(StormDataProvider.KEY_RAINTIME, city.getRainTime());
-                cv.put(StormDataProvider.KEY_RAINALERT, city.getRainAlert());
-                context.getContentResolver().update(Uri.withAppendedPath(StormDataProvider.CONTENT_URI, Integer.toString(city.getCityId())),
-                        cv, null, null);
-            }
-            Log.d(LOG_TAG, "result: " + resultList);
-            return 1;
-        }
-
-        return resultCode;
-    }
-
-    static public int getRectColor(int stormTime, int stormChance, int rainTime, int rainChance) {
-        if (stormTime <= 120 && stormTime > 60 && stormChance >= 10 || rainTime <= 120 && rainTime > 60 && rainChance >= 10)
+    public static int getRectColor(int stormTime, int stormChance, int rainTime, int rainChance) {
+        if (stormTime <= 120 && stormTime > 60 && stormChance >= 10
+                || rainTime <= 120 && rainTime > 60 && rainChance >= 10)
             return R.drawable.rectangle_yellow;
-        else if (stormTime <= 60 && stormTime > 30 && stormChance >= 10 || rainTime <= 60 && rainTime > 30 && rainChance >= 10)
+        else if (stormTime <= 60 && stormTime > 30 && stormChance >= 10
+                || rainTime <= 60 && rainTime > 30 && rainChance >= 10)
             return R.drawable.rectangle_orange;
-        else if (stormTime <= 30 && stormChance >= 30 || rainTime <= 30 && rainChance >= 30)
+        else if (stormTime <= 30 && stormChance >= 30
+                || rainTime <= 30 && rainChance >= 30)
             return R.drawable.rectangle_red;
         else
             return R.drawable.rectangle_green;
     }
 
-    static public String getTimeString(int time, int alert) {
+    public static String getTimeString(int time, int alert) {
         if (time < 240 && alert == 1) {
             return "~ " + time + " min";
         } else {
@@ -177,7 +193,7 @@ public class Utils {
         }
     }
 
-    static public String chromeChannel(Context ctx) {
+    public static String getChromeChannel(Context ctx) {
         String chromeStable = "com.android.chrome";
         String chromeBeta = "com.chrome.beta";
         String chromeDev = "com.chrome.dev";
@@ -188,14 +204,12 @@ public class Utils {
             return chromeBeta;
         if (isPackageInstalled(chromeDev, ctx))
             return chromeDev;
-
         return null;
     }
 
-    static public boolean isPackageInstalled(String packagename, Context ctx) {
-        PackageManager pm = ctx.getPackageManager();
+    public static boolean isPackageInstalled(String packagename, Context ctx) {
         try {
-            pm.getPackageInfo(packagename, PackageManager.GET_ACTIVITIES);
+            ctx.getPackageManager().getPackageInfo(packagename, PackageManager.GET_ACTIVITIES);
             return true;
         } catch (PackageManager.NameNotFoundException e) {
             return false;

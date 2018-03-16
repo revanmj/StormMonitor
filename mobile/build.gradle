@@ -8,15 +8,15 @@ repositories {
     maven { url 'https://maven.google.com' }
 }
 android {
-    compileSdkVersion 26
-    buildToolsVersion "26.0.3"
+    compileSdkVersion 27
+    buildToolsVersion "27.0.3"
 
     defaultConfig {
         applicationId "pl.revanmj.stormmonitor"
         minSdkVersion 16
-        targetSdkVersion 26
-        versionCode 41
-        versionName "1.7.4"
+        targetSdkVersion 27
+        versionCode 42
+        versionName "1.7.5"
     }
 
 
@@ -41,16 +41,16 @@ dependencies {
     compile 'com.github.delight-im:Android-AdvancedWebView:v3.0.0'
     compile 'com.readystatesoftware.sqliteasset:sqliteassethelper:+'
     compile 'com.android.support.constraint:constraint-layout:1.0.+'
-    compile 'com.android.support:support-v4:26.+'
-    compile 'com.android.support:appcompat-v7:26.+'
-    compile 'com.android.support:design:26.+'
-    compile 'com.android.support:customtabs:26.+'
+    compile 'com.android.support:support-v4:27.+'
+    compile 'com.android.support:appcompat-v7:27.+'
+    compile 'com.android.support:design:27.+'
+    compile 'com.android.support:customtabs:27.+'
     compile 'com.google.android.gms:play-services-base:11.8.0'
     compile 'com.google.android.gms:play-services-location:11.8.0'
     compile 'com.google.firebase:firebase-core:11.8.0'
     compile 'com.google.code.gson:gson:2.8.0'
-    compile 'com.evernote:android-job:1.2.2'
-    compile('com.crashlytics.sdk.android:crashlytics:2.6.8@aar') {
+    compile 'com.evernote:android-job:1.2.4'
+    compile('com.crashlytics.sdk.android:crashlytics:2.9.1@aar') {
         transitive = true;
     }
     compile 'com.android.support.constraint:constraint-layout:1.0.2'

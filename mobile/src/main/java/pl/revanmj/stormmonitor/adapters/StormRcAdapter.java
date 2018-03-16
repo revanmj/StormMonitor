@@ -9,14 +9,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import pl.revanmj.stormmonitor.R;
-import pl.revanmj.stormmonitor.data.StormDataProvider;
 import pl.revanmj.stormmonitor.logic.Utils;
+import pl.revanmj.stormmonitor.model.StormData;
 
 /**
  * Created by revanmj on 05.02.2016.
  */
 
-public class MainRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class StormRcAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final int EMPTY_VIEW = 10;
     private Cursor mCursor;
 
@@ -26,31 +26,19 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
             View itemView = LayoutInflater
                     .from(parent.getContext())
                     .inflate(R.layout.empty_view, parent, false);
-
             return new EmptyViewHolder(itemView);
         }
 
         View itemView = LayoutInflater.
                 from(parent.getContext()).
                 inflate(R.layout.row_listview, parent, false);
-
         return new StormDataViewHolder(itemView);
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof StormDataViewHolder) {
-            Cursor item = getItem(position);
-            int id = item.getInt(StormDataProvider.CITYID);
-            int stormTime = item.getInt(StormDataProvider.STORMTIME);
-            int rainTime = item.getInt(StormDataProvider.RAINTIME);
-            int stormChance = item.getInt(StormDataProvider.STORMCHANCE);
-            int rainChance = item.getInt(StormDataProvider.RAINCHANCE);
-            int stormAlert = item.getInt(StormDataProvider.STORMALERT);
-            int rainAlert = item.getInt(StormDataProvider.RAINALERT);
-            String city = item.getString(StormDataProvider.CITYNAME);
-
-            ((StormDataViewHolder)holder).bind(id, city, stormChance, rainChance, stormTime, rainTime, stormAlert, rainAlert);
+            ((StormDataViewHolder)holder).bind(Utils.getCityFromCursor(getItem(position)));
         }
     }
 
@@ -94,23 +82,24 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
         public StormDataViewHolder(View itemView) {
             super(itemView);
 
-            city = (TextView) itemView.findViewById(R.id.cityText);
-            stormChanceLabel = (TextView) itemView.findViewById(R.id.stormChanceText);
-            stormTimeLabel = (TextView) itemView.findViewById(R.id.stormTimeText);
-            rect = (ImageView) itemView.findViewById(R.id.colorRectangle);
-            rainChanceLabel = (TextView) itemView.findViewById(R.id.rainChanceText);
-            rainTimeLabel = (TextView) itemView.findViewById(R.id.rainTimeText);
+            city = itemView.findViewById(R.id.cityText);
+            stormChanceLabel = itemView.findViewById(R.id.stormChanceText);
+            stormTimeLabel = itemView.findViewById(R.id.stormTimeText);
+            rect = itemView.findViewById(R.id.colorRectangle);
+            rainChanceLabel = itemView.findViewById(R.id.rainChanceText);
+            rainTimeLabel = itemView.findViewById(R.id.rainTimeText);
         }
 
-        public void bind(int id, String city, int stormChance, int rainChance, int stormTime, int rainTime,
-                         int stormAlert, int rainAlert) {
-            this._id = id;
-            this.city.setText(city);
-            this.stormChanceLabel.setText(Integer.toString(stormChance));
-            this.rainChanceLabel.setText(Integer.toString(rainChance));
-            this.stormTimeLabel.setText(Utils.getTimeString(stormTime, stormAlert));
-            this.rainTimeLabel.setText(Utils.getTimeString(rainTime, rainAlert));
-            this.rect.setImageResource(Utils.getRectColor(stormTime, stormChance, rainTime, rainChance));
+        public void bind(StormData data) {
+            this._id = data.getCityId();
+            this.city.setText(data.getCityName());
+            this.stormChanceLabel.setText(Integer.toString(data.getStormChance()));
+            this.rainChanceLabel.setText(Integer.toString(data.getRainChance()));
+            this.stormTimeLabel.setText(Utils.getTimeString(data.getStormTime(), data.getStormAlert()));
+            this.rainTimeLabel.setText(Utils.getTimeString(data.getRainTime(), data.getRainAlert()));
+
+            this.rect.setImageResource(Utils.getRectColor(data.getStormTime(), data.getStormChance(),
+                    data.getRainTime(), data.getRainChance()));
         }
 
         public int getId() {

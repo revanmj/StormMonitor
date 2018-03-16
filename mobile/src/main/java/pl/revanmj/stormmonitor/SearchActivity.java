@@ -1,5 +1,6 @@
 package pl.revanmj.stormmonitor;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -48,12 +49,10 @@ import java.util.Locale;
 
 public class SearchActivity extends AppCompatActivity {
     private static final String LOG_TAG = SearchActivity.class.getSimpleName();
-    private static final String PERMISSION_COARSE_LOCATION = "android.permission.ACCESS_COARSE_LOCATION";
-    private ListView resultsListView;
-    private EditText searchField;
-    private SearchAdapter searchAdapter;
-    private List<StormData> cities;
-    private ProgressDialog locationLoading;
+    private ListView mResultsListView;
+    private SearchAdapter mSearchAdapter;
+    private List<StormData> mCities;
+    private ProgressDialog mLocationLoadingDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,19 +74,19 @@ public class SearchActivity extends AppCompatActivity {
                 .putContentType("Views")
                 .putContentId("addView"));
 
-        // Get list of all cities
-        cities = Utils.getAllData(this);
+        // Get list of all mCities
+        mCities = Utils.loadCitiesFromDb(this);
 
         // Prepare ListView
         List<StormData> results = new ArrayList<>();
-        searchAdapter = new SearchAdapter(results, this);
-        resultsListView = findViewById(R.id.list_search);
-        resultsListView.setAdapter(searchAdapter);
-        searchField = findViewById(R.id.search_text);
+        mSearchAdapter = new SearchAdapter(results, this);
+        mResultsListView = findViewById(R.id.list_search);
+        mResultsListView.setAdapter(mSearchAdapter);
+        EditText searchField = findViewById(R.id.search_text);
 
         // Add listener for Search key presses on virtual keyboard
         searchField.setOnEditorActionListener((textView, i, keyEvent) -> {
-            doSearch(textView.getText().toString());
+            searchCity(textView.getText().toString());
             final InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.toggleSoftInput(InputMethodManager.RESULT_UNCHANGED_HIDDEN, 0);
             return true;
@@ -98,13 +97,13 @@ public class SearchActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                doSearch(charSequence.toString());
+                searchCity(charSequence.toString());
             }
 
             @Override
             public void afterTextChanged(Editable editable) {}
         });
-        doSearch("");
+        searchCity("");
     }
 
     @Override
@@ -143,14 +142,17 @@ public class SearchActivity extends AppCompatActivity {
      * Methods for cheking location permission in Android 6.0 and newer
      */
     private void checkForPermission() {
-        int permission = ContextCompat.checkSelfPermission(this, PERMISSION_COARSE_LOCATION);
+        int permission = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION);
 
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this, PERMISSION_COARSE_LOCATION)) {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION)) {
             Toast.makeText(this, R.string.error_location_denied, Toast.LENGTH_SHORT).show();
             return;
         }
         else if (permission != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{PERMISSION_COARSE_LOCATION}, 1);
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
             return;
         }
 
@@ -160,7 +162,7 @@ public class SearchActivity extends AppCompatActivity {
     /**
      * Main method for searching the database
      */
-    public void doSearch(String query) {
+    public void searchCity(String query) {
         // Remove polish letters
         if (query.toLowerCase().startsWith("ą") || query.toLowerCase().startsWith("ć") ||
                 query.toLowerCase().startsWith("ę") || query.toLowerCase().startsWith("ł") ||
@@ -176,13 +178,9 @@ public class SearchActivity extends AppCompatActivity {
 
         // Get the results
         Cursor cursor = cities_db.searchCity(query);
-        if (cursor.moveToFirst()) {
+        if (cursor.getCount() > 0 && cursor.moveToFirst()) {
             do {
-                StormData city = new StormData();
-                city.setCityId(Integer.parseInt(cursor.getString(0)));
-                city.setCityName(cursor.getString(1));
-
-                results.add(city);
+                results.add(Utils.getCityFromCursor(cursor));
             } while (cursor.moveToNext());
         }
 
@@ -191,15 +189,15 @@ public class SearchActivity extends AppCompatActivity {
             Toast.makeText(SearchActivity.this, R.string.message_no_results, Toast.LENGTH_SHORT).show();
         } else {
             // Clear the ListView and add results to it
-            searchAdapter.clear();
-            searchAdapter.addAll(results);
-            searchAdapter.notifyDataSetChanged();
+            mSearchAdapter.clear();
+            mSearchAdapter.addAll(results);
+            mSearchAdapter.notifyDataSetChanged();
 
-            resultsListView.setOnItemClickListener((parent, view, position, id) -> {
+            mResultsListView.setOnItemClickListener((parent, view, position, id) -> {
                 // Add clicked city to the database
                 StormData tmp = cities_db.getCity(results.get(position).getCityName());
                 if (tmp != null) {
-                    if (!cityExists(tmp.getCityId())) {
+                    if (!containsCityId(tmp.getCityId())) {
                         ContentValues cv = new ContentValues();
                         cv.put(StormDataProvider.KEY_ID, tmp.getCityId());
                         cv.put(StormDataProvider.KEY_CITYNAME, tmp.getCityName());
@@ -228,7 +226,7 @@ public class SearchActivity extends AppCompatActivity {
     private void addCityByLocation() {
         try {
             FusedLocationProviderClient client = LocationServices.getFusedLocationProviderClient(this);
-            locationLoading = new ProgressDialog(this);
+            mLocationLoadingDialog = new ProgressDialog(this);
             // Get the last known location
             client.getLastLocation()
                     .addOnCompleteListener(this, task -> {
@@ -252,10 +250,10 @@ public class SearchActivity extends AppCompatActivity {
                         } else
                             Toast.makeText(SearchActivity.this, R.string.no_location, Toast.LENGTH_SHORT).show();
 
-                        locationLoading.dismiss();
+                        mLocationLoadingDialog.dismiss();
                     })
                     .addOnFailureListener(this, task -> {
-                        locationLoading.dismiss();
+                        mLocationLoadingDialog.dismiss();
                         Log.d(LOG_TAG, "getLastLocation failed");
                     });
         } catch (SecurityException e) {}
@@ -271,7 +269,7 @@ public class SearchActivity extends AppCompatActivity {
         cities_db.close();
 
         if (tmp != null) {
-            if (!cityExists(tmp.getCityId())) {
+            if (!containsCityId(tmp.getCityId())) {
                 ContentValues cv = new ContentValues();
                 cv.put(StormDataProvider.KEY_ID, tmp.getCityId());
                 cv.put(StormDataProvider.KEY_CITYNAME, tmp.getCityName());
@@ -295,9 +293,9 @@ public class SearchActivity extends AppCompatActivity {
         }
     }
 
-    private boolean cityExists(int cityId) {
-        for (int i = 0; i < cities.size(); i++)
-            if (cities.get(i).getCityId() == cityId)
+    private boolean containsCityId(int cityId) {
+        for (int i = 0; i < mCities.size(); i++)
+            if (mCities.get(i).getCityId() == cityId)
                 return true;
         return false;
     }

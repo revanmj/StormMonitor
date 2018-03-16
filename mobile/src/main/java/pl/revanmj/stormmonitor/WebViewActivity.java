@@ -24,9 +24,8 @@ import im.delight.android.webview.AdvancedWebView;
  */
 
 public class WebViewActivity extends AppCompatActivity {
-
-    private AdvancedWebView webview;
-    private ProgressBar loadingAnim;
+    private AdvancedWebView mWebView;
+    private ProgressBar mLoadingBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,47 +52,39 @@ public class WebViewActivity extends AppCompatActivity {
         }
 
         // Setting up loading animation and WebView
-        loadingAnim = (ProgressBar) findViewById(R.id.progressBar);
-        webview = (AdvancedWebView) findViewById(R.id.webView);
-        webview.getSettings().setAppCacheEnabled(true);
+        mLoadingBar = findViewById(R.id.progressBar);
+        mWebView = findViewById(R.id.webView);
+        mWebView.getSettings().setAppCacheEnabled(true);
         checkForPermission();
-        webview.addPermittedHostname("antistorm.eu");
-        webview.addPermittedHostname("m.antistorm.eu");
-        webview.addPermittedHostname("www.antistorm.eu");
-        webview.addPermittedHostname("www.antistorm.eu/m");
-        webview.setListener(this, new AdvancedWebView.Listener() {
+        mWebView.addPermittedHostname("antistorm.eu");
+        mWebView.addPermittedHostname("m.antistorm.eu");
+        mWebView.addPermittedHostname("www.antistorm.eu");
+        mWebView.addPermittedHostname("www.antistorm.eu/m");
+        mWebView.setListener(this, new AdvancedWebView.Listener() {
 
             @Override
             public void onPageFinished(String url) {
-                webview.setVisibility(View.VISIBLE);
-                loadingAnim.setProgress(100);
-                loadingAnim.setVisibility(View.GONE);
+                mWebView.setVisibility(View.VISIBLE);
+                mLoadingBar.setProgress(100);
+                mLoadingBar.setVisibility(View.GONE);
             }
 
             @Override
             public void onPageStarted(String url, Bitmap favicon) {
-                webview.setVisibility(View.GONE);
-                loadingAnim.setVisibility(View.VISIBLE);
-                loadingAnim.setProgress(0);
+                mWebView.setVisibility(View.GONE);
+                mLoadingBar.setVisibility(View.VISIBLE);
+                mLoadingBar.setProgress(0);
             }
 
             @Override
             public void onPageError(int errorCode, String description, String failingUrl) {
-                loadingAnim.setProgress(100);
-                loadingAnim.setVisibility(View.GONE);
+                mLoadingBar.setProgress(100);
+                mLoadingBar.setVisibility(View.GONE);
             }
 
             @Override
-            public void onDownloadRequested(String url, String suggestedFilename, String mimeType, long contentLength, String contentDisposition, String userAgent) {
-                if (AdvancedWebView.handleDownload(WebViewActivity.this, url, suggestedFilename)) {
-                    // download successfully handled
-                }
-                else {
-                    // download couldn't be handled because user has disabled download manager app on the device
-                    // TODO show some notice to the user
-                }
-
-            }
+            public void onDownloadRequested(String url, String suggestedFilename, String mimeType,
+                                            long contentLength, String contentDisposition, String userAgent) {}
 
             @Override
             public void onExternalPageRequest(String url) {
@@ -104,21 +95,18 @@ public class WebViewActivity extends AppCompatActivity {
 
         });
 
-
         if (url != null && !url.equals(""))
-            webview.loadUrl(url);
+            mWebView.loadUrl(url);
     }
 
     private void checkForPermission() {
         int permission = ContextCompat.checkSelfPermission(this, "android.permission.ACCESS_FINE_LOCATION");
-
         if (permission != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{"android.permission.ACCESS_FINE_LOCATION"},
                     1);
             return;
         }
-
-        webview.setGeolocationEnabled(true);
+        mWebView.setGeolocationEnabled(true);
     }
 
     @Override
@@ -126,7 +114,7 @@ public class WebViewActivity extends AppCompatActivity {
         switch (requestCode) {
             case 1:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    webview.setGeolocationEnabled(true);
+                    mWebView.setGeolocationEnabled(true);
                 }
                 break;
             default:
@@ -137,7 +125,7 @@ public class WebViewActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
-        webview.onActivityResult(requestCode, resultCode, intent);
+        mWebView.onActivityResult(requestCode, resultCode, intent);
     }
 
     @Override
@@ -156,7 +144,7 @@ public class WebViewActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_refresh) {
-            webview.reload();
+            mWebView.reload();
             return true;
         }
 
