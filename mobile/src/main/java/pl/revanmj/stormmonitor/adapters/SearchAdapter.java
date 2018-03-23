@@ -9,7 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import pl.revanmj.stormmonitor.R;
-import pl.revanmj.stormmonitor.model.StormData;
+import pl.revanmj.stormmonitor.data.StormData;
 
 import java.util.List;
 

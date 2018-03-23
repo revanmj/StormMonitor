@@ -1,4 +1,4 @@
-package pl.revanmj.stormmonitor.model;
+package pl.revanmj.stormmonitor.data;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

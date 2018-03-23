@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import pl.revanmj.stormmonitor.R;
 import pl.revanmj.stormmonitor.logic.Utils;
-import pl.revanmj.stormmonitor.model.StormData;
+import pl.revanmj.stormmonitor.data.StormData;
 
 /**
  * Created by revanmj on 05.02.2016.

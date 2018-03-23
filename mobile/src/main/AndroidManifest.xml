@@ -16,7 +16,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".activities.MainActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:label="@string/app_name">
             <intent-filter>
@@ -30,9 +30,9 @@
                 android:resource="@xml/shortcuts" />
         </activity>
         <activity
-            android:name=".PreferencesActivity"
+            android:name=".activities.PreferencesActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName=".activities.MainActivity"
             android:theme="@style/AppThemeSettings">
             <intent-filter>
                 <action android:name="android.intent.action.APPLICATION_PREFERENCES" />
@@ -42,22 +42,22 @@
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="pl.revanmj.stormmonitor.MainActivity" />
+                android:value="pl.revanmj.stormmonitor.activities.MainActivity" />
         </activity>
         <activity
-            android:name=".SearchActivity"
+            android:name=".activities.AddCityActivity"
             android:label="@string/title_activity_search"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="pl.revanmj.stormmonitor.MainActivity" />
+                android:value="pl.revanmj.stormmonitor.activities.MainActivity" />
         </activity>
         <activity
-            android:name=".WebViewActivity"
+            android:name=".activities.WebViewActivity"
             android:label="@string/title_activity_details">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="pl.revanmj.stormmonitor.MainActivity" />
+                android:value="pl.revanmj.stormmonitor.activities.MainActivity" />
         </activity>
 
         <provider

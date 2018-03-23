@@ -1,4 +1,4 @@
-package pl.revanmj.stormmonitor;
+package pl.revanmj.stormmonitor.activities;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -18,6 +18,7 @@ import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.ContentViewEvent;
 
 import im.delight.android.webview.AdvancedWebView;
+import pl.revanmj.stormmonitor.R;
 
 /**
  * Created by revanmj on 25.01.2015.

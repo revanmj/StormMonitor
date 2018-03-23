@@ -1,4 +1,4 @@
-package pl.revanmj.stormmonitor;
+package pl.revanmj.stormmonitor.activities;
 
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
@@ -10,6 +10,8 @@ import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.view.MenuItem;
 
+import pl.revanmj.stormmonitor.CitiesWidget;
+import pl.revanmj.stormmonitor.R;
 import pl.revanmj.stormmonitor.data.SharedSettings;
 import pl.revanmj.stormmonitor.logic.StormJob;
 import pl.revanmj.stormmonitor.logic.Utils;

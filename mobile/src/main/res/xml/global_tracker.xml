@@ -6,16 +6,16 @@
     <bool name="ga_autoActivityTracking">true</bool>
 
     <!-- The screen names that will appear in reports -->
-    <screenName name="pl.revanmj.stormmonitor.MainActivity">
+    <screenName name="pl.revanmj.stormmonitor.activities.MainActivity">
         Home Screen
     </screenName>
     <screenName name="pl.revanmj.stormmonitor.MapActivity">
         Map Screen
     </screenName>
-    <screenName name="pl.revanmj.stormmonitor.SearchActivity">
+    <screenName name="pl.revanmj.stormmonitor.activities.AddCityActivity">
         Add City Screen
     </screenName>
-    <screenName name="pl.revanmj.stormmonitor.WebViewActivity">
+    <screenName name="pl.revanmj.stormmonitor.activities.WebViewActivity">
         Details Screen
     </screenName>
     <!--  The following value should be replaced with correct property id. -->

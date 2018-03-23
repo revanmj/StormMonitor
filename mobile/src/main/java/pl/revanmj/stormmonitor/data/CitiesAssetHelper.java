@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
 import pl.revanmj.stormmonitor.logic.Utils;
-import pl.revanmj.stormmonitor.model.StormData;
 
 /**
  * Created by revanmj on 29.12.2013.

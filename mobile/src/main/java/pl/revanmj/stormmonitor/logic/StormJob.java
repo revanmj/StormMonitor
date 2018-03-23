@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 import pl.revanmj.stormmonitor.CitiesWidget;
 import pl.revanmj.stormmonitor.R;
 import pl.revanmj.stormmonitor.data.SharedSettings;
-import pl.revanmj.stormmonitor.model.StormData;
+import pl.revanmj.stormmonitor.data.StormData;
 
 /**
  * Created by revanmj on 06.11.2016.

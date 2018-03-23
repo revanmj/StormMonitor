@@ -19,7 +19,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import pl.revanmj.stormmonitor.logic.Utils;
-import pl.revanmj.stormmonitor.model.StormData;
 
 /**
  * Created by revanmj on 05.02.2016.

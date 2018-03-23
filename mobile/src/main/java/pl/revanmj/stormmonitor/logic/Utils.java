@@ -22,7 +22,7 @@ import java.util.List;
 import pl.revanmj.stormmonitor.BuildConfig;
 import pl.revanmj.stormmonitor.R;
 import pl.revanmj.stormmonitor.data.StormDataProvider;
-import pl.revanmj.stormmonitor.model.StormData;
+import pl.revanmj.stormmonitor.data.StormData;
 
 /**
  * Created by revanmj on 10.07.2013.

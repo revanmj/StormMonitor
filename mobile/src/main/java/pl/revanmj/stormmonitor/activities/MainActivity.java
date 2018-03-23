@@ -1,4 +1,4 @@
-package pl.revanmj.stormmonitor;
+package pl.revanmj.stormmonitor.activities;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -28,6 +28,7 @@ import android.view.MenuItem;
 import com.crashlytics.android.Crashlytics;
 import com.winsontan520.wversionmanager.library.WVersionManager;
 
+import pl.revanmj.stormmonitor.R;
 import pl.revanmj.stormmonitor.adapters.StormRcAdapter;
 import pl.revanmj.stormmonitor.data.StormDataProvider;
 import pl.revanmj.stormmonitor.logic.Utils;
@@ -175,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add:
-                Intent search_a = new Intent(MainActivity.this, SearchActivity.class);
+                Intent search_a = new Intent(MainActivity.this, AddCityActivity.class);
                 MainActivity.this.startActivity(search_a);
                 refreshData(false);
                 return true;
