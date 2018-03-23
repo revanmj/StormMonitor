@@ -17,16 +17,10 @@
         <item name="windowActionBar">false</item>
     </style>
 
-    <style name="AppThemeSettings" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/md_blue_500</item>
-        <item name="colorPrimaryDark">@color/md_blue_700</item>
-
-        <item name="colorAccent">@color/md_blue_700</item>
-        <!--<item name="android:buttonStyle">@style/ButtonAppTheme</item>-->
+    <style name="AppThemeSettings" parent="AppTheme.Base">
         <item name="colorButtonNormal">@color/md_blue_500</item>
-        <!--<item name="colorControlNormal">@color/white</item>-->
         <item name="android:maxLines">20</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

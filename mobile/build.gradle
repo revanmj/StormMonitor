@@ -36,24 +36,24 @@ android {
 }
 
 dependencies {
-    compile files('src/main/libs/wversionmanager-1.4.jar')
-    compile 'it.sephiroth.android.library.imagezoom:imagezoom:+'
-    compile 'com.github.delight-im:Android-AdvancedWebView:v3.0.0'
-    compile 'com.readystatesoftware.sqliteasset:sqliteassethelper:+'
-    compile 'com.android.support.constraint:constraint-layout:1.0.+'
-    compile 'com.android.support:support-v4:27.+'
-    compile 'com.android.support:appcompat-v7:27.+'
-    compile 'com.android.support:design:27.+'
-    compile 'com.android.support:customtabs:27.+'
-    compile 'com.google.android.gms:play-services-base:11.8.0'
-    compile 'com.google.android.gms:play-services-location:11.8.0'
-    compile 'com.google.firebase:firebase-core:11.8.0'
-    compile 'com.google.code.gson:gson:2.8.0'
-    compile 'com.evernote:android-job:1.2.4'
-    compile('com.crashlytics.sdk.android:crashlytics:2.9.1@aar') {
+    implementation files('src/main/libs/wversionmanager-1.4.jar')
+    implementation 'it.sephiroth.android.library.imagezoom:imagezoom:+'
+    implementation 'com.github.delight-im:Android-AdvancedWebView:v3.0.0'
+    implementation 'com.readystatesoftware.sqliteasset:sqliteassethelper:+'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.+'
+    implementation 'com.android.support:support-v4:27.+'
+    implementation 'com.android.support:appcompat-v7:27.+'
+    implementation 'com.android.support:design:27.+'
+    implementation 'com.android.support:customtabs:27.+'
+    implementation 'com.android.support:preference-v14:27.+'
+    implementation 'com.google.android.gms:play-services-base:11.8.0'
+    implementation 'com.google.android.gms:play-services-location:11.8.0'
+    implementation 'com.google.firebase:firebase-core:11.8.0'
+    implementation 'com.google.code.gson:gson:2.8.0'
+    implementation 'com.evernote:android-job:1.2.4'
+    implementation('com.crashlytics.sdk.android:crashlytics:2.9.1@aar') {
         transitive = true;
     }
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
 }
 
 apply plugin: 'com.google.gms.google-services'
