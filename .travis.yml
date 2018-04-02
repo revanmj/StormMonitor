@@ -12,6 +12,8 @@ android:
     - tools
     - build-tools-27.0.3
     - android-27
+    - build-tools-26.0.3
+    - android-26
 
 script:
   - ./gradlew clean check --profile
