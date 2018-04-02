@@ -1,4 +1,7 @@
 # StormMonitor
+
+![build status](https://travis-ci.org/revanmj/StormMonitor.svg?branch=master)
+
 Nieoficjalny klient serwisu antistorm.eu (oferuje dosyć szczegółowe prognozy dotyczące burz i opadów w Polsce na najbliższych kilka godzin) dla Androida stworzony w celach edukacyjnych.
 
 Dane tekstowe (prawdopodobieństwo opadów / burz oraz przewidywanych czas ich nadejścia) pobierane są poprzez [wystawione przez autora API](http://antistorm.eu/deweloperzy.php) zwracające te informacje w formacie JSON. Przy czym zastrzega on, że API nie służy do wykorzystania w aplikacjach, a na niekomercyjnych stronach internetowych (aplikacji używam tylko ja i paru znajomych, więc serwera raczej nie przeciążyliśmy ;)
