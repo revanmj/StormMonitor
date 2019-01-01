@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.widget.RemoteViews;
 
-import pl.revanmj.stormmonitor.logic.StormJob;
+import pl.revanmj.stormmonitor.logic.StormWorker;
 
 /**
  * Created by revanmj on 26.12.2013.
@@ -36,12 +36,12 @@ public class CitiesWidget extends AppWidgetProvider {
 
     @Override
     public void onEnabled(Context ctx) {
-        StormJob.scheduleJob(ctx);
+        StormWorker.scheduleJob(ctx);
     }
 
     @Override
     public void onDisabled(Context ctx) {
-        StormJob.cancelJob();
+        StormWorker.cancelJob();
     }
 
 }

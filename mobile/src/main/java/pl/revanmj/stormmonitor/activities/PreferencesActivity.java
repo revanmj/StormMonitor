@@ -14,7 +14,7 @@ import androidx.preference.PreferenceFragmentCompat;
 import pl.revanmj.stormmonitor.CitiesWidget;
 import pl.revanmj.stormmonitor.R;
 import pl.revanmj.stormmonitor.data.SharedSettings;
-import pl.revanmj.stormmonitor.logic.StormJob;
+import pl.revanmj.stormmonitor.logic.StormWorker;
 import pl.revanmj.stormmonitor.logic.Utils;
 
 /**
@@ -55,7 +55,7 @@ public class PreferencesActivity extends AppCompatActivity {
             final ListPreference syncPeriod = (ListPreference) findPreference(SharedSettings.SYNC_PERIOD);
             syncPeriod.setOnPreferenceChangeListener((preference, newValue) -> {
                 Integer period = Integer.parseInt((String) newValue);
-                StormJob.scheduleJob(period);
+                StormWorker.scheduleJob(period);
                 return true;
             });
 
