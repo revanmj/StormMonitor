@@ -56,4 +56,10 @@
     <string name="action_title">Selected: %d</string>
     <string name="rectangle_description">Color representation of storm/rain conditions</string>
     <string name="label_search">Szukaj</string>
+    <string name="wvm_dialog_title_update">Dostępna aktualizacja!</string>
+    <string name="wvm_dialog_message_update">Zmiany w tej wersji:</string>
+    <string name="wvm_button_ignore">Pomiń</string>
+    <string name="wvm_button_remind_later">Później</string>
+    <string name="wvm_button_update">Aktualizuj</string>
+    <string name="wvm_button_not_now">Nie teraz</string>
 </resources>

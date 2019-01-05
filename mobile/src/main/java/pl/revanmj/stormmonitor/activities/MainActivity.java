@@ -29,7 +29,7 @@ import com.crashlytics.android.Crashlytics;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
-import com.winsontan520.wversionmanager.library.WVersionManager;
+import com.winsontan520.wversionmanager.WVersionManager;
 
 import pl.revanmj.stormmonitor.BuildConfig;
 import pl.revanmj.stormmonitor.R;
@@ -104,9 +104,6 @@ public class MainActivity extends AppCompatActivity {
         // Setting up updater form WVersionManager library
         WVersionManager versionManager = new WVersionManager(this);
         versionManager.setVersionContentUrl(UPDATE_CHANGELOG_URL);
-        versionManager.setUpdateNowLabel(getString(R.string.dialog_update));
-        versionManager.setRemindMeLaterLabel(getString(R.string.dialog_remind));
-        versionManager.setIgnoreThisVersionLabel(getString(R.string.dialog_ignore));
         versionManager.setTitle(getString(R.string.label_update));
         versionManager.setUpdateUrl(UPDATE_APK_URL);
         versionManager.setReminderTimer(1440); // this mean checkVersion() will not take effect within 10 minutes
@@ -167,7 +164,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onStop() {
         super.onStop();
-        this.unbindService(mCustomTabsServiceConnection);
+        if (mCustomTabsServiceConnection != null)
+            unbindService(mCustomTabsServiceConnection);
     }
 
     @Override
