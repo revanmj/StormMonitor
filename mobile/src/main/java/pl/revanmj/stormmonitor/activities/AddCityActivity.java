@@ -61,12 +61,6 @@ public class AddCityActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.setStatusBarColor(getResources().getColor(R.color.md_blue_700));
-        }
-
         Answers.getInstance().logContentView(new ContentViewEvent()
                 .putContentName("AddView")
                 .putContentType("Views")
