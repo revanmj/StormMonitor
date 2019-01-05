@@ -2,6 +2,7 @@ package pl.revanmj.stormmonitor.logic;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -208,12 +209,16 @@ public class Utils {
         return null;
     }
 
-    public static boolean isPackageInstalled(String packagename, Context ctx) {
+    private static boolean isPackageInstalled(String packagename, Context ctx) {
         try {
-            ctx.getPackageManager().getPackageInfo(packagename, PackageManager.GET_ACTIVITIES);
-            return true;
+            PackageInfo info = ctx.getPackageManager()
+                    .getPackageInfo(packagename, PackageManager.GET_ACTIVITIES);
+            if (info != null) {
+                return info.applicationInfo.enabled;
+            }
         } catch (PackageManager.NameNotFoundException e) {
-            return false;
+            Log.d(LOG_TAG, "Chrome is not installed");
         }
+        return false;
     }
 }
