@@ -39,7 +39,7 @@ public class WebViewActivity extends AppCompatActivity {
         // Getting parameters
         String url = getIntent().getStringExtra("url");
         String title = getIntent().getStringExtra("title");
-        if (title.equals("menu_map")) {
+        if (title.equals("map")) {
             getSupportActionBar().setTitle(R.string.title_activity_maps);
             Answers.getInstance().logContentView(new ContentViewEvent()
                     .putContentName("Map (webView)")

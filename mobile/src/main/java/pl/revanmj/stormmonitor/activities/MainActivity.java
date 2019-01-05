@@ -31,6 +31,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import com.winsontan520.wversionmanager.library.WVersionManager;
 
+import pl.revanmj.stormmonitor.BuildConfig;
 import pl.revanmj.stormmonitor.R;
 import pl.revanmj.stormmonitor.adapters.StormRcAdapter;
 import pl.revanmj.stormmonitor.data.StormDataProvider;
@@ -48,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String UPDATE_APK_URL = "https://github.com/revanmj/StormMonitor/raw/master/StormMonitor.apk";
     private static final String UPDATE_CHANGELOG_URL = "https://github.com/revanmj/StormMonitor/raw/master/updates.json";
     // URL for opening a menu_map in WebView
-    private static final String SERVICE_URL = "http://antistorm.eu/m/";
+    private static final String SERVICE_URL = "https://antistorm.eu/m/";
 
     private static final String KEY_LAST_UPDATE = "lastUpdate";
 
@@ -119,10 +120,11 @@ public class MainActivity extends AppCompatActivity {
         fab.show();
         fab.setOnClickListener(view -> {
             String chromePackageName = Utils.getChromeChannel(this);
-            if (chromePackageName != null) {
+            if (BuildConfig.FLAVOR.equals("chrome") && chromePackageName != null) {
                 CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
                 builder.setToolbarColor(getResources().getColor(R.color.md_blue_500));
                 CustomTabsIntent customTabsIntent = builder.build();
+                customTabsIntent.intent.setPackage(chromePackageName);
                 customTabsIntent.launchUrl(this, Uri.parse(SERVICE_URL));
             } else {
                 Intent webviewIntent = new Intent(MainActivity.this, WebViewActivity.class);
