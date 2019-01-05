@@ -3,7 +3,7 @@ apply plugin: 'io.fabric'
 
 repositories {
     google()
-    mavenCentral()
+    jcenter()
     maven { url 'https://jitpack.io' }
     maven { url 'https://maven.fabric.io/public' }
 }
