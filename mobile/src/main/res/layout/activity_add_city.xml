@@ -1,58 +1,29 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.AddCityActivity"
-    android:fitsSystemWindows="true">
+    android:orientation="vertical"
+    tools:context=".activities.AddCityActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/appbar_toolbar"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:layout_alignParentTop="true"
-            android:background="?attr/colorPrimary">
-
-            <LinearLayout
-                android:id="@+id/search_bar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <EditText
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:singleLine="true"
-                    android:hint="@string/search_hint"
-                    android:imeOptions="actionSearch"
-                    android:inputType="text"
-                    android:maxLines="1"
-                    android:ellipsize="end"
-                    android:id="@+id/search_text"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginRight="16dp"
-                    android:textCursorDrawable="@null"/>
-            </LinearLayout>
-
-        </androidx.appcompat.widget.Toolbar>
-
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay"
+            app:contentInsetStartWithNavigation="0dp"/>
     </com.google.android.material.appbar.AppBarLayout>
 
     <ListView
         android:id="@+id/list_search"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:divider="@drawable/divider"
-        android:dividerHeight="1dp"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/appbar_toolbar" />
-</RelativeLayout>
+        android:dividerHeight="1dp"/>
+</LinearLayout>

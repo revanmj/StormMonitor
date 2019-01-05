@@ -3,7 +3,6 @@ package pl.revanmj.stormmonitor.activities;
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.location.Address;
@@ -11,22 +10,19 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.answers.ContentViewEvent;
@@ -84,33 +80,31 @@ public class AddCityActivity extends AppCompatActivity {
         mSearchAdapter = new SearchAdapter(results, this);
         mResultsListView = findViewById(R.id.list_search);
         mResultsListView.setAdapter(mSearchAdapter);
-        EditText searchField = findViewById(R.id.search_text);
-
-        // Add listener for Search key presses on virtual keyboard
-        searchField.setOnEditorActionListener((textView, i, keyEvent) -> {
-            searchCity(textView.getText().toString());
-            final InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.toggleSoftInput(InputMethodManager.RESULT_UNCHANGED_HIDDEN, 0);
-            return true;
-        });
-        searchField.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                searchCity(charSequence.toString());
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {}
-        });
         searchCity("");
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_search, menu);
+
+        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                searchCity(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                searchCity(newText);
+                return false;
+            }
+        });
+        searchView.setIconified(false);
+        searchView.onActionViewExpanded();
+        searchView.requestFocusFromTouch();
+
         return true;
     }
 
@@ -186,12 +180,12 @@ public class AddCityActivity extends AppCompatActivity {
             } while (cursor.moveToNext());
         }
 
+        mSearchAdapter.clear();
         if (results.size() == 0) {
             // No city fits the query
             Toast.makeText(AddCityActivity.this, R.string.message_no_results, Toast.LENGTH_SHORT).show();
         } else {
             // Clear the ListView and add results to it
-            mSearchAdapter.clear();
             mSearchAdapter.addAll(results);
             mSearchAdapter.notifyDataSetChanged();
 
@@ -249,8 +243,10 @@ public class AddCityActivity extends AppCompatActivity {
                             } catch (IOException e) {
                                 Toast.makeText(AddCityActivity.this, R.string.no_permission, Toast.LENGTH_SHORT).show();
                             }
-                        } else
+                        } else {
+                            Log.e(LOG_TAG, "MapMyLocationCallback - location is null!");
                             Toast.makeText(AddCityActivity.this, R.string.no_location, Toast.LENGTH_SHORT).show();
+                        }
 
                         mLocationLoadingDialog.dismiss();
                     })
@@ -258,7 +254,9 @@ public class AddCityActivity extends AppCompatActivity {
                         mLocationLoadingDialog.dismiss();
                         Log.d(LOG_TAG, "getLastLocation failed");
                     });
-        } catch (SecurityException e) {}
+        } catch (SecurityException e) {
+            Log.e(LOG_TAG, "addCityByLocation - no permission!");
+        }
     }
 
     /**

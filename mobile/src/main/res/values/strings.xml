@@ -52,4 +52,8 @@
     <string name="label_empty_list">Nie obserwujesz żadnych miast</string>
     <string name="no_location">Nie udało się ustalić lokalizacji</string>
     <string name="no_permission">Brak dostępu do lokalizacji!</string>
+    <string name="action_delete">Delete city</string>
+    <string name="action_title">Selected: %d</string>
+    <string name="rectangle_description">Color representation of storm/rain conditions</string>
+    <string name="label_search">Szukaj</string>
 </resources>

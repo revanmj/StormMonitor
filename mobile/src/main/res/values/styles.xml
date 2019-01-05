@@ -5,12 +5,10 @@
         <item name="colorPrimaryDark">@color/md_blue_700</item>
         <item name="colorAccent">@color/md_blue_500</item>
         <item name="windowActionBar">true</item>
+        <item name="searchViewStyle">@style/SearchViewMy</item>
     </style>
 
-    <style name="AppTheme.NoActionBar" parent="Theme.MaterialComponents.NoActionBar">
-        <item name="colorPrimary">@color/md_blue_500</item>
-        <item name="colorPrimaryDark">@color/md_blue_700</item>
-        <item name="colorAccent">@color/md_blue_500</item>
+    <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
     </style>
 
@@ -18,6 +16,11 @@
         <item name="colorButtonNormal">@color/md_blue_500</item>
         <item name="android:maxLines">20</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
+    </style>
+
+    <style name="SearchViewMy" parent="Widget.AppCompat.SearchView">
+        <item name="searchHintIcon">@null</item>
+        <item name="searchIcon">@null</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar" />
