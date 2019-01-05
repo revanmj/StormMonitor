@@ -6,12 +6,13 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
+import androidx.core.content.ContextCompat;
 import android.view.View;
 
+import com.google.android.material.snackbar.Snackbar;
+
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.RecyclerView;
 import pl.revanmj.stormmonitor.R;
 import pl.revanmj.stormmonitor.adapters.StormRcAdapter;
 import pl.revanmj.stormmonitor.data.StormDataProvider;

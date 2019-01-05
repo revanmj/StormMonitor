@@ -1,13 +1,13 @@
 package pl.revanmj.stormmonitor.adapters;
 
 import android.database.Cursor;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.RecyclerView;
 import pl.revanmj.stormmonitor.R;
 import pl.revanmj.stormmonitor.logic.Utils;
 import pl.revanmj.stormmonitor.data.StormData;

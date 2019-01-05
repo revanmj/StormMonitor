@@ -5,8 +5,9 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
-import android.support.annotation.WorkerThread;
 import android.util.Log;
+
+import androidx.annotation.WorkerThread;
 
 import com.google.gson.Gson;
 
