@@ -1,5 +1,5 @@
 {
-"version_code": 38,
-"content": "Wersja 1.7.0 <p>Nowości:</p>&#8226; W pełni działające odświeżanie widżetów w tle<br>&#8226; Aktualizacje wbudowanych bibliotek",
-"download_url": "https://github.com/revanmj/StormMonitor/releases/download/1.7.5/mobile-release.apk"
+    "version_code": 44,
+    "content": "Wersja 1.7.6 <p>Nowości:</p>&#8226; Poprawki dla Androida 9<br>&#8226; Aktualizacje wbudowanych bibliotek",
+    "download_url": "https://github.com/revanmj/StormMonitor/releases/download/1.7.6/mobile-chrome-release.apk"
 }
