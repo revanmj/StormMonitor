@@ -32,7 +32,7 @@ import pl.revanmj.stormmonitor.data.StormData;
 
 public class Utils {
     private static final String LOG_TAG = Utils.class.getSimpleName();
-    private final static String BASE_URL = "http://antistorm.eu/webservice.php?id=";
+    private final static String BASE_URL = "https://antistorm.eu/webservice.php?id=";
     public static final String APP_VERSION = BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE + ")";
     public static final int CONNECTION_ERROR = 2;
     public static final int UNKOWN_ERROR = -1;

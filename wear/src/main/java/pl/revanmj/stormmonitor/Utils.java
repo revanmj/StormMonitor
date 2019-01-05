@@ -26,7 +26,7 @@ import pl.revanmj.stormmonitor.data.StormDataProvider;
  */
 
 public class Utils {
-    private static final String BASE_URL = "http://antistorm.eu/webservice.php?id=";
+    private static final String BASE_URL = "https://antistorm.eu/webservice.php?id=";
 
     public static boolean cityExists(int cityId, Context context) {
         List<StormData> cities = Utils.getAllData(context);
@@ -56,6 +56,7 @@ public class Utils {
                 //tmp.setRainAlert(c.getInt(StormDataProvider.RAINALERT));
                 cities.add(tmp);
             }
+            c.close();
             return cities;
         }
         return new ArrayList<>();
