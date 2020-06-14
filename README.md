@@ -1,6 +1,6 @@
 # StormMonitor
 
-![build status](https://travis-ci.org/revanmj/StormMonitor.svg?branch=master)
+![Android CI](https://github.com/revanmj/StormMonitor/workflows/Android%20CI/badge.svg)
 
 Nieoficjalny klient serwisu antistorm.eu (oferuje dosyć szczegółowe prognozy dotyczące burz i opadów w Polsce na najbliższych kilka godzin) dla Androida stworzony w celach edukacyjnych.
 
